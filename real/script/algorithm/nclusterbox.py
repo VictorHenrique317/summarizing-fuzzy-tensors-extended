@@ -84,9 +84,7 @@ class NclusterBox(Algorithm):
             tube_dim = 1
 
         command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "
-        command += f"../algorithms/nclusterbox/fiber-input {dataset_path} {tube_dim} | "
-        command += f"../algorithms/nclusterbox/nclusterbox -f {dataset_path} -o {self.experiment_path}"
-
+        command += f"../algorithms/nclusterbox/nclusterbox -j8 -m1000 {dataset_path} -o {self.experiment_path}"
         command += f">> {self.log_path}"
 
         print(command)

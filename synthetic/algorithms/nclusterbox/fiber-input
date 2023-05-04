@@ -4,6 +4,9 @@ if [ -z "$2" ]
 then
     printf "Usage: $0 tensor free-dim [min-membership-degree]
 
+Every line in tensor must be either empty or specify a tuple and its
+membership degree, all space-separated.  No repeated tuple is allowed.
+
 By default, min-membership-degree is the density of tensor.
 " 1>&2
     exit 64
