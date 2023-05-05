@@ -85,7 +85,7 @@ class NclusterBoxNoPerformanceImp(Algorithm):
         self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/nclusterboxnoperformanceimp.log"
         dataset_path = self.__controller.current_dataset_path
 
-        command += f"../algorithms/nclusterbox_no_performance_imp/nclusterbox -j8 {dataset_path} -o {self.experiment_path}"
+        command = f"../algorithms/nclusterbox_no_performance_imp/nclusterbox -j8 {dataset_path} -o {self.experiment_path}"
         command += f">> {self.log_path}"
 
         print(command)
