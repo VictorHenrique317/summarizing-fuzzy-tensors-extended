@@ -90,8 +90,7 @@ class NclusterBoxNoPerformanceImp(Algorithm):
         if dimension == 2:
             tube_dim = 1
 
-        command = f"../algorithms/tribiclusterbox/fiber-input {dataset_path} {tube_dim} | "
-        command += f"../algorithms/tribiclusterbox/nclusterbox -f {dataset_path} -o {self.experiment_path}"
+        command += f"../algorithms/nclusterbox_no_performance_imp/nclusterbox -j8 -m1000 {dataset_path} -o {self.experiment_path}"
         command += f">> {self.log_path}"
 
         print(command)
