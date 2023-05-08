@@ -79,7 +79,7 @@ class NclusterBox(Algorithm):
         # multidupehack_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/multidupehack.experiment"
 
         command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "
-        command += f"../algorithms/nclusterbox/nclusterbox -j8 {dataset_path} -o {self.experiment_path}"
+        command += f"../algorithms/nclusterbox/nclusterbox -j8 -m1000 {dataset_path} -o {self.experiment_path}"
         command += f">> {self.log_path}"
 
         print(command)
