@@ -8,12 +8,12 @@ from algorithm.nclusterbox_no_performance_imp import NclusterBoxNoPerformanceImp
 controller = Controller()
 
 # ========================== ALGORITHMS USED ========================== #
-# getf = Getf(controller)
-# cancer = Cancer(controller)
+getf = Getf(controller)
+cancer = Cancer(controller)
 nclusterbox = NclusterBox(controller)
 triclusterbox = TriBiclusterBox(controller)
 nclusterboxnoperformanceimp = NclusterBoxNoPerformanceImp(controller)
 # ========================== ALGORITHMS USED ========================== #
 
-controller.initiateSession()
+# controller.initiateSession()
 controller.initiatePostAnalysis()
