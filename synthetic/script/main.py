@@ -15,5 +15,5 @@ triclusterbox = TriBiclusterBox(controller)
 nclusterboxnoperformanceimp = NclusterBoxNoPerformanceImp(controller)
 # ========================== ALGORITHMS USED ========================== #
 
-# controller.initiateSession()
-controller.initiatePostAnalysis()
+controller.initiateSession()
+#controller.initiatePostAnalysis()
