@@ -26,4 +26,10 @@ RUN make
 RUN cd ../nclusterbox_no_performance_imp
 RUN make
 
+RUN cd ../gennsets
+RUN make
+
+RUN cd ../num-noise
+RUN make
+
 WORKDIR /app/script
