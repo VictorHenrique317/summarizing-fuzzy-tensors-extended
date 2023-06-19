@@ -51,6 +51,7 @@ class RandomDataset():
         return tensor_density
 
     def __toMatrix(self):
+        print(self.__path)
         dataset = pd.read_csv(self.__path, sep=' ', header=None)
         dataset = dataset.iloc[:, :].values
         matrix = np.zeros(self.getDimension())

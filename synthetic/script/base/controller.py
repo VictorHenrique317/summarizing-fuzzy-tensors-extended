@@ -99,6 +99,9 @@ class Controller:
         FileSystem.deletePostAnalysisFolder()
 
         for config_file in Commands.listFolder(self.__configs_folder):
+            if config_file.split(".")[-1] == "off":
+                continue
+            
             Configs.readConfigFile(f"{self.__configs_folder}/{config_file}")
             self.__current_configuration_name = Configs.getParameter("configuration_name")
             self.__current_iteration_number = Configs.getParameter("nb_iterations")
@@ -151,6 +154,9 @@ class Controller:
             self.__calculate_quality = True
 
         for config_file in Commands.listFolder(self.__configs_folder):
+            if config_file.split(".")[-1] == "off":
+                continue
+
             Configs.readConfigFile(f"{self.__configs_folder}/{config_file}")
             self.__current_configuration_name = Configs.getParameter("configuration_name")
             
