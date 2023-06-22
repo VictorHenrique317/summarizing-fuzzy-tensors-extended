@@ -15,10 +15,10 @@
 #define OPTIMAL_SUBFIBERS_AS_INITIAL_PATTERNS
 
 /* UPDATE_SUMS makes nclusterbox update (rather than compute from scratch) the sums of the membership degrees on all elements after each addition/remotion step.  Define it. */
-/* #define UPDATE_SUMS */
+/*#define UPDATE_SUMS*/
 
 /* REMEMBER makes nclusterbox store every pattern that it visits, either in a hash set (#define REMEMBER 1) or in a homemade trie (#define REMEMBER 2) to avoid redundant computation if it is visited again.  Use #define REMEMBER 1. */
-/* #define REMEMBER 1 */
+#define REMEMBER 1
 
 /* VERBOSE_PARSER turns on the output (on the standard output) of information when the input data are parsed. */
 /* #define VERBOSE_PARSER */

@@ -90,7 +90,7 @@ class NclusterBoxNoPerformanceImp(Algorithm):
         if dimension == 2:
             tube_dim = 1
 
-        command = f"../algorithms/nclusterbox_no_performance_imp/nclusterbox -j1 -m1000 {dataset_path} -o {self.experiment_path}"
+        command = f"../algorithms/nclusterbox_no_performance_imp/nclusterbox -f -j1 -m1000 {dataset_path} -o {self.experiment_path}"
         command += f">> {self.log_path}"
 
         print(command)
