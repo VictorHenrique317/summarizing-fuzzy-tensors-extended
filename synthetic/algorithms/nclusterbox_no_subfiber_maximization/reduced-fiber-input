@@ -1,0 +1,82 @@
+#!/bin/sh
+
+if [ -z "$1" -o "$1" = "-h" -o "$1" = "--help" ]
+then
+    printf "Usage: $0 tensor [min-g] [shift]
+
+Every line in tensor must be either empty or specify a tuple and its
+membership degree, all space-separated.  No repeated tuple is allowed.
+
+min-g is the maximal too-low product of the area and the square of the
+shifted density.  It is 0 by default.
+
+By default, shift is the density of tensor.
+"
+    exit
+fi
+
+if [ -z "$3" ]
+then
+    if [ -z "$2" ]
+    then
+       min_g=0
+    else
+       min_g=$2
+    fi
+    shift=$(gawk '
+{
+    for (i = 1; i < NF; ++i)
+        dim[i][$i]
+    sum += $NF }
+
+END {
+    for (i in dim)
+        sum /= length(dim[i])
+    print sum }' "$1")
+else
+    min_g=$2
+    shift=$3
+fi
+
+sort -k $(grep -om  1 '[^ ] .*[^ ]' "$1" | tr -s ' ' | tr -cd ' ' | wc -m)nr "$1" |
+    gawk -v min_g=$min_g -v shift=$shift '
+function insert() {
+    a = area[i][t]
+    s_before = sum[i][t]
+    s_after = s_before + $NF - shift
+    if (s_after * s_after * a >= s_before * s_before * (1 + a)) {
+        sum[i][t] = s_after
+        ++area[i][t]
+        dim[i][t] = dim[i][t] "," $i } }
+
+$NF > shift {
+    i = 1
+    t = $2
+    for (j = 3; j != NF; ++j)
+	t = t FS $j
+    insert()
+    while (++i != NF) {
+        t = $1
+        for (j = 2; j != i; ++j)
+            t = t FS $j
+        while (++j != NF)
+	    t = t FS $j
+        insert() } }
+
+END {
+    for (t in dim[1]) {
+        s = sum[1][t]
+        if (s * s > min_g * area[1][t])
+            print substr(dim[1][t], 2) FS t }
+    for (i = 2; i != NF; ++i) {
+        for (t in dim[i]) {
+            s = sum[i][t]
+            if (s * s > min_g * area[i][t]) {
+                n = split(t, b)
+	        printf "%s", b[1]
+	        for (j = 2; j != i; ++j)
+	            printf "%s", FS b[j]
+	        printf "%s", FS substr(dim[i][t], 2)
+	        for (; j <= n; ++j)
+	            printf "%s", FS b[j]
+	        print "" } } } }' "$1"

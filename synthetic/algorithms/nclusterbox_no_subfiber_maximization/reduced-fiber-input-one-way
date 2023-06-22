@@ -1,0 +1,86 @@
+#!/bin/sh
+
+if [ -z "$2" ]
+then
+    printf "Usage: $0 tensor free-dim [min-g] [shift]
+
+Every line in tensor must be either empty or specify a tuple and its
+membership degree, all space-separated.  No repeated tuple is allowed.
+
+min-g is the maximal too-low product of the area and the square of the
+shifted density.  It is 0 by default.
+
+By default, shift is the density of tensor.
+"
+    exit
+fi
+
+if [ $2 -lt 1 ]
+then
+    printf "free-dim must be an integer greater or equal to 1.
+"
+    exit 64
+fi
+
+if [ -z "$4" ]
+then
+    if [ -z "$3" ]
+    then
+       min_g=0
+    else
+       min_g=$3
+    fi
+    shift=$(gawk '
+{
+    for (i = 1; i < NF; ++i)
+        dim[i][$i]
+    sum += $NF }
+
+END {
+    for (i in dim)
+        sum /= length(dim[i])
+    print sum }' "$1")
+else
+    min_g=$3
+    shift=$4
+fi
+
+sort -k $(grep -om  1 '[^ ] .*[^ ]' "$1" | tr -s ' ' | tr -cd ' ' | wc -m)nr "$1" |
+    LC_ALL=C awk -v i=$2 -v min_g=$min_g -v shift=$shift '
+$NF > shift {
+    if (i == 1) {
+	t = $2
+	j = 3 }
+    else {
+	t = $1
+	for (j = 2; j != i; ++j)
+	    t = t FS $j
+	++j }
+    for (; j != NF; ++j)
+	t = t FS $j
+    a = area[t]
+    s_before = sum[t]
+    s_after = s_before + $NF - shift
+    if (s_after * s_after * a >= s_before * s_before * (1 + a)) {
+        sum[t] = s_after
+        ++area[t]
+        dim[t] = dim[t] "," $i } }
+
+END {
+    if (i == 1) {
+	for (t in dim) {
+            s = sum[t]
+            if (s * s > min_g * area[t])
+	        print substr(dim[t], 2) FS t }
+	exit }
+    for (t in dim) {
+        s = sum[t]
+        if (s * s > min_g * area[t]) {
+	    n = split(t, b)
+	    printf "%s", b[1]
+	    for (j = 2; j != i; ++j)
+	        printf "%s", FS b[j]
+	    printf "%s", FS substr(dim[t], 2)
+	    for (; j <= n; ++j)
+	        printf "%s", FS b[j]
+	    print "" } } }' "$1"
