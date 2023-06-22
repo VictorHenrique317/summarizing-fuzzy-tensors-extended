@@ -50,7 +50,7 @@ class AbstractRoughTensor
   static const vector<unsigned int>& getExternal2InternalDimensionOrder();
   static unsigned int getNbOfCandidateVariables();
   static unsigned long long getArea();
-  static void insertCandidateVariables(vector<vector<vector<unsigned int>>>& additionalCandidateVariables);
+  static back_insert_iterator<vector<vector<vector<unsigned int>>>> getIteratorToInsertCandidateVariables();
   static vector<vector<vector<unsigned int>>>& getCandidateVariables();
   static double getNullModelRSS();
 

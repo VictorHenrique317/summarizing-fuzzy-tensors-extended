@@ -54,7 +54,6 @@ int main(int argc, char* argv[])
 	    generic.add_options()
 	      ("help,h", "produce this help message")
 	      ("hio", "produce help on Input/Output format")
-	      ("hu", "produce help on useless options")
 	      ("version,V", "display version information and exit")
 	      ("opt", value<string>(), "set the option file name (by default [tensor-file].opt if present)");
 	    options_description basicConfig("Basic configuration (on the command line or in the option file)");
@@ -63,18 +62,20 @@ int main(int argc, char* argv[])
 	      ("boolean,b", "consider the tensor Boolean")
 	      ("out,o", value<string>(&outputFileName)->default_value("-"), "set output file name")
 	      ("max,m", value<int>(), "set max nb of initial patterns (unbounded by default)")
+	      ("forget,f", "do not store the visited patterns")
+#ifdef DEBUG_MODIFY
+	      ("jobs,j", value<int>()->default_value(1), "set nb of simultaneously modified patterns")
+#else
 	      ("jobs,j", value<int>()->default_value(max(thread::hardware_concurrency(), static_cast<unsigned int>(1))), "set nb of simultaneously modified patterns")
-	      ("density,d", value<float>(), "set threshold between 0 (completely dense storage of the tensor) and 1 (default, minimization of memory usage)")
+#endif
+	      ("density,d", value<float>(), "set threshold between 0 (dense storage of the input tensor) and 1 (default, minimization of memory usage)")
 	      ("msc", value<string>()->default_value("bic"), "set max selection criterion (rss, aic or bic)")
 	      ("mss", value<int>(), "set max selection size (by default, unbounded)")
 	      ("ns", "neither select nor rank patterns")
 	      ("shift,s", value<float>(), "shift memberhip degrees by constant in argument (by default, density of input tensor)")
 	      ("expectation,e", "shift every memberhip degree by the max density of the slices covering it")
-	    ("patterns,p", value<string>(), "set initial patterns, instead of the default ones");
-	    options_description uselessConfig("Useless configuration (on the command line or in the option file)");
-	    uselessConfig.add_options()
-	      ("grow,g", "remove nothing from the input patterns")
-	      ("intermediary,i", "keep intermediary patterns");
+	      ("patterns,p", value<string>(), "set initial patterns, instead of the default ones")
+	      ("grow,g", "remove nothing from the initial patterns");
 	    options_description io("Input/Output format (on the command line or in the option file)");
 	    io.add_options()
 	      ("tds", value<string>()->default_value(" "), "set any character separating dimensions in input tensor")
@@ -97,7 +98,7 @@ int main(int argc, char* argv[])
 	    positional_options_description p;
 	    p.add("file", -1);
 	    options_description commandLineOptions;
-	    commandLineOptions.add(generic).add(basicConfig).add(uselessConfig).add(io).add(hidden);
+	    commandLineOptions.add(generic).add(basicConfig).add(io).add(hidden);
 	    variables_map vm;
 	    store(command_line_parser(argc, argv).options(commandLineOptions).positional(p).run(), vm);
 	    notify(vm);
@@ -111,14 +112,9 @@ int main(int argc, char* argv[])
 		cout << io;
 		return EX_OK;
 	      }
-	    if (vm.count("hu"))
-	      {
-		cout << uselessConfig;
-		return EX_OK;
-	      }
 	    if (vm.count("version"))
 	      {
-		cout << "nclusterbox version 0.37\nCopyright (C) 2023 Loïc Cerf.\nLicense GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n";
+		cout << "nclusterbox version 0.40\nCopyright (C) 2023 Loïc Cerf.\nLicense GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n";
 		return EX_OK;
 	      }
 	    ifstream optionFile;
@@ -145,7 +141,7 @@ int main(int argc, char* argv[])
 		  }
 	      }
 	    options_description config;
-	    config.add(basicConfig).add(uselessConfig).add(io).add(hidden);
+	    config.add(basicConfig).add(io).add(hidden);
 	    store(parse_config_file(optionFile, config), vm);
 	    optionFile.close();
 	    notify(vm);
@@ -192,12 +188,16 @@ int main(int argc, char* argv[])
 		      }
 		  }
 	      }
-	    if (tensorFileName == "-")
+	    if (outputFileName == "-")
 	      {
-		tensorFileName = "/dev/stdin";
+		outputFileName = "/dev/stdout";
 	      }
 	    if (vm.count("verbose"))
 	      {
+		if (vm.count("ns") && outputFileName == "/dev/stdout")
+		  {
+		    throw UsageException("ns and verbose together forbid the output (set with option output) to be /dev/stdout!");
+		  }
 		verboseStep = vm["verbose"].as<float>();
 		if (!verboseStep)
 		  {
@@ -216,6 +216,10 @@ int main(int argc, char* argv[])
 	    else
 	      {
 		density = 1;
+	      }
+	    if (tensorFileName == "-")
+	      {
+		tensorFileName = "/dev/stdin";
 	      }
 	    if (vm.count("patterns"))
 	      {
@@ -259,14 +263,10 @@ int main(int argc, char* argv[])
 		    roughTensor = AbstractRoughTensor::makeRoughTensor(tensorFileName.c_str(), vm["tds"].as<string>().c_str(), vm["tes"].as<string>().c_str(), density, vm.count("boolean"), verboseStep);
 		  }
 	      }
-	    ModifiedPattern::setContext(roughTensor, vm.count("intermediary"));
+	    ModifiedPattern::setContext(roughTensor, !vm.count("forget"));
 	    if (verboseStep)
 	      {
 		cout << "\rShifting tensor: done.\n";
-	      }
-	    if (outputFileName == "-")
-	      {
-		outputFileName = "/dev/stdout";
 	      }
 	    AbstractRoughTensor::setOutput(outputFileName.c_str(), vm["ods"].as<string>().c_str(), vm["oes"].as<string>().c_str(), "", "", vm["sp"].as<string>().c_str(), vm["ss"].as<string>().c_str(), vm["ap"].as<string>().c_str(), vm["rp"].as<string>().c_str(), vm.count("pl"), vm.count("ps"), vm.count("pa"), vm.count("ns"));
 	    if (AbstractRoughTensor::isDirectOutput())
@@ -346,22 +346,13 @@ int main(int argc, char* argv[])
 	  {
 	    t.join();
 	  }
-	ModifiedPattern::clearAndFree();
 	if (AbstractRoughTensor::isDirectOutput())
 	  {
-	    unsigned int nbOfOutputPatterns = 0;
-	    for (ModifiedPattern& c : modifiedPatterns)
-	      {
-		nbOfOutputPatterns += c.outputAndGetSizeOfOutput();
-	      }
-	    cout << "\rModifying patterns: " << nbOfOutputPatterns << " patterns with locally maximal explanatory powers.\n";
+	    cout << "\rModifying patterns: " << ModifiedPattern::getNbOfOutputPatterns() << " patterns with locally maximal explanatory powers.\n";
 	  }
 	else
 	  {
-	    for (ModifiedPattern& c : modifiedPatterns)
-	      {
-		c.insertCandidateVariables();
-	      }
+	    ModifiedPattern::insertCandidateVariables();
 	    cout << "\rModifying patterns: " << AbstractRoughTensor::getCandidateVariables().size() << " patterns with locally maximal explanatory powers.\n";
 	  }
       }
@@ -371,20 +362,9 @@ int main(int argc, char* argv[])
 	  {
 	    t.join();
 	  }
-	ModifiedPattern::clearAndFree();
-	if (AbstractRoughTensor::isDirectOutput())
+	if (!AbstractRoughTensor::isDirectOutput())
 	  {
-	    for (ModifiedPattern& c : modifiedPatterns)
-	      {
-		c.output();
-	      }
-	  }
-	else
-	  {
-	    for (ModifiedPattern& c : modifiedPatterns)
-	      {
-		c.insertCandidateVariables();
-	      }
+	    ModifiedPattern::insertCandidateVariables();
 	  }
       }
 #ifdef DETAILED_TIME

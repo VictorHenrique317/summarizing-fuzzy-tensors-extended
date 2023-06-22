@@ -13,13 +13,15 @@
 #include <algorithm>
 
 #include "ConcurrentPatternPool.h"
-
-#if REMEMBER != 0
 #include "VisitedPatterns.h"
-#endif
+
+unordered_set<vector<vector<unsigned int>>, boost::hash<vector<vector<unsigned int>>>> ModifiedPattern::distinctCandidateVariables;
+
+unsigned int ModifiedPattern::nbOfOutputPatterns;
+mutex ModifiedPattern::candidateVariablesLock;
 
 const AbstractRoughTensor* ModifiedPattern::roughTensor;
-bool ModifiedPattern::isIntermediaryPatternsOutput;
+bool ModifiedPattern::isEveryVisitedPatternStored;
 Trie ModifiedPattern::tensor;
 
 void addFirstNonInitialAndSubsequentInitialInDimension(const vector<unsigned int>& dimension, vector<unsigned int>& firstNonInitialAndSubsequentInitial)
@@ -34,7 +36,7 @@ void addFirstNonInitialAndSubsequentInitialInDimension(const vector<unsigned int
   firstNonInitialAndSubsequentInitial.insert(firstNonInitialAndSubsequentInitial.end(), dimension.begin() + elementId, dimension.end());
 }
 
-ModifiedPattern::ModifiedPattern(): nSet(), area(), membershipSum(), sumsOnHyperplanes(), nextStep(), bestG(), bestDimensionIt(), bestSumIt(), candidateVariables(), patternsToOutput()
+ModifiedPattern::ModifiedPattern(): nSet(), area(), membershipSum(), sumsOnHyperplanes(), nextStep(), bestG(), bestDimensionIt(), bestSumIt(), candidateVariables()
 {
   const vector<unsigned int>& cardinalities = AbstractRoughTensor::getCardinalities();
   vector<unsigned int>::const_iterator cardinalityIt = cardinalities.begin();
@@ -53,17 +55,15 @@ void ModifiedPattern::modify()
 {
   for (nSet = ConcurrentPatternPool::next(); !nSet.empty(); nSet = ConcurrentPatternPool::next())
     {
-#if REMEMBER != 0
-      if (VisitedPatterns::visited(nSet))
+      if (isEveryVisitedPatternStored && VisitedPatterns::visited(nSet))
 	{
 	  continue;
 	}
-#endif
       init();
       do
 	{
-	  initStep();
 	  // Decide modification step
+	  nextStep = stop;
 	  vector<vector<int>>::const_iterator sumsInDimensionIt = sumsOnHyperplanes.begin();
 	  vector<vector<unsigned int>>::iterator dimensionIt = nSet.begin();
 	  considerDimensionForNextModificationStep(dimensionIt, *sumsInDimensionIt);
@@ -82,6 +82,7 @@ void ModifiedPattern::modify()
 	}
       while (doStep());
     }
+  terminate();
 }
 
 void ModifiedPattern::grow()
@@ -89,12 +90,10 @@ void ModifiedPattern::grow()
   for (nSet = ConcurrentPatternPool::next(); !nSet.empty(); nSet = ConcurrentPatternPool::next())
     {
       // assuming no input pattern is a subpattern of another input pattern; if not, the commented code below is useful to never reconsider several times the superpattern (and have it output several times, if AbstractRoughTensor::isDirectOutput())
-// #if REMEMBER != 0
-//       if (VisitedPatterns::visited(nSet))
+//       if (isEveryVisitedPatternStored && VisitedPatterns::visited(nSet))
 // 	{
 // 	  continue;
 // 	}
-// #endif
       init();
       const vector<vector<unsigned int>>::iterator dimensionEnd = nSet.end();
       vector<vector<unsigned int>>::iterator dimensionIt = nSet.begin();
@@ -111,8 +110,8 @@ void ModifiedPattern::grow()
       while (++dimensionIt != dimensionEnd);
       do
 	{
-	  initStep();
 	  // Decide growing step
+	  nextStep = stop;
 	  dimensionIt = nSet.begin();
 	  vector<vector<unsigned int>>::const_iterator firstNonInitialAndSubsequentInitialIt = firstNonInitialAndSubsequentInitial.begin();
 	  vector<vector<int>>::const_iterator sumsInDimensionIt = sumsOnHyperplanes.begin();
@@ -133,25 +132,23 @@ void ModifiedPattern::grow()
 	}
       while (doStep());
     }
+  terminate();
+}
+
+unsigned int ModifiedPattern::getNbOfOutputPatterns()
+{
+  return nbOfOutputPatterns;
 }
 
 void ModifiedPattern::insertCandidateVariables()
 {
-  AbstractRoughTensor::insertCandidateVariables(candidateVariables);
-}
-
-void ModifiedPattern::output() const
-{
-  for (const pair<vector<vector<unsigned int>>, float>& patternAndDensity : patternsToOutput)
+  tensor.clearAndFree();
+  if (isEveryVisitedPatternStored)
     {
-      roughTensor->output(patternAndDensity.first, patternAndDensity.second);
+      VisitedPatterns::clear();
+      return;
     }
-}
-
-unsigned int ModifiedPattern::outputAndGetSizeOfOutput() const
-{
-  output();
-  return patternsToOutput.size();
+  std::move(distinctCandidateVariables.begin(), distinctCandidateVariables.end(), AbstractRoughTensor::getIteratorToInsertCandidateVariables());
 }
 
 void ModifiedPattern::init()
@@ -168,6 +165,9 @@ void ModifiedPattern::init()
   if (Trie::is01)
     {
       membershipSum = tensor.sumsOnPatternAndHyperplanes(nSet.begin(), sumsOnHyperplanes, area, AbstractRoughTensor::getUnit());
+
+      cout << "Sum on first element in first dimension: " << sumsOnHyperplanes.front()[nSet.front().front()] << '\n';
+
     }
   else
     {
@@ -178,20 +178,6 @@ void ModifiedPattern::init()
   roughTensor->printPattern(nSet, static_cast<float>(membershipSum) / area, cout);
   cout << " gives g = " << static_cast<float>(bestG) / AbstractRoughTensor::getUnit() / AbstractRoughTensor::getUnit() << '\n';
 #endif
-}
-
-void ModifiedPattern::initStep()
-{
-  nextStep = stop;
-  if (isIntermediaryPatternsOutput)
-    {
-      if (AbstractRoughTensor::isDirectOutput())
-	{
-	  patternsToOutput.emplace_back(nSet, static_cast<float>(membershipSum) / area);
-	  return;
-	}
-      candidateVariables.emplace_back(nSet);
-    }
 }
 
 void ModifiedPattern::considerDimensionForNextModificationStep(const vector<vector<unsigned int>>::iterator dimensionIt, const vector<int>& sumsInDimension)
@@ -428,15 +414,38 @@ bool ModifiedPattern::doStep()
 #ifdef DEBUG_MODIFY
       cout << "    g's local maximum reached\n";
 #endif
-      if (!isIntermediaryPatternsOutput)
+      if (isEveryVisitedPatternStored)
 	{
 	  if (AbstractRoughTensor::isDirectOutput())
 	    {
-	      patternsToOutput.emplace_back(std::move(nSet), static_cast<float>(membershipSum) / area);
+	      const lock_guard<mutex> lock(candidateVariablesLock);
+	      roughTensor->output(std::move(nSet), static_cast<float>(membershipSum) / area);
+	      ++nbOfOutputPatterns;
 	      return false;
 	    }
 	  candidateVariables.emplace_back(std::move(nSet));
+	  return false;
 	}
+      if (AbstractRoughTensor::isDirectOutput())
+	{
+	  candidateVariablesLock.lock();
+	  if (distinctCandidateVariables.insert(nSet).second)
+	    {
+	      // Unlock candidateVariablesLock and lock another mutex, so that other local maxima can be tested (and were probably alreaady found: the above test fails) while that local maximum is output
+	      candidateVariablesLock.unlock();
+	      static mutex outputLock; // using a local mutex takes a little more time, but there are only a few distinct candidate variables and having a static member variable just for that case (!isEveryVisitedPatternStored && AbstractRoughTensor::isDirectOutput()) looks exagerated
+	      const lock_guard<mutex> lock(outputLock);
+	      roughTensor->output(std::move(nSet), static_cast<float>(membershipSum) / area);
+	      ++nbOfOutputPatterns;
+	    }
+	  else
+	    {
+	      candidateVariablesLock.unlock();
+	    }
+	  return false;
+	}
+      const lock_guard<mutex> lock(candidateVariablesLock);
+      distinctCandidateVariables.insert(std::move(nSet));
       return false;
     }
   area /= bestDimensionIt->size();
@@ -451,11 +460,13 @@ bool ModifiedPattern::doStep()
 #ifdef DEBUG_MODIFY
       cout << "    Adding slice for ";
       AbstractRoughTensor::printElement(bestDimensionIt - nSet.begin(), element, cout);
+
+      cout << " of shifted density " << static_cast<float>(*bestSumIt) / area / AbstractRoughTensor::getUnit();
+
       cout << " gives ";
 #endif
       bestDimensionIt->insert(lower_bound(bestDimensionIt->begin(), bestDimensionIt->end(), element), element);
-#if REMEMBER != 0
-      if (VisitedPatterns::visited(nSet))
+      if (isEveryVisitedPatternStored && VisitedPatterns::visited(nSet))
 	{
 #ifdef DEBUG_MODIFY
 	  roughTensor->printPattern(nSet, static_cast<float>(membershipSum + *bestSumIt) / (area * bestDimensionIt->size()), cout);
@@ -463,7 +474,6 @@ bool ModifiedPattern::doStep()
 #endif
 	  return false;
 	}
-#endif
 #ifdef UPDATE_SUMS
       singleElement.swap(*bestDimensionIt);
       if (Trie::is01)
@@ -482,11 +492,13 @@ bool ModifiedPattern::doStep()
 #ifdef DEBUG_MODIFY
       cout << "    Removing slice for ";
       AbstractRoughTensor::printElement(bestDimensionIt - nSet.begin(), element, cout);
+
+      cout << " of shifted density " << static_cast<float>(*bestSumIt) / area / AbstractRoughTensor::getUnit();
+
       cout << " gives ";
 #endif
       bestDimensionIt->erase(lower_bound(bestDimensionIt->begin(), bestDimensionIt->end(), element));
-#if REMEMBER != 0
-      if (VisitedPatterns::visited(nSet))
+      if (isEveryVisitedPatternStored && VisitedPatterns::visited(nSet))
 	{
 #ifdef DEBUG_MODIFY
 	  roughTensor->printPattern(nSet, static_cast<float>(membershipSum - *bestSumIt) / (area * bestDimensionIt->size()), cout);
@@ -494,7 +506,6 @@ bool ModifiedPattern::doStep()
 #endif
 	  return false;
 	}
-#endif
 #ifdef UPDATE_SUMS
       singleElement.swap(*bestDimensionIt);
       if (Trie::is01)
@@ -529,22 +540,32 @@ bool ModifiedPattern::doStep()
   return true;
 }
 
-void ModifiedPattern::setContext(const AbstractRoughTensor* roughTensorParam, const bool isIntermediaryPatternsOutputParam)
+void ModifiedPattern::setContext(const AbstractRoughTensor* roughTensorParam, const bool isEveryVisitedPatternStoredParam)
 {
-  isIntermediaryPatternsOutput = isIntermediaryPatternsOutputParam;
+  nbOfOutputPatterns = 0;
   roughTensor = roughTensorParam;
   tensor = roughTensor->getTensor();
-#if REMEMBER != 0
-  VisitedPatterns::init(AbstractRoughTensor::getCardinalities());
-#endif
+  isEveryVisitedPatternStored = isEveryVisitedPatternStoredParam;
+  if (isEveryVisitedPatternStored)
+    {
+      VisitedPatterns::init(AbstractRoughTensor::getCardinalities());
+    }
 }
 
-void ModifiedPattern::clearAndFree()
+void ModifiedPattern::terminate()
 {
-  tensor.clearAndFree();
-#if REMEMBER != 0
-  VisitedPatterns::clear();
-#endif
+  nSet.clear();
+  nSet.shrink_to_fit();
+  sumsOnHyperplanes.clear();
+  sumsOnHyperplanes.shrink_to_fit();
+  if (isEveryVisitedPatternStored && !AbstractRoughTensor::isDirectOutput())
+    {
+      candidateVariablesLock.lock();
+      std::move(candidateVariables.begin(), candidateVariables.end(), AbstractRoughTensor::getIteratorToInsertCandidateVariables());
+      candidateVariablesLock.unlock();
+      candidateVariables.clear();
+      candidateVariables.shrink_to_fit();
+    }
 }
 
 #ifdef ASSERT

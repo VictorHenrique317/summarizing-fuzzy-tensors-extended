@@ -36,9 +36,9 @@ class DenseRoughTensor final : public AbstractRoughTensor
   /* PERF: a specific class for a 0/1 tensor where memberships are stored in a dynamic_bitset */
 
   void init(vector<FuzzyTuple>& fuzzyTuples);
-  double updateNullModelRSSAndElementMembershipsAndAdvance(vector<unsigned int>& tuple, const double shiftedMembership, vector<vector<pair<double, unsigned int>>>& elementPositiveMemberships);
+  double updateNullModelRSSAndElementMembershipsAndAdvance(vector<unsigned int>& tuple, const double shiftedMembership, vector<vector<pair<unsigned int, unsigned int>>>& elementPresences);
   double updateNullModelRSSAndElementMembershipsAndAdvance(vector<unsigned int>& tuple, const double shiftedMembership, vector<vector<pair<double, unsigned int>>>& elementPositiveMemberships, vector<vector<double>>& elementNegativeMemberships);
-  void updateNullModelRSSAndElementMemberships(const vector<unsigned int>& tuple, const double shiftedMembership, vector<vector<pair<double, unsigned int>>>& elementPositiveMemberships);
+  void updateNullModelRSSAndElementMemberships(const vector<unsigned int>& tuple, const double shiftedMembership, vector<vector<pair<unsigned int, unsigned int>>>& elementPresences);
   void updateNullModelRSSAndElementMemberships(const vector<unsigned int>& tuple, const double shiftedMembership, vector<vector<pair<double, unsigned int>>>& elementPositiveMemberships, vector<vector<double>>& elementNegativeMemberships);
 };
 

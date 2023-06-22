@@ -398,6 +398,59 @@ void AbstractRoughTensor::setMetadataForDimension(const unsigned int dimensionId
   // Sparse tensor
   const unsigned int nbOfElements = ids2LabelsInDimension.size();
   // Computing positive and, for fuzzy tensors, negative memberships of the elements
+  if (Trie::is01)
+    {
+      // shifts not subtracted because Trie::sumsOnPatternAndHyperplanes multiplies by unit (the product cannot overflow) before subtracting the shifts
+      vector<pair<unsigned int, unsigned int>> elementPositiveMemberships;
+      elementPositiveMemberships.reserve(nbOfElements);
+      {
+	unsigned int id = 0;
+	do
+	  {
+	    elementPositiveMemberships.emplace_back(0, id);
+	  }
+	while (++id != nbOfElements);
+      }
+      const vector<FuzzyTuple>::iterator fuzzyTupleEnd = fuzzyTuples.end();
+      vector<FuzzyTuple>::iterator fuzzyTupleIt = fuzzyTuples.begin();
+      do
+	{
+	  ++elementPositiveMemberships[fuzzyTupleIt->getElementId(dimensionId)].first;
+	}
+      while (++fuzzyTupleIt != fuzzyTupleEnd);
+      fuzzyTupleIt = fuzzyTuples.begin();
+      sort(elementPositiveMemberships.begin(), elementPositiveMemberships.end(), [](const pair<double, unsigned int>& elementPositiveMembership1, const pair<unsigned int, unsigned int>& elementPositiveMembership2) {return elementPositiveMembership1.first < elementPositiveMembership2.first;});
+      if (elementPositiveMemberships.back().first > unitDenominator)
+	{
+	  unitDenominator = elementPositiveMemberships.back().first;
+	}
+      vector<unsigned int> mapping(nbOfElements);
+      {
+	vector<string> newIds2LabelsInDimension;
+	newIds2LabelsInDimension.reserve(nbOfElements);
+	{
+	  unsigned int newId = 0;
+	  vector<pair<unsigned int, unsigned int>>::const_iterator elementPositiveMembershipIt = elementPositiveMemberships.begin();
+	  do
+	    {
+	      newIds2LabelsInDimension.emplace_back(std::move(ids2LabelsInDimension[elementPositiveMembershipIt->second]));
+	      mapping[elementPositiveMembershipIt->second] = newId;
+	      ++elementPositiveMembershipIt;
+	    }
+	  while (++newId != nbOfElements);
+	}
+	ids2LabelsInDimension = std::move(newIds2LabelsInDimension);
+      }
+      // Remap the element of the fuzzyTuples accordingly
+      do
+	{
+	  unsigned int& elementId = fuzzyTupleIt->getElementId(dimensionId);
+	  elementId = mapping[elementId];
+	}
+      while (++fuzzyTupleIt != fuzzyTupleEnd);
+      return;
+    }
+  // !is01
   vector<pair<double, unsigned int>> elementPositiveMemberships;
   elementPositiveMemberships.reserve(nbOfElements);
   {
@@ -410,40 +463,28 @@ void AbstractRoughTensor::setMetadataForDimension(const unsigned int dimensionId
   }
   const vector<FuzzyTuple>::iterator fuzzyTupleEnd = fuzzyTuples.end();
   vector<FuzzyTuple>::iterator fuzzyTupleIt = fuzzyTuples.begin();
-  if (Trie::is01)
+  vector<double> elementNegativeMemberships(nbOfElements, shift * (area / nbOfElements)); // assumes every membership null and correct that in the loop below
+  do
     {
-      const double oneMinusShift = 1. - shift;
-      do
+      const unsigned int elementId = fuzzyTupleIt->getElementId(dimensionId);
+      const double membership = fuzzyTupleIt->getMembership();
+      if (membership > 0)
 	{
-	  elementPositiveMemberships[fuzzyTupleIt->getElementId(dimensionId)].first += oneMinusShift;
+	  elementPositiveMemberships[elementId].first += membership;
+	  elementNegativeMemberships[elementId] -= shift;
 	}
-      while (++fuzzyTupleIt != fuzzyTupleEnd);
-    }
-  else
-    {
-      vector<double> elementNegativeMemberships(nbOfElements, shift * (area / nbOfElements)); // assumes every membership null and correct that in the loop below
-      do
+      else
 	{
-	  const unsigned int elementId = fuzzyTupleIt->getElementId(dimensionId);
-	  const double membership = fuzzyTupleIt->getMembership();
-	  if (membership > 0)
-	    {
-	      elementPositiveMemberships[elementId].first += membership;
-	      elementNegativeMemberships[elementId] -= shift;
-	    }
-	  else
-	    {
-	      elementNegativeMemberships[elementId] -= membership + shift;
-	    }
-	}
-      while (++fuzzyTupleIt != fuzzyTupleEnd);
-      const double maxNegativeMembership = *max_element(elementNegativeMemberships.begin(), elementNegativeMemberships.end());
-      if (maxNegativeMembership > unitDenominator)
-	{
-	  unitDenominator = maxNegativeMembership;
+	  elementNegativeMemberships[elementId] -= membership + shift;
 	}
     }
+  while (++fuzzyTupleIt != fuzzyTupleEnd);
   fuzzyTupleIt = fuzzyTuples.begin();
+  const double maxNegativeMembership = *max_element(elementNegativeMemberships.begin(), elementNegativeMemberships.end());
+  if (maxNegativeMembership > unitDenominator)
+    {
+      unitDenominator = maxNegativeMembership;
+    }
   sort(elementPositiveMemberships.begin(), elementPositiveMemberships.end(), [](const pair<double, unsigned int>& elementPositiveMembership1, const pair<double, unsigned int>& elementPositiveMembership2) {return elementPositiveMembership1.first < elementPositiveMembership2.first;});
   if (elementPositiveMemberships.back().first > unitDenominator)
     {
@@ -494,7 +535,7 @@ void AbstractRoughTensor::setMetadata(vector<FuzzyTuple>& fuzzyTuples, const dou
 	}
       while (++fuzzyTupleIt != fuzzyTupleEnd);
       unitDenominator = unitDenominatorGivenNullModelRSS();
-      const double maxElementNegativeMembership = shift * (area / cardinalities.back());
+      const double maxElementNegativeMembership = shift * (area / cardinalities.front());
       if (maxElementNegativeMembership > unitDenominator)
 	{
 	  unitDenominator = maxElementNegativeMembership;
@@ -665,9 +706,9 @@ vector<vector<unsigned int>> AbstractRoughTensor::projectMetadata(const unsigned
   return idMapping;
 }
 
-void AbstractRoughTensor::insertCandidateVariables(vector<vector<vector<unsigned int>>>& additionalCandidateVariables)
+back_insert_iterator<vector<vector<vector<unsigned int>>>> AbstractRoughTensor::getIteratorToInsertCandidateVariables()
 {
-  std::move(additionalCandidateVariables.begin(), additionalCandidateVariables.end(), back_inserter(candidateVariables));
+  return back_inserter<vector<vector<vector<unsigned int>>>>(candidateVariables);
 }
 
 vector<vector<vector<unsigned int>>>& AbstractRoughTensor::getCandidateVariables()

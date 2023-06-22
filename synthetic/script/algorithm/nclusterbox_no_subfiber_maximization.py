@@ -6,7 +6,7 @@ from models.experiment import Experiment
 from base.configs import Configs
 import re
 
-class NclusterBoxNoSubfiberMazimization(Algorithm):
+class NclusterBoxNoSubfiberMaximization(Algorithm):
     def __init__(self, controller: Controller) -> None:
         super().__init__()
         self.name = "nclusterboxnosubfibermaximization"

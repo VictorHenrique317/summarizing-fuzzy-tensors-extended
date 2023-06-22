@@ -13,7 +13,6 @@
 
 #include "../../Parameters.h"
 
-#if REMEMBER != 0
 #include <vector>
 #include <mutex>
 
@@ -44,14 +43,13 @@ protected:
 #endif
 
 private:
-  static vector<unsigned int> tupleOffsets;
   static vector<unsigned int> elementOffsets;
+  static vector<unsigned int> tupleOffsets;
 #if REMEMBER == 1
   static vector<pair<mutex, unordered_set<vector<unsigned int>, boost::hash<vector<unsigned int>>>>> firstTuples;
-#else
+#else  // REMEMBER == 2
   static vector<pair<mutex, VisitedPatterns*>> firstTuples;
 #endif
 };
-#endif
 
 #endif /*VISITED_PATTERNS_H_*/

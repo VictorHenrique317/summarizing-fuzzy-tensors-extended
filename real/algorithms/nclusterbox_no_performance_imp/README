@@ -22,8 +22,6 @@ script.  They are conformed to sysexit.h.
 the main options.
 * nclusterbox called with option --hio displays a reminder of the
 options modifying the Input/Output format.
-* nclusterbox called with option --hu displays a reminder of "useless
-options", detailed in the eponymous section of this file.
 * nclusterbox --version (or simply nclusterbox -V) displays version
 information.
 
@@ -167,13 +165,20 @@ Giving a smaller argument to option --max, which has just been
 presented, is the main way to decrease time and memory requirements.
 That may worsen the output summary, unlike the following options.
 
+Option --forget (or -f) disables the storage of the visited patterns
+to detect redundant computation.  It may drastically reduce memory
+requirements but increases time requirements.  It should be used if
+the memory requirements are prohibitive.  For instance:
+
+$ nclusterbox -v 2 --tds ': ' -o res/out -fm 1000 tensor
+
 Option --jobs (or -j) sets how many patterns are simultaneously
 modified, thanks to multithreading.  The default argument, shown by
 option --help, is the detected number of supported concurrent threads.
 A smaller number may actually lower the run time.  With the following
 call, at most six patterns are simultaneously modified:
 
-$ nclusterbox -v 2 --tds ': ' -o res/out -m 1000 -j 6 tensor
+$ nclusterbox -v 2 --tds ': ' -o res/out -fm 1000 -j 6 tensor
 
 nclusterbox can store the shifted fuzzy tensor in a hybrid way: part
 of it in sparse structures and part of it in dense structures.  Option
@@ -205,12 +210,13 @@ output with a greater bound or no bound (not using --mss).  Indeed, to
 heuristically minimize the selection criterion, shorter summaries
 favor larger and less dense patterns.  For the last time (it is not
 essential to read the rest of that README), let us complement the
-command line to have at most 100 output patterns:
+command line to have at most 10 output patterns:
 
-$ nclusterbox -v 2 --tds ': ' -o res/out -m 1000 -j 6 --mss 100 tensor
+$ nclusterbox -v 2 --tds ': ' -o res/out -fm 1000 -j 6 --mss 10 tensor
 
 Option --ns disables the selection and the ranking: every pattern that
-is built is directly output.
+is built is directly output.  Used together with option --verbose, the
+output cannot be the standard output: it would be scrambled.
 
 
 *** SHIFT ***
@@ -299,25 +305,19 @@ optional fourth argument, by default the density of the tensor.
 reduced-fiber-input outputs everything reduced-fiber-input-one-way
 would output if repetitively called with every integer from 1 to n, as
 the second argument.  The expected arguments are the same, but with
-the second argument removed.  Wasting more time, reduced-fiber-input
-actually provides nclusterbox's default initial patterns.
+the second argument removed.  reduced-fiber-input provides the
+smallest subfibers locally maximizing the explanatory power.  They are
+smaller than nclusterbox's default, the global maxima.
 
 
-*** USELESS OPTIONS ***
+*** FORBDDING REMOVALS ***
 
 By default, nclusterbox can both add and remove elements to/from every
 initial pattern.  With option --grow (or -g), initially present
-elements cannot be removed.  Do not use that option!  Unless many tiny
-patterns are input through option --patterns, forbidding elements from
-being removed prevents the discovery of patterns with better
+elements cannot be removed.  Do not use that option, unless many tiny
+patterns are input through option --patterns.  Forbidding elements
+from being removed prevents the discovery of patterns with better
 explanatory powers.
-
-By default, every input pattern leads to at most one pattern that is
-candidate to enter the summary, one with a locally maximal explanatory
-power.  With option --intermediary (or -i), all the visited patterns,
-from the input pattern to the local maximal (including them), are
-candidates.  Do not use that option!  The resulting number of
-candidates makes the selection take ages.
 
 
 *** BUGS ***

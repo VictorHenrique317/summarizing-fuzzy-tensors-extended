@@ -6,7 +6,7 @@ class Configs():
         pass
     @staticmethod
     def getAlgorithms():
-        return ["Getf", "Cancer", "NclusterBox", "TriBiclusterBox", "NclusterBoxNoPerformanceImp", "NclusterBoxNoSubfiberMazimization"]
+        return ["Getf", "Cancer", "NclusterBox", "TriBiclusterBox", "NclusterBoxNoPerformanceImp", "NclusterBoxNoSubfiberMaximization"]
 
     @staticmethod
     def readConfigFile(path):

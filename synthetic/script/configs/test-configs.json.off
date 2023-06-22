@@ -1,0 +1,9 @@
+{
+  "configuration_name":"16x16x16",
+  "timeout":7200,
+  "dataset_size": [16,16,16],
+  "pattern_size": 3,
+  "n_patterns":10,
+  "correct_obs":[1,2,4,8,16],
+  "nb_iterations":1
+}

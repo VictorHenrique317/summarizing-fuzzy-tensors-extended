@@ -297,7 +297,7 @@ pair<vector<vector<unsigned int>>, double> ConcurrentPatternPool::subFiberMaximi
   // Compute the subset with the maximal product of the size and the square of the density
   const vector<pair<unsigned int, double>>::iterator fiberEnd = freeDimension.end();
   vector<pair<unsigned int, double>>::iterator fiberIt = freeDimension.begin();
-  sort(fiberIt, fiberEnd, [](const pair<unsigned int, double>& elementAndMembershipDegree1, const pair<unsigned int, double>& elementAndMembershipDegree2) { return elementAndMembershipDegree1.second > elementAndMembershipDegree2.second; });
+  sort(fiberIt, fiberEnd, [](const pair<unsigned int, double>& elementAndMembershipDegree1, const pair<unsigned int, double>& elementAndMembershipDegree2) { return elementAndMembershipDegree1.second > elementAndMembershipDegree2.second; }); // no need for a second criterion if elementAndMembershipDegree1.second == elementAndMembershipDegree2.second: either adding k = 1 membership degree decreases g(k) = (sum + k * T'_t)² / (area + k) or adding all of them will keep on increasing g.  Indeed g' is continuous, has two distinct zeros, the smaller is -sum / T'_t < 0, and g' tends to T'_t² > 0 when k -> infinity.
   pattern.emplace_back(1, fiberIt->first);
   unsigned int area = 1;
   double sum = fiberIt->second;
@@ -307,6 +307,33 @@ pair<vector<vector<unsigned int>>, double> ConcurrentPatternPool::subFiberMaximi
       sum += fiberIt->second;
       pattern.back().push_back(fiberIt->first);
     }
+  double g = sum * sum / area; // first local maximum
+#ifdef OPTIMAL_SUBFIBERS_AS_INITIAL_PATTERNS
+  {
+    // Searching global maximum
+    vector<pair<unsigned int, double>>::iterator localMaxIt = fiberIt - 1;
+    const unsigned int nbOfPositiveMemberships = fiberEnd - freeDimension.begin();
+    for (unsigned int nbOfRemainingPositiveMemberships = fiberEnd - fiberIt; nbOfRemainingPositiveMemberships; --nbOfRemainingPositiveMemberships)
+      {
+	const double higestPossibleSum = sum + fiberIt->second * nbOfRemainingPositiveMemberships;
+	if (higestPossibleSum * higestPossibleSum < g * nbOfPositiveMemberships)
+	  {
+	    break;
+	  }
+	sum += fiberIt->second;
+	if (sum * sum > g * ++area)
+	  {
+	    g = sum * sum / area;
+	    do
+	      {
+		pattern.back().push_back((++localMaxIt)->first);
+	      }
+	    while (localMaxIt != fiberIt);
+	  }
+	++fiberIt;
+      }
+  }
+#endif
   sort(pattern.back().begin(), pattern.back().end());
   // Single elements after the dimension with possibly several elements
   --n;
@@ -314,7 +341,7 @@ pair<vector<vector<unsigned int>>, double> ConcurrentPatternPool::subFiberMaximi
     {
       pattern.emplace_back(1, constrainedDimensions[dimensionId]);
     }
-  return {pattern, sum * sum / area};
+  return {pattern, g};
 }
 
 pair<vector<vector<unsigned int>>, double> ConcurrentPatternPool::remappedSubFiberMaximizingG(const vector<unsigned int>& constrainedDimensions, vector<pair<unsigned int, double>>& freeDimension, const unsigned int freeDimensionId)
@@ -332,7 +359,7 @@ pair<vector<vector<unsigned int>>, double> ConcurrentPatternPool::remappedSubFib
   // Compute the subset with the maximal product of the size and the square of the density
   const vector<pair<unsigned int, double>>::iterator fiberEnd = freeDimension.end();
   vector<pair<unsigned int, double>>::iterator fiberIt = freeDimension.begin();
-  sort(fiberIt, fiberEnd, [](const pair<unsigned int, double>& elementAndMembershipDegree1, const pair<unsigned int, double>& elementAndMembershipDegree2) { return elementAndMembershipDegree1.second > elementAndMembershipDegree2.second; });
+  sort(fiberIt, fiberEnd, [](const pair<unsigned int, double>& elementAndMembershipDegree1, const pair<unsigned int, double>& elementAndMembershipDegree2) { return elementAndMembershipDegree1.second > elementAndMembershipDegree2.second; }); // no need for a second criterion if elementAndMembershipDegree1.second == elementAndMembershipDegree2.second: either adding k = 1 membership degree decreases g(k) = (sum + k * T'_t)² / (area + k) or adding all of them will keep on increasing g.  Indeed g' is continuous, has two distinct zeros, the smaller is -sum / T'_t < 0, and g' tends to T'_t² > 0 when k -> infinity.
   vector<unsigned int>& dimension = pattern[old2NewDimensionOrder[freeDimensionId]];
   dimension.push_back((*oldIds2NewIdsInDimensionIt)[fiberIt->first]);
   unsigned int area = 1;
@@ -343,13 +370,38 @@ pair<vector<vector<unsigned int>>, double> ConcurrentPatternPool::remappedSubFib
       sum += fiberIt->second;
       dimension.push_back((*oldIds2NewIdsInDimensionIt)[fiberIt->first]);
     }
+  double g = sum * sum / area; // first local maximum
+#ifdef OPTIMAL_SUBFIBERS_AS_INITIAL_PATTERNS
+  {
+    // Searching global maximum
+    vector<pair<unsigned int, double>>::iterator localMaxIt = fiberIt - 1;
+    const unsigned int nbOfPositiveMemberships = fiberEnd - freeDimension.begin();
+    for (unsigned int nbOfRemainingPositiveMemberships = fiberEnd - fiberIt; nbOfRemainingPositiveMemberships; --nbOfRemainingPositiveMemberships)
+      {
+	const double higestPossibleSum = sum + fiberIt->second * nbOfRemainingPositiveMemberships;
+	if (higestPossibleSum * higestPossibleSum < g * nbOfPositiveMemberships)
+	  {
+	    break;
+	  }
+	sum += fiberIt->second;
+	if (sum * sum > g * ++area)
+	  {
+	    g = sum * sum / area;
+	    do
+	      {
+		dimension.push_back((*oldIds2NewIdsInDimensionIt)[(++localMaxIt)->first]);
+	      }
+	    while (localMaxIt != fiberIt);
+	  }
+	++fiberIt;
+      }
+  }
+#endif
   sort(dimension.begin(), dimension.end());
   // Single elements after the dimension with possibly several elements
-  ++oldIds2NewIdsInDimensionIt;
   for (unsigned int oldDimensionId = freeDimensionId + 1; oldDimensionId != n; ++oldDimensionId)
     {
-      pattern[old2NewDimensionOrder[oldDimensionId]].push_back((*oldIds2NewIdsInDimensionIt)[constrainedDimensions[oldDimensionId - 1]]);
-      ++oldIds2NewIdsInDimensionIt;
+      pattern[old2NewDimensionOrder[oldDimensionId]].push_back((*++oldIds2NewIdsInDimensionIt)[constrainedDimensions[oldDimensionId - 1]]);
     }
-  return {pattern, sum * sum / area};
+  return {pattern, g};
 }

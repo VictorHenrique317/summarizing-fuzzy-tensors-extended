@@ -1,4 +1,4 @@
-// Copyright 2018-2022 Loïc Cerf (lcerf@dcc.ufmg.br)
+// Copyright 2018-2023 Loïc Cerf (lcerf@dcc.ufmg.br)
 
 // This file is part of nclusterbox.
 
@@ -11,16 +11,19 @@
 #ifndef PARAMETERS_H_
 #define PARAMETERS_H_
 
-/* UPDATE_SUMS makes nclusterbox update (rather than compute from scratch) the sums of the membership degrees on all elements after each addition/remotion step.  Use #define UPDATE_SUMS. */
+/* OPTIMAL_SUBFIBERS_AS_INITIAL_PATTERNS makes the default initial patterns be the subfibers with the greatest explanatory power rather than the smallest subfibers locally maximizing it.  Define it. */
+#define OPTIMAL_SUBFIBERS_AS_INITIAL_PATTERNS
+
+/* UPDATE_SUMS makes nclusterbox update (rather than compute from scratch) the sums of the membership degrees on all elements after each addition/remotion step.  Define it. */
 /* #define UPDATE_SUMS */
 
-/* REMEMBER makes nclusterbox store or not (#define REMEMBER 0) every pattern that it visits, either in a hash set (#define REMEMBER 1) or in a homemade trie (#define REMEMBER 2) to avoid redundant computation if it is visited again.  Use #define REMEMBER 1. */
+/* REMEMBER makes nclusterbox store every pattern that it visits, either in a hash set (#define REMEMBER 1) or in a homemade trie (#define REMEMBER 2) to avoid redundant computation if it is visited again.  Use #define REMEMBER 1. */
 /* #define REMEMBER 1 */
 
 /* VERBOSE_PARSER turns on the output (on the standard output) of information when the input data are parsed. */
 /* #define VERBOSE_PARSER */
 
-/* DEBUG_MODIFY turns on the output (on the standard output) of information during the execution of nclusterbox --jobs 1.  This option may be enabled by who wishes to understand how nclusterbox modifies a small number of patterns. */
+/* DEBUG_MODIFY turns on the output (on the standard output) of information during the modification of the patterns.  This option may be enabled by who wishes to understand how nclusterbox modifies a small number of patterns.  1 becomes the default argument of option --job.  More jobs scrambles the output. */
 /* #define DEBUG_MODIFY */
 
 /* DEBUG_SELECT turns on the output (on the standard output) of information during the selection of the patterns.  This option may be enabled by who wishes to understand how a small number of patterns are selected. */

@@ -8,10 +8,10 @@
 
 // You should have received a copy of the GNU General Public License along with nclusterbox.  If not, see <https://www.gnu.org/licenses/>.
 
-#if REMEMBER == 2
 #include "PresentVisitedPatternLeaf.h"
 #include "PresentVisitedPatternTrie.h"
 
+#if REMEMBER == 2
 #include <algorithm>
 
 VisitedPatternTrie::VisitedPatternTrie(vector<pair<unsigned int, VisitedPatterns*>>& suffixesParam) : suffixes(std::move(suffixesParam))

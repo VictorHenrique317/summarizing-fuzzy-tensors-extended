@@ -11,9 +11,9 @@
 #ifndef VISITED_PATTERN_TRIE_H_
 #define VISITED_PATTERN_TRIE_H_
 
-#if REMEMBER == 2
 #include "VisitedPatterns.h"
 
+#if REMEMBER == 2
 class VisitedPatternTrie : public VisitedPatterns /* the pattern ending here is absent */
 {
 public:
