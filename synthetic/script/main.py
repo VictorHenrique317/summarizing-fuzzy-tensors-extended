@@ -17,5 +17,5 @@ nclusterboxnosubfibermaximization = NclusterBoxNoSubfiberMazimization(controller
 nclusterbox = NclusterBox(controller)
 # ========================== ALGORITHMS USED ========================== #
 
-controller.initiateSession()
+#controller.initiateSession()
 controller.initiatePostAnalysis()
