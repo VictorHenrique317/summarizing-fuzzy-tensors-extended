@@ -1,0 +1,1 @@
+docker build -t summarazing-fuzzy-tensors-extended .
