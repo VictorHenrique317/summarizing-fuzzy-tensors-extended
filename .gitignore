@@ -1,11 +1,4 @@
 synthetic/iterations
 real/iteration
 
-synthetic/algorithms/gennsets/gennsets
-synthetic/algorithms/num-noise/num-noise
-
-synthetic/algorithms/nclusterbox/nclusterbox
-synthetic/algorithms/nclusterbox_no_perfomance_imp/nclusterbox
-synthetic/algorithms/tribiclusterbox/nclusterbox
-
-
+nohup.out

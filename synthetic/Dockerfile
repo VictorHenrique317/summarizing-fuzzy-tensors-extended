@@ -21,16 +21,19 @@ COPY . /app
 WORKDIR /app/algorithms/nclusterbox
 RUN make
 
-RUN cd ../tribiclusterbox
+WORKDIR /app/algorithms/tribiclusterbox
 RUN make
 
-RUN cd ../nclusterbox_no_performance_imp
+WORKDIR /app/algorithms/nclusterbox_no_performance_imp
 RUN make
 
-RUN cd ../gennsets
+WORKDIR /app/algorithms/nclusterbox_no_subfiber_maximization
 RUN make
 
-RUN cd ../num-noise
+WORKDIR /app/algorithms/gennsets
+RUN make
+
+WORKDIR /app/algorithms/num-noise
 RUN make
 
 WORKDIR /app/script
