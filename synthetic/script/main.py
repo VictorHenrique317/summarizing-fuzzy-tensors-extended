@@ -9,11 +9,11 @@ from algorithm.nclusterbox_no_subfiber_maximization import NclusterBoxNoSubfiber
 controller = Controller()
 
 # ========================== ALGORITHMS USED ========================== #
-# getf = Getf(controller)
-# cancer = Cancer(controller)
-# triclusterbox = TriBiclusterBox(controller)
+getf = Getf(controller)
+cancer = Cancer(controller)
+triclusterbox = TriBiclusterBox(controller)
 # nclusterboxnoperformanceimp = NclusterBoxNoPerformanceImp(controller)
-nclusterboxnosubfibermaximization = NclusterBoxNoSubfiberMaximization(controller)
+# nclusterboxnosubfibermaximization = NclusterBoxNoSubfiberMaximization(controller)
 # nclusterbox = NclusterBox(controller)
 # ========================== ALGORITHMS USED ========================== #
 
