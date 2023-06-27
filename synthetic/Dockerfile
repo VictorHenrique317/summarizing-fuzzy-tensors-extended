@@ -1,6 +1,9 @@
 FROM ubuntu:latest
 FROM python:latest
+FROM mathworks/matlab:latest
 ENV DEBIAN_FRONTEND=noninteractive
+
+USER root
 
 RUN apt-get update && \
 	apt-get install -y make && \
@@ -19,21 +22,21 @@ RUN pip install pandas
 
 COPY . /app
 WORKDIR /app/algorithms/nclusterbox
-RUN make
+RUN make clean & make
 
 WORKDIR /app/algorithms/tribiclusterbox
-RUN make
+RUN make clean & make
 
 WORKDIR /app/algorithms/nclusterbox_no_performance_imp
-RUN make
+RUN make clean & make
 
 WORKDIR /app/algorithms/nclusterbox_no_subfiber_maximization
-RUN make
+RUN make clean & make
 
 WORKDIR /app/algorithms/gennsets
-RUN make
+RUN make clean & make
 
 WORKDIR /app/algorithms/num-noise
-RUN make
+RUN make clean & make
 
 WORKDIR /app/script
