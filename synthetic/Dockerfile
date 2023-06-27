@@ -10,7 +10,8 @@ RUN apt-get update && \
 	apt-get install -y libboost-all-dev && \
 	apt-get install -y g++ && \
 	apt-get install -y r-base && \
-	apt-get install -y time
+	apt-get install -y time && \
+	apt-get install -y gawk
 		
 RUN R -e "install.packages('reticulate')"
 RUN pip install numpy
