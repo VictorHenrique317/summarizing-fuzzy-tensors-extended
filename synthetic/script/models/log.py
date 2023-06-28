@@ -64,7 +64,7 @@ class Log():
                 if attribute == variants:
                     return translated_attribute
 
-            if self.__algorithm == "tribiterbox":
+            if self.__algorithm == "tribiclusterbox":
                 if attribute == variants:
                     return translated_attribute
 
