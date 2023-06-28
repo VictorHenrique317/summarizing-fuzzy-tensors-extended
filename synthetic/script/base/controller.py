@@ -154,7 +154,7 @@ class Controller:
             self.__calculate_quality = True
 
         for config_file in Commands.listFolder(self.__configs_folder):
-            if config_file.split(".")[-1] == "off":
+            if config_file.strip().split(".")[-1] == "off":
                 continue
 
             Configs.readConfigFile(f"{self.__configs_folder}/{config_file}")
