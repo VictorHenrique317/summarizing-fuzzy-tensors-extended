@@ -99,9 +99,11 @@ class Controller:
         FileSystem.deletePostAnalysisFolder()
 
         for config_file in Commands.listFolder(self.__configs_folder):
-            if config_file.split(".")[-1] == "off":
+            if config_file.strip().split(".")[-1] == "off":
+                print(f"Skipping {config_file}")
                 continue
             
+            print("#"*120 + f" CONFIGURATION = {config_file}")
             Configs.readConfigFile(f"{self.__configs_folder}/{config_file}")
             self.__current_configuration_name = Configs.getParameter("configuration_name")
             self.__current_iteration_number = Configs.getParameter("nb_iterations")

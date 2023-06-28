@@ -1,1 +1,1 @@
-docker build -t summarazing-fuzzy-tensors-extended .
+docker build -f Dockerfile.dependencies -t summarazing-fuzzy-tensors-extended-dependencies .

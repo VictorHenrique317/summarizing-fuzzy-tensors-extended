@@ -1,8 +1,24 @@
 #!/bin/bash
 
 NAME="summarazing-fuzzy-tensors-extended"
-docker volume create $NAME
 
+if [ -d "iterations" ]; then
+  # The directory exists, do nothing
+  :
+else
+    mkdir iterations
+fi
+
+if [ -d "post_analysis" ]; then
+  # The directory exists, do nothing
+  :
+else
+    mkdir post_analysis
+fi
+docker build -f Dockerfile.code -t $NAME --no-cache .
+
+docker volume create $NAME
+echo -e "\n"
 docker run -it -v $NAME:/app $NAME python3 main.py
 
 CONTAINER_ID=$(docker ps -a --filter ancestor=$NAME -q)
