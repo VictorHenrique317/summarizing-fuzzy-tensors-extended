@@ -21,7 +21,7 @@ RUN pip install matplotlib
 RUN pip install scikit-learn
 RUN pip install pandas
 
-COPY algorithms /app/algorithms
+COPY . /app
 
 WORKDIR /app/algorithms/nclusterbox
 RUN make clean & make
@@ -38,4 +38,4 @@ RUN make clean & make
 WORKDIR /app/algorithms/num-noise
 RUN make clean & make
 
-WORKDIR /
+WORKDIR /app/script

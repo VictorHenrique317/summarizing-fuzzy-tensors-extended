@@ -1,7 +1,0 @@
-FROM summarazing-fuzzy-tensors-extended-dependencies
-
-COPY iterations /app/iterations
-COPY post_analysis /app/post_analysis
-COPY script /app/script
-
-WORKDIR /app/script

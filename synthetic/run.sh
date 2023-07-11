@@ -15,7 +15,7 @@ if [ -d "post_analysis" ]; then
 else
     mkdir post_analysis
 fi
-docker build -f Dockerfile.code -t $NAME --no-cache .
+docker build -t $NAME .
 
 docker volume create $NAME
 echo -e "\n"
