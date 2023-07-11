@@ -97,8 +97,9 @@ class Controller:
         delete_iterations = self.delete_iterations
         if delete_iterations is None:
             delete_iterations = str(input("Delete previous iterations? Y/N: ")).strip().lower()
-
+        
         if delete_iterations == "y":
+            print("DELETING PREVIOUS ITERATIONS")
             FileSystem.deleteIterationFolders()
         elif delete_iterations == "n":
             self.__skip_gennsets = True
@@ -155,6 +156,7 @@ class Controller:
             delete_post_analysis = str(input("Delete post analysis folder? Y/N: ")).strip().lower()
 
         if delete_post_analysis == "y":
+            print("DELETE POST ANALYSIS FOLDER")
             FileSystem.deletePostAnalysisFolder()
 
         calculate_rss_evolution = self.calculate_metrics
@@ -162,6 +164,7 @@ class Controller:
             calculate_rss_evolution = str(input("Calculate RSS evolution? Y/N: ")).strip().lower()
 
         if calculate_rss_evolution == "y":
+            print("WILL CALCULATE METRICS")
             self.__calculate_rss_evolution = True
 
         calculate_quality = self.calculate_metrics

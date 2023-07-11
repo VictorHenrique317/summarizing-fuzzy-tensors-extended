@@ -21,7 +21,7 @@ RUN pip install matplotlib
 RUN pip install scikit-learn
 RUN pip install pandas
 
-COPY . /app
+COPY algorithms /app/algorithms
 
 WORKDIR /app/algorithms/nclusterbox
 RUN make clean & make
@@ -30,9 +30,6 @@ WORKDIR /app/algorithms/tribiclusterbox
 RUN make clean & make
 
 WORKDIR /app/algorithms/nclusterbox_no_performance_imp
-RUN make clean & make
-
-WORKDIR /app/algorithms/nclusterbox_no_subfiber_maximization
 RUN make clean & make
 
 WORKDIR /app/algorithms/gennsets

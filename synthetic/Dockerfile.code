@@ -1,9 +1,7 @@
 FROM summarazing-fuzzy-tensors-extended-dependencies
 
-COPY iterations /app
-COPY post_analysis /app
-COPY script /app
+COPY iterations /app/iterations
+COPY post_analysis /app/post_analysis
+COPY script /app/script
 
 WORKDIR /app/script
-
-RUN matlab -batch "disp('Hello, World!')"

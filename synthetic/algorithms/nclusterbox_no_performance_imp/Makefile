@@ -1,7 +1,7 @@
 
 NAME = nclusterbox
-CXX = clang++ -O3 -flto -Wall -Wextra -Weffc++ -pedantic -Wno-unused-parameter
-# CXX = g++ -O3 -flto -Wall -Wextra -Weffc++ -pedantic -Wno-unused-parameter
+# CXX = clang++ -O3 -flto -Wall -Wextra -Weffc++ -pedantic -Wno-unused-parameter
+CXX = g++ -O3 -flto -Wall -Wextra -Weffc++ -pedantic -Wno-unused-parameter
 # CXX = g++ -g -Og -Wall -Wextra -Weffc++ -pedantic -Wno-unused-parameter
 EXTRA_CXXFLAGS = -lboost_program_options -lpthread
 HELP2MAN = help2man -n 'Modify patterns, which hold in a fuzzy tensor, to maximize their explanatory powers and select an ordered subset of the built patterns to summarize this tensor' -N
