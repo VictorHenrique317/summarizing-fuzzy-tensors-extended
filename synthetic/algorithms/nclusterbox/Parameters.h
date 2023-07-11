@@ -11,13 +11,10 @@
 #ifndef PARAMETERS_H_
 #define PARAMETERS_H_
 
-/* OPTIMAL_SUBFIBERS_AS_INITIAL_PATTERNS makes the default initial patterns be the subfibers with the greatest explanatory power rather than the smallest subfibers locally maximizing it.  Define it. */
-#define OPTIMAL_SUBFIBERS_AS_INITIAL_PATTERNS
-
 /* UPDATE_SUMS makes nclusterbox update (rather than compute from scratch) the sums of the membership degrees on all elements after each addition/remotion step.  Define it. */
 #define UPDATE_SUMS
 
-/* REMEMBER makes nclusterbox store every pattern that it visits, either in a hash set (#define REMEMBER 1) or in a homemade trie (#define REMEMBER 2) to avoid redundant computation if it is visited again.  Use #define REMEMBER 1. */
+/* REMEMBER makes nclusterbox called without option --forget (or -f) store every visited pattern either in a hash set (#define REMEMBER 1) or in a trie (#define REMEMBER 2) to avoid redundant computation if it is visited again.  Use #define REMEMBER 1. */
 #define REMEMBER 1
 
 /* VERBOSE_PARSER turns on the output (on the standard output) of information when the input data are parsed. */
@@ -30,7 +27,7 @@
 /* #define DEBUG_SELECT */
 
 /* NUMERIC_PRECISION turns ou the output (on the standard output) of the maximal possible round-off error when internally storing a membership degree for modifying patterns and, then, for selecting them. */
-#define NUMERIC_PRECISION
+/* #define NUMERIC_PRECISION */
 
 /* NB_OF_PATTERNS turns on the output (on the standard output) of the numbers of patterns candidates for selection, and, then, of selected patterns. */
 #define NB_OF_PATTERNS

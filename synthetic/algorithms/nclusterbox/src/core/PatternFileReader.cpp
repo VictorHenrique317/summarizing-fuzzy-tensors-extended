@@ -50,7 +50,7 @@ void PatternFileReader::openFile(const char* noisyNSetFileNameParam)
   ConcurrentPatternPool::setReadFromFile();
 }
 
-void PatternFileReader::read(const char* inputDimensionSeparatorParam, const char* inputElementSeparatorParam, const vector<vector<string>>& ids2Labels, const unsigned int maxNbOfInitialPatterns)
+void PatternFileReader::read(const char* inputDimensionSeparatorParam, const char* inputElementSeparatorParam, const vector<vector<string>>& ids2Labels, unsigned long long maxNbOfInitialPatterns)
 {
   inputElementSeparator = char_separator<char>(inputElementSeparatorParam);
   lineNb = 0;
@@ -64,7 +64,6 @@ void PatternFileReader::read(const char* inputDimensionSeparatorParam, const cha
       labels2Ids.emplace_back(labels2IdsInDimension(*labelsInDimensionIt));
     }
   while (++labelsInDimensionIt != labelsInDimensionEnd);
-  unsigned int nbOfInitialPatterns = 0;
   const char_separator<char> inputDimensionSeparator(inputDimensionSeparatorParam);
   while (!noisyNSetFile.eof())
     {
@@ -99,7 +98,7 @@ void PatternFileReader::read(const char* inputDimensionSeparatorParam, const cha
 	      continue;
 	    }
 	  ConcurrentPatternPool::addPattern(nSet);
-	  if (++nbOfInitialPatterns == maxNbOfInitialPatterns)
+	  if (!--maxNbOfInitialPatterns)
 	    {
 	      break;
 	    }

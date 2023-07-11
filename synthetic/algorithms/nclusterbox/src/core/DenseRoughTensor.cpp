@@ -72,8 +72,6 @@ DenseRoughTensor::~DenseRoughTensor()
 void DenseRoughTensor::init(vector<FuzzyTuple>& fuzzyTuples)
 {
   nullModelRSS = 0;
-  // Inform ConcurrentPatternPool, responsible of computing the initial patterns, of the number of dimensions
-  ConcurrentPatternPool::setNbOfDimensions(ids2Labels.size());
   // Initialize tuple and positive/negative memberships of the elements
   vector<double> shiftedMemberships;
   unsigned long long nbOfTuples;

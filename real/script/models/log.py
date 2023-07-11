@@ -69,10 +69,6 @@ class Log:
             if self.__algorithm == "nclusterboxnoperformanceimp":
                 if attribute == variants:
                     return translated_attribute
-                
-            if self.__algorithm == "nclusterboxnosubfibermaximization":
-                if attribute == variants:
-                    return translated_attribute
 
             if attribute == translated_attribute: # generic case
                 return translated_attribute

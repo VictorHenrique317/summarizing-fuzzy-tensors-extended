@@ -22,10 +22,8 @@ enum NextStep { insert, erase, stop };
 class ModifiedPattern
 {
  public:
-  ModifiedPattern();
-
-  void modify();
-  void grow();
+  static void modify();
+  static void grow();
 
   static void setContext(const AbstractRoughTensor* roughTensor, const bool isEveryVisitedPatternStored);
   static unsigned int getNbOfOutputPatterns();
@@ -53,11 +51,15 @@ class ModifiedPattern
   static bool isEveryVisitedPatternStored;
   static Trie tensor;
 
+  ModifiedPattern();
+  ~ModifiedPattern();
+
+  void doModify();
+  void doGrow();
   void init();
   void considerDimensionForNextModificationStep(const vector<vector<unsigned int>>::iterator dimensionIt, const vector<int>& sumsInDimension);
   void considerDimensionForNextGrowingStep(const vector<vector<unsigned int>>::iterator dimensionIt, const vector<int>& sumsInDimension, const vector<unsigned int>& firstNonInitialAndSubsequentInitial);
   bool doStep(); // returns whether to go on
-  void terminate();
 
 #ifdef ASSERT
   void assertAreaAndSums();

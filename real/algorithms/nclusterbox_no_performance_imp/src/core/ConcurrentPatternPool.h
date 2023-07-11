@@ -12,10 +12,8 @@
 #define CONCURRENT_PATTERN_POOL_H_
 
 #include <vector>
-#include <unordered_map>
 #include <mutex>
 #include <condition_variable>
-#include <boost/container_hash/hash.hpp>
 
 using namespace std;
 
@@ -23,9 +21,8 @@ class ConcurrentPatternPool
 {
  public:
   static void setReadFromFile();
-  static void setDefaultPatterns();
-  static void setNbOfDimensions(const unsigned int nbOfDimensions);
-  static bool readFromFile(const unsigned int maxNbOfInitialPatterns);
+  static void setDefaultPatterns(const unsigned long long maxNbOfPatterns);
+  static bool readFromFile();
 
   static void addPattern(vector<vector<unsigned int>>& pattern);
   static void addFuzzyTuple(const vector<unsigned int>& tuple, const double shiftedMembership);
@@ -40,14 +37,17 @@ class ConcurrentPatternPool
   static mutex patternsLock;
   static condition_variable cv;
   static bool isDefaultInitialPatterns;
+  static bool isUnboundedNumberOfPatterns;
   static bool isAllPatternsAdded;
-  static vector<unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>> tuples;
+  static unsigned long long nbOfFreeSlots;
+  static vector<pair<vector<unsigned int>, double>> tuplesWithHighestMembershipDegrees;
+  static vector<vector<unsigned int>> additionalTuplesWithLowestAmongHighestMembershipDegrees;
   static vector<unsigned int> old2NewDimensionOrder;
   static vector<vector<unsigned int>> oldIds2NewIds;
 
   static vector<unsigned int> oldIds2NewIdsInDimension(const vector<pair<double, unsigned int>>& elements);
-  static pair<vector<vector<unsigned int>>, double> subFiberMaximizingG(const vector<unsigned int>& constrainedDimensions, vector<pair<unsigned int, double>>& freeDimension, const unsigned int freeDimensionId);
-  static pair<vector<vector<unsigned int>>, double> remappedSubFiberMaximizingG(const vector<unsigned int>& constrainedDimensions, vector<pair<unsigned int, double>>& freeDimension, const unsigned int freeDimensionId);
+  static void addDefaultPattern(const vector<unsigned int>& tuple);
+  static void addRemappedDefaultPattern(const vector<unsigned int>& tuple);
 };
 
 #endif /*CONCURRENT_PATTERN_POOL_H_*/

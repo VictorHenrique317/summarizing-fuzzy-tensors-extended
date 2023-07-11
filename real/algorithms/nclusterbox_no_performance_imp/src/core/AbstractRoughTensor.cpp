@@ -564,7 +564,6 @@ void AbstractRoughTensor::setMetadata(vector<FuzzyTuple>& fuzzyTuples, const dou
 	setMetadataForDimension(dimensionId, area, shift, unitDenominator, *++ids2LabelsInDimensionIt, fuzzyTuples);
       }
     while (++dimensionId != n);
-    ConcurrentPatternPool::setNbOfDimensions(n);
   }
   // Reorder fuzzy tuples, according to the new dimension order
   do

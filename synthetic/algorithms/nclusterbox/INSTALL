@@ -35,18 +35,14 @@ your PATH variable.
 Several options can be easily enabled (respectively disabled) in
 Parameters.h by uncommenting (respectively commenting) them:
 
-OPTIMAL_SUBFIBERS_AS_INITIAL_PATTERNS makes the default initial
-patterns be the subfibers with the greatest explanatory power rather
-than the smallest subfibers locally maximizing it.  Define it.
-
 UPDATES_SUM makes nclusterbox update (rather than compute from
 scratch) the sums of the membership degrees on all elements after each
 addition/remotion step.  Define it.
 
-REMEMBER makes nclusterbox store every pattern that it visits, either
-in a hash set (#define REMEMBER 1) or in a homemade trie (#define
-REMEMBER 2) to avoid redundant computation if it is visited again.
-Use #define REMEMBER 1.
+REMEMBER makes nclusterbox called without option --forget (or -f)
+store every visited pattern either in a hash set (#define REMEMBER 1)
+or in a trie (#define REMEMBER 2) to avoid redundant computation if it
+is visited again.  Use #define REMEMBER 1.
 
 VERBOSE_PARSER turns on the output (on the standard output) of
 information when the input data are parsed.

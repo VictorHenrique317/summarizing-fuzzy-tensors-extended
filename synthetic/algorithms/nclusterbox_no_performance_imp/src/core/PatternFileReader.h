@@ -24,7 +24,7 @@ class PatternFileReader
 {
  public:
   static void openFile(const char* noisyNSetFileName);
-  static void read(const char* inputDimensionSeparator, const char* inputElementSeparator, const vector<vector<string>>& ids2Labels, const unsigned int maxNbOfInitialPatterns);
+  static void read(const char* inputDimensionSeparator, const char* inputElementSeparator, const vector<vector<string>>& ids2Labels, unsigned long long maxNbOfInitialPatterns);
 
  private:
   static string noisyNSetFileName;

@@ -10,20 +10,24 @@
 
 #include "ConcurrentPatternPool.h"
 
+#include <cmath>
 #include <algorithm>
+#include <random>
 #include <iostream>
 #include <iomanip>
 #include <thread>
 
 #include "AbstractRoughTensor.h"
-#include "BestPatterns.h"
 
 vector<vector<vector<unsigned int>>> ConcurrentPatternPool::patterns;
 mutex ConcurrentPatternPool::patternsLock;
 condition_variable ConcurrentPatternPool::cv;
 bool ConcurrentPatternPool::isDefaultInitialPatterns;
+bool ConcurrentPatternPool::isUnboundedNumberOfPatterns;
 bool ConcurrentPatternPool::isAllPatternsAdded;
-vector<unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>> ConcurrentPatternPool::tuples;
+unsigned long long ConcurrentPatternPool::nbOfFreeSlots;
+vector<pair<vector<unsigned int>, double>> ConcurrentPatternPool::tuplesWithHighestMembershipDegrees;
+vector<vector<unsigned int>> ConcurrentPatternPool::additionalTuplesWithLowestAmongHighestMembershipDegrees;
 vector<unsigned int> ConcurrentPatternPool::old2NewDimensionOrder;
 vector<vector<unsigned int>> ConcurrentPatternPool::oldIds2NewIds;
 
@@ -33,130 +37,158 @@ void ConcurrentPatternPool::setReadFromFile()
   isAllPatternsAdded = false;
 }
 
-void ConcurrentPatternPool::setDefaultPatterns()
+void ConcurrentPatternPool::setDefaultPatterns(const unsigned long long maxNbOfPatterns)
 {
   isDefaultInitialPatterns = true;
   isAllPatternsAdded = false;
+  if (maxNbOfPatterns)
+    {
+      isUnboundedNumberOfPatterns = false;
+      nbOfFreeSlots = maxNbOfPatterns;
+      tuplesWithHighestMembershipDegrees.reserve(maxNbOfPatterns);
+      return;
+    }
+  isUnboundedNumberOfPatterns = true;
 }
 
-void ConcurrentPatternPool::setNbOfDimensions(const unsigned int nbOfDimensions)
-{
-  tuples.resize(nbOfDimensions);
-}
-
-bool ConcurrentPatternPool::readFromFile(const unsigned int maxNbOfInitialPatterns)
+bool ConcurrentPatternPool::readFromFile()
 {
   if (isDefaultInitialPatterns)
     {
-      // Compute how many initial patterns with no max
-      vector<unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>>::const_iterator tuplesIt = tuples.begin();
-      long long nbOfInitialPatterns = tuplesIt->size();
-      ++tuplesIt;
-      const vector<unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>>::const_iterator tuplesEnd = tuples.end();
-      do
+      if (old2NewDimensionOrder.empty())
 	{
-	  nbOfInitialPatterns += tuplesIt->size();
-	}
-      while (++tuplesIt != tuplesEnd);
-      patterns.reserve(nbOfInitialPatterns);
-      const unsigned int n = tuples.size();
-      unsigned int freeDimensionId = 0;
-      if (maxNbOfInitialPatterns && nbOfInitialPatterns > maxNbOfInitialPatterns)
-	{
-	  BestPatterns::setMaxNbOfPatterns(maxNbOfInitialPatterns);
-	  if (old2NewDimensionOrder.empty())
+	  if (isUnboundedNumberOfPatterns)
 	    {
-	      do
-		{
-		  unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>& fibers = tuples[freeDimensionId];
-		  const unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>::iterator fiberEnd = fibers.end();
-		  unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>::iterator fiberIt = fibers.begin();
-		  do
-		    {
-		      BestPatterns::push(subFiberMaximizingG(fiberIt->first, fiberIt->second, freeDimensionId));
-		      fiberIt = fibers.erase(fiberIt);
-		    }
-		  while (fiberIt != fiberEnd);
-		}
-	      while (++freeDimensionId != n);
+	      for_each(additionalTuplesWithLowestAmongHighestMembershipDegrees.cbegin(), additionalTuplesWithLowestAmongHighestMembershipDegrees.cend(), addDefaultPattern);
+	      allPatternsAdded();
+	      additionalTuplesWithLowestAmongHighestMembershipDegrees.clear();
+	      additionalTuplesWithLowestAmongHighestMembershipDegrees.shrink_to_fit();
+	      return false;
+	    }
+	  if (additionalTuplesWithLowestAmongHighestMembershipDegrees.empty())
+	    {
+	      for_each(tuplesWithHighestMembershipDegrees.cbegin(), tuplesWithHighestMembershipDegrees.cend(), [](const pair<vector<unsigned int>, double>& fuzzyTuple) { addDefaultPattern(fuzzyTuple.first); });
+	      allPatternsAdded();
 	    }
 	  else
 	    {
+	      const unsigned int nbOfAdditionalTuples = additionalTuplesWithLowestAmongHighestMembershipDegrees.size();
+	      {
+		// insert in additionalTuplesWithLowestAmongHighestMembershipDegrees the tuples in tuplesWithHighestMembershipDegrees with the min memberhip degree and insert the remaining ones in patterns
+		const vector<pair<vector<unsigned int>, double>>::const_iterator lastFuzzyTupleIt = --tuplesWithHighestMembershipDegrees.end();
+		for (vector<pair<vector<unsigned int>, double>>::const_iterator fuzzyTupleIt = tuplesWithHighestMembershipDegrees.begin(); fuzzyTupleIt != lastFuzzyTupleIt; ++fuzzyTupleIt)
+		  {
+		    if (fuzzyTupleIt->second == tuplesWithHighestMembershipDegrees.back().second)
+		      {
+			additionalTuplesWithLowestAmongHighestMembershipDegrees.emplace_back(std::move(fuzzyTupleIt->first));
+			continue;
+		      }
+		    addDefaultPattern(fuzzyTupleIt->first);
+		  }
+		additionalTuplesWithLowestAmongHighestMembershipDegrees.emplace_back(std::move(lastFuzzyTupleIt->first));
+	      }
+	      // insert in patterns random tuples from additionalTuplesWithLowestAmongHighestMembershipDegrees
+	      vector<vector<unsigned int>>::iterator additionalTupleIt = additionalTuplesWithLowestAmongHighestMembershipDegrees.begin();
+	      shuffle(additionalTupleIt, additionalTuplesWithLowestAmongHighestMembershipDegrees.end(), mt19937(random_device()()));
+	      const vector<vector<unsigned int>>::iterator additionalTupleEnd = additionalTupleIt + (additionalTuplesWithLowestAmongHighestMembershipDegrees.size() - nbOfAdditionalTuples);
 	      do
 		{
-		  unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>& fibers = tuples[freeDimensionId];
-		  const unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>::iterator fiberEnd = fibers.end();
-		  unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>::iterator fiberIt = fibers.begin();
-		  do
-		    {
-		      BestPatterns::push(remappedSubFiberMaximizingG(fiberIt->first, fiberIt->second, freeDimensionId));
-		      fiberIt = fibers.erase(fiberIt);
-		    }
-		  while (fiberIt != fiberEnd);
+		  addDefaultPattern(*additionalTupleIt);
 		}
-	      while (++freeDimensionId != n);
+	      while (++additionalTupleIt != additionalTupleEnd);
+	      allPatternsAdded();
+	      additionalTuplesWithLowestAmongHighestMembershipDegrees.clear();
+	      additionalTuplesWithLowestAmongHighestMembershipDegrees.shrink_to_fit();
 	    }
-	  vector<pair<vector<vector<unsigned int>>, double>>& patternsWithG = BestPatterns::get();
-	  const vector<pair<vector<vector<unsigned int>>, double>>::iterator patternWithGEnd = patternsWithG.end();
-	  vector<pair<vector<vector<unsigned int>>, double>>::iterator patternWithGIt = patternsWithG.begin();
-	  do
-	    {
-	      addPattern(patternWithGIt->first);
-	    }
-	  while (++patternWithGIt != patternWithGEnd);
-	  patternsWithG.clear();
-	  patternsWithG.shrink_to_fit();
+	  tuplesWithHighestMembershipDegrees.clear();
+	  tuplesWithHighestMembershipDegrees.shrink_to_fit();
+	  return false;
+	}
+      if (isUnboundedNumberOfPatterns)
+	{
+	  for_each(additionalTuplesWithLowestAmongHighestMembershipDegrees.cbegin(), additionalTuplesWithLowestAmongHighestMembershipDegrees.cend(), addRemappedDefaultPattern);
+	  allPatternsAdded();
+	  additionalTuplesWithLowestAmongHighestMembershipDegrees.clear();
+	  additionalTuplesWithLowestAmongHighestMembershipDegrees.shrink_to_fit();
 	}
       else
 	{
-	  if (old2NewDimensionOrder.empty())
+	  if (additionalTuplesWithLowestAmongHighestMembershipDegrees.empty())
 	    {
-	      do
-		{
-		  unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>& fibers = tuples[freeDimensionId];
-		  const unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>::iterator fiberEnd = fibers.end();
-		  unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>::iterator fiberIt = fibers.begin();
-		  do
-		    {
-		      vector<vector<unsigned int>> pattern = subFiberMaximizingG(fiberIt->first, fiberIt->second, freeDimensionId).first;
-		      addPattern(pattern);
-		      fiberIt = fibers.erase(fiberIt);
-		    }
-		  while (fiberIt != fiberEnd);
-		}
-	      while (++freeDimensionId != n);
+	      for_each(tuplesWithHighestMembershipDegrees.cbegin(), tuplesWithHighestMembershipDegrees.cend(), [](const pair<vector<unsigned int>, double>& fuzzyTuple) { addRemappedDefaultPattern(fuzzyTuple.first); });
+	      allPatternsAdded();
 	    }
 	  else
 	    {
+	      const unsigned int nbOfAdditionalTuples = additionalTuplesWithLowestAmongHighestMembershipDegrees.size();
+	      {
+		// insert in additionalTuplesWithLowestAmongHighestMembershipDegrees the tuples in tuplesWithHighestMembershipDegrees with the min memberhip degree and insert the remaining ones in patterns
+		const vector<pair<vector<unsigned int>, double>>::const_iterator lastFuzzyTupleIt = --tuplesWithHighestMembershipDegrees.end();
+		for (vector<pair<vector<unsigned int>, double>>::const_iterator fuzzyTupleIt = tuplesWithHighestMembershipDegrees.begin(); fuzzyTupleIt != lastFuzzyTupleIt; ++fuzzyTupleIt)
+		  {
+		    if (fuzzyTupleIt->second == tuplesWithHighestMembershipDegrees.back().second)
+		      {
+			additionalTuplesWithLowestAmongHighestMembershipDegrees.emplace_back(std::move(fuzzyTupleIt->first));
+			continue;
+		      }
+		    addRemappedDefaultPattern(fuzzyTupleIt->first);
+		  }
+		additionalTuplesWithLowestAmongHighestMembershipDegrees.emplace_back(std::move(lastFuzzyTupleIt->first));
+	      }
+	      // insert in patterns random tuples from additionalTuplesWithLowestAmongHighestMembershipDegrees
+	      vector<vector<unsigned int>>::iterator additionalTupleIt = additionalTuplesWithLowestAmongHighestMembershipDegrees.begin();
+	      shuffle(additionalTupleIt, additionalTuplesWithLowestAmongHighestMembershipDegrees.end(), mt19937(random_device()()));
+	      const vector<vector<unsigned int>>::iterator additionalTupleEnd = additionalTupleIt + (additionalTuplesWithLowestAmongHighestMembershipDegrees.size() - nbOfAdditionalTuples);
 	      do
 		{
-		  unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>& fibers = tuples[freeDimensionId];
-		  const unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>::iterator fiberEnd = fibers.end();
-		  unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>::iterator fiberIt = fibers.begin();
-		  do
-		    {
-		      vector<vector<unsigned int>> pattern = remappedSubFiberMaximizingG(fiberIt->first, fiberIt->second, freeDimensionId).first;
-		      addPattern(pattern);
-		      fiberIt = fibers.erase(fiberIt);
-		    }
-		  while (fiberIt != fiberEnd);
+		  addRemappedDefaultPattern(*additionalTupleIt);
 		}
-	      while (++freeDimensionId != n);
+	      while (++additionalTupleIt != additionalTupleEnd);
+	      allPatternsAdded();
+	      additionalTuplesWithLowestAmongHighestMembershipDegrees.clear();
+	      additionalTuplesWithLowestAmongHighestMembershipDegrees.shrink_to_fit();
 	    }
+	  tuplesWithHighestMembershipDegrees.clear();
+	  tuplesWithHighestMembershipDegrees.shrink_to_fit();
 	}
-      allPatternsAdded();
-      tuples.clear();
-      tuples.shrink_to_fit();
-      if (!old2NewDimensionOrder.empty())
-	{
-	  old2NewDimensionOrder.clear();
-	  old2NewDimensionOrder.shrink_to_fit();
-	  oldIds2NewIds.clear();
-	  oldIds2NewIds.shrink_to_fit();
-	}
+      old2NewDimensionOrder.clear();
+      old2NewDimensionOrder.shrink_to_fit();
+      oldIds2NewIds.clear();
+      oldIds2NewIds.shrink_to_fit();
       return false;
     }
   return true;
+}
+
+void ConcurrentPatternPool::addDefaultPattern(const vector<unsigned int>& tuple)
+{
+  vector<vector<unsigned int>> pattern;
+  const vector<unsigned int>::const_iterator idEnd = tuple.end();
+  vector<unsigned int>::const_iterator idIt = tuple.begin();
+  pattern.reserve(idEnd - idIt);
+  pattern.emplace_back(1, *idIt);
+  ++idIt;
+  do
+    {
+      pattern.emplace_back(1, *idIt);
+    }
+  while (++idIt != idEnd);
+  addPattern(pattern);
+}
+
+
+void ConcurrentPatternPool::addRemappedDefaultPattern(const vector<unsigned int>& tuple)
+{
+  const unsigned int n = tuple.size();
+  vector<vector<unsigned int>> pattern(n);
+  pattern[old2NewDimensionOrder.front()].emplace_back(oldIds2NewIds.front()[tuple.front()]);
+  unsigned int oldDimensionId = 1;
+  do
+    {
+      pattern[old2NewDimensionOrder[oldDimensionId]].emplace_back(oldIds2NewIds[oldDimensionId][tuple[oldDimensionId]]);
+    }
+  while (++oldDimensionId != n);
+  addPattern(pattern);
 }
 
 void ConcurrentPatternPool::addPattern(vector<vector<unsigned int>>& pattern)
@@ -171,34 +203,37 @@ void ConcurrentPatternPool::addFuzzyTuple(const vector<unsigned int>& tuple, con
 {
   if (isDefaultInitialPatterns && shiftedMembership > 0)
     {
-      vector<unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>>::iterator tuplesIt = tuples.begin();
-      vector<unsigned int>::const_iterator elementInFreeDimensionIt = tuple.begin();
-      vector<unsigned int> key(elementInFreeDimensionIt + 1, tuple.end());
-      unordered_map<vector<unsigned int>, vector<pair<unsigned int, double>>, boost::hash<vector<unsigned int>>>::iterator insertIt = tuplesIt->find(key);
-      if (insertIt == tuplesIt->end())
+      if (isUnboundedNumberOfPatterns)
 	{
-	  (*tuplesIt)[key] = {pair<unsigned int, double>(*elementInFreeDimensionIt, shiftedMembership)};
+	  additionalTuplesWithLowestAmongHighestMembershipDegrees.emplace_back(tuple);
+	  return;
 	}
-      else
+      if (nbOfFreeSlots)
 	{
-	  insertIt->second.push_back(pair<unsigned int, double>(*elementInFreeDimensionIt, shiftedMembership));
-	}
-      const vector<unsigned int>::iterator keyEnd = key.end();
-      vector<unsigned int>::iterator keyIt = key.begin();
-      do
-	{
-	  *keyIt++ = *elementInFreeDimensionIt;
-	  insertIt = (++tuplesIt)->find(key);
-	  if (insertIt == tuplesIt->end())
+	  tuplesWithHighestMembershipDegrees.emplace_back(make_pair(tuple, shiftedMembership));
+	  if (!--nbOfFreeSlots)
 	    {
-	      (*tuplesIt)[key] = {pair<unsigned int, double>(*++elementInFreeDimensionIt, shiftedMembership)};
+	      make_heap(tuplesWithHighestMembershipDegrees.begin(), tuplesWithHighestMembershipDegrees.end(), [](const pair<vector<unsigned int>, double>& fuzzyTuple1, const pair<vector<unsigned int>, double>& fuzzyTuple2) { return fuzzyTuple1.second > fuzzyTuple2.second; });
+	      pop_heap(tuplesWithHighestMembershipDegrees.begin(), tuplesWithHighestMembershipDegrees.end(), [](const pair<vector<unsigned int>, double>& fuzzyTuple1, const pair<vector<unsigned int>, double>& fuzzyTuple2) { return fuzzyTuple1.second > fuzzyTuple2.second; });
 	    }
-	  else
-	    {
-	      insertIt->second.push_back(pair<unsigned int, double>(*++elementInFreeDimensionIt, shiftedMembership));
-	    }
+	  return;
 	}
-      while (keyIt != keyEnd);
+      const double lowestAmongHighestMembershipDegrees = tuplesWithHighestMembershipDegrees.back().second;
+      if (lowestAmongHighestMembershipDegrees < shiftedMembership)
+	{
+	  tuplesWithHighestMembershipDegrees.pop_back();
+	  tuplesWithHighestMembershipDegrees.emplace_back(make_pair(tuple, shiftedMembership));
+	  pop_heap(tuplesWithHighestMembershipDegrees.begin(), tuplesWithHighestMembershipDegrees.end(), [](const pair<vector<unsigned int>, double>& fuzzyTuple1, const pair<vector<unsigned int>, double>& fuzzyTuple2) { return fuzzyTuple1.second > fuzzyTuple2.second; });
+	  if (tuplesWithHighestMembershipDegrees.back().second != lowestAmongHighestMembershipDegrees)
+	    {
+	      additionalTuplesWithLowestAmongHighestMembershipDegrees.clear();
+	    }
+	  return;
+	}
+      if (lowestAmongHighestMembershipDegrees == shiftedMembership)
+	{
+	  additionalTuplesWithLowestAmongHighestMembershipDegrees.emplace_back(tuple);
+	}
     }
 }
 
@@ -281,127 +316,4 @@ vector<unsigned int> ConcurrentPatternPool::oldIds2NewIdsInDimension(const vecto
       oldIds2NewIdsInDimension[elements[newElementId].second] = newElementId;
     }
   return oldIds2NewIdsInDimension;
-}
-
-pair<vector<vector<unsigned int>>, double> ConcurrentPatternPool::subFiberMaximizingG(const vector<unsigned int>& constrainedDimensions, vector<pair<unsigned int, double>>& freeDimension, const unsigned int freeDimensionId)
-{
-  unsigned int n = tuples.size();
-  vector<vector<unsigned int>> pattern;
-  pattern.reserve(n);
-  // Single elements before the dimension with possibly several elements
-  for (unsigned int dimensionId = 0; dimensionId != freeDimensionId; ++dimensionId)
-    {
-      pattern.emplace_back(1, constrainedDimensions[dimensionId]);
-    }
-  // Elements in the dimension with possibly several elements
-  // Compute the subset with the maximal product of the size and the square of the density
-  const vector<pair<unsigned int, double>>::iterator fiberEnd = freeDimension.end();
-  vector<pair<unsigned int, double>>::iterator fiberIt = freeDimension.begin();
-  sort(fiberIt, fiberEnd, [](const pair<unsigned int, double>& elementAndMembershipDegree1, const pair<unsigned int, double>& elementAndMembershipDegree2) { return elementAndMembershipDegree1.second > elementAndMembershipDegree2.second; }); // no need for a second criterion if elementAndMembershipDegree1.second == elementAndMembershipDegree2.second: either adding k = 1 membership degree decreases g(k) = (sum + k * T'_t)² / (area + k) or adding all of them will keep on increasing g.  Indeed g' is continuous, has two distinct zeros, the smaller is -sum / T'_t < 0, and g' tends to T'_t² > 0 when k -> infinity.
-  pattern.emplace_back(1, fiberIt->first);
-  unsigned int area = 1;
-  double sum = fiberIt->second;
-  while (++fiberIt != fiberEnd && (sum + fiberIt->second) * (sum + fiberIt->second) * area > sum * sum * (area + 1))
-    {
-      ++area;
-      sum += fiberIt->second;
-      pattern.back().push_back(fiberIt->first);
-    }
-  double g = sum * sum / area; // first local maximum
-#ifdef OPTIMAL_SUBFIBERS_AS_INITIAL_PATTERNS
-  {
-    // Searching global maximum
-    vector<pair<unsigned int, double>>::iterator localMaxIt = fiberIt - 1;
-    const unsigned int nbOfPositiveMemberships = fiberEnd - freeDimension.begin();
-    for (unsigned int nbOfRemainingPositiveMemberships = fiberEnd - fiberIt; nbOfRemainingPositiveMemberships; --nbOfRemainingPositiveMemberships)
-      {
-	const double higestPossibleSum = sum + fiberIt->second * nbOfRemainingPositiveMemberships;
-	if (higestPossibleSum * higestPossibleSum < g * nbOfPositiveMemberships)
-	  {
-	    break;
-	  }
-	sum += fiberIt->second;
-	if (sum * sum > g * ++area)
-	  {
-	    g = sum * sum / area;
-	    do
-	      {
-		pattern.back().push_back((++localMaxIt)->first);
-	      }
-	    while (localMaxIt != fiberIt);
-	  }
-	++fiberIt;
-      }
-  }
-#endif
-  sort(pattern.back().begin(), pattern.back().end());
-  // Single elements after the dimension with possibly several elements
-  --n;
-  for (unsigned int dimensionId = freeDimensionId; dimensionId != n; ++dimensionId)
-    {
-      pattern.emplace_back(1, constrainedDimensions[dimensionId]);
-    }
-  return {pattern, g};
-}
-
-pair<vector<vector<unsigned int>>, double> ConcurrentPatternPool::remappedSubFiberMaximizingG(const vector<unsigned int>& constrainedDimensions, vector<pair<unsigned int, double>>& freeDimension, const unsigned int freeDimensionId)
-{
-  const unsigned int n = tuples.size();
-  vector<vector<unsigned int>> pattern(n);
-  vector<vector<unsigned int>>::const_iterator oldIds2NewIdsInDimensionIt = oldIds2NewIds.begin();
-  // Single elements before the dimension with possibly several elements
-  for (unsigned int oldDimensionId = 0; oldDimensionId != freeDimensionId; ++oldDimensionId)
-    {
-      pattern[old2NewDimensionOrder[oldDimensionId]].push_back((*oldIds2NewIdsInDimensionIt)[constrainedDimensions[oldDimensionId]]);
-      ++oldIds2NewIdsInDimensionIt;
-    }
-  // Elements in the dimension with possibly several elements
-  // Compute the subset with the maximal product of the size and the square of the density
-  const vector<pair<unsigned int, double>>::iterator fiberEnd = freeDimension.end();
-  vector<pair<unsigned int, double>>::iterator fiberIt = freeDimension.begin();
-  sort(fiberIt, fiberEnd, [](const pair<unsigned int, double>& elementAndMembershipDegree1, const pair<unsigned int, double>& elementAndMembershipDegree2) { return elementAndMembershipDegree1.second > elementAndMembershipDegree2.second; }); // no need for a second criterion if elementAndMembershipDegree1.second == elementAndMembershipDegree2.second: either adding k = 1 membership degree decreases g(k) = (sum + k * T'_t)² / (area + k) or adding all of them will keep on increasing g.  Indeed g' is continuous, has two distinct zeros, the smaller is -sum / T'_t < 0, and g' tends to T'_t² > 0 when k -> infinity.
-  vector<unsigned int>& dimension = pattern[old2NewDimensionOrder[freeDimensionId]];
-  dimension.push_back((*oldIds2NewIdsInDimensionIt)[fiberIt->first]);
-  unsigned int area = 1;
-  double sum = fiberIt->second;
-  while (++fiberIt != fiberEnd && (sum + fiberIt->second) * (sum + fiberIt->second) * area > sum * sum * (area + 1))
-    {
-      ++area;
-      sum += fiberIt->second;
-      dimension.push_back((*oldIds2NewIdsInDimensionIt)[fiberIt->first]);
-    }
-  double g = sum * sum / area; // first local maximum
-#ifdef OPTIMAL_SUBFIBERS_AS_INITIAL_PATTERNS
-  {
-    // Searching global maximum
-    vector<pair<unsigned int, double>>::iterator localMaxIt = fiberIt - 1;
-    const unsigned int nbOfPositiveMemberships = fiberEnd - freeDimension.begin();
-    for (unsigned int nbOfRemainingPositiveMemberships = fiberEnd - fiberIt; nbOfRemainingPositiveMemberships; --nbOfRemainingPositiveMemberships)
-      {
-	const double higestPossibleSum = sum + fiberIt->second * nbOfRemainingPositiveMemberships;
-	if (higestPossibleSum * higestPossibleSum < g * nbOfPositiveMemberships)
-	  {
-	    break;
-	  }
-	sum += fiberIt->second;
-	if (sum * sum > g * ++area)
-	  {
-	    g = sum * sum / area;
-	    do
-	      {
-		dimension.push_back((*oldIds2NewIdsInDimensionIt)[(++localMaxIt)->first]);
-	      }
-	    while (localMaxIt != fiberIt);
-	  }
-	++fiberIt;
-      }
-  }
-#endif
-  sort(dimension.begin(), dimension.end());
-  // Single elements after the dimension with possibly several elements
-  for (unsigned int oldDimensionId = freeDimensionId + 1; oldDimensionId != n; ++oldDimensionId)
-    {
-      pattern[old2NewDimensionOrder[oldDimensionId]].push_back((*++oldIds2NewIdsInDimensionIt)[constrainedDimensions[oldDimensionId - 1]]);
-    }
-  return {pattern, g};
 }

@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 {
   AbstractRoughTensor* roughTensor;
   float verboseStep = 0;
-  int maxNbOfInitialPatterns = 0;
+  long long maxNbOfInitialPatterns = 0;
   int maxSelectionSize = 0;
   SelectionCriterion selectionCriterion;
   bool isRSSPrinted;
@@ -39,11 +39,11 @@ int main(int argc, char* argv[])
     steady_clock::time_point startingPoint;
 #endif
     vector<thread> threads;
-    vector<ModifiedPattern> modifiedPatterns;
     {
       string patternDimensionSeparator;
       string patternElementSeparator;
       {
+	int nbOfJobs;
 	bool isGrow;
 	// Parsing the command line and the option file
 	try
@@ -55,23 +55,23 @@ int main(int argc, char* argv[])
 	      ("help,h", "produce this help message")
 	      ("hio", "produce help on Input/Output format")
 	      ("version,V", "display version information and exit")
-	      ("opt", value<string>(), "set the option file name (by default [tensor-file].opt if present)");
+	      ("opt", value<string>(), "set the option file name (by default, [tensor-file].opt if present)");
 	    options_description basicConfig("Basic configuration (on the command line or in the option file)");
 	    basicConfig.add_options()
 	      ("verbose,v", value<float>(), "verbose output every arg seconds")
 	      ("boolean,b", "consider the tensor Boolean")
 	      ("out,o", value<string>(&outputFileName)->default_value("-"), "set output file name")
-	      ("max,m", value<int>(), "set max nb of initial patterns (unbounded by default)")
+	      ("max,m", value<long long>(), "set max nb of initial patterns (by default, unbounded)")
 	      ("forget,f", "do not store the visited patterns")
 #ifdef DEBUG_MODIFY
-	      ("jobs,j", value<int>()->default_value(1), "set nb of simultaneously modified patterns")
+	      ("jobs,j", value<int>(&nbOfJobs)->default_value(1), "set nb of simultaneously modified patterns")
 #else
-	      ("jobs,j", value<int>()->default_value(max(thread::hardware_concurrency(), static_cast<unsigned int>(1))), "set nb of simultaneously modified patterns")
+	      ("jobs,j", value<int>(&nbOfJobs)->default_value(max(thread::hardware_concurrency(), static_cast<unsigned int>(1))), "set nb of simultaneously modified patterns")
 #endif
 	      ("density,d", value<float>(), "set threshold between 0 (dense storage of the input tensor) and 1 (default, minimization of memory usage)")
 	      ("msc", value<string>()->default_value("bic"), "set max selection criterion (rss, aic or bic)")
 	      ("mss", value<int>(), "set max selection size (by default, unbounded)")
-	      ("ns", "neither select nor rank patterns")
+	      ("ns", "neither select nor rank output patterns")
 	      ("shift,s", value<float>(), "shift memberhip degrees by constant in argument (by default, density of input tensor)")
 	      ("expectation,e", "shift every memberhip degree by the max density of the slices covering it")
 	      ("patterns,p", value<string>(), "set initial patterns, instead of the default ones")
@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
 	      }
 	    if (vm.count("version"))
 	      {
-		cout << "nclusterbox version 0.40\nCopyright (C) 2023 Loïc Cerf.\nLicense GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n";
+		cout << "nclusterbox version 0.43\nCopyright (C) 2023 Loïc Cerf.\nLicense GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n";
 		return EX_OK;
 	      }
 	    ifstream optionFile;
@@ -151,11 +151,11 @@ int main(int argc, char* argv[])
 	      }
 	    if (vm.count("max"))
 	      {
-		if (vm["max"].as<int>() < 1)
+		if (vm["max"].as<long long>() < 1)
 		  {
 		    throw UsageException("max option should provide a positive integer!");
 		  }
-		maxNbOfInitialPatterns = vm["max"].as<int>();
+		maxNbOfInitialPatterns = vm["max"].as<long long>();
 	      }
 	    if (vm.count("mss"))
 	      {
@@ -234,7 +234,7 @@ int main(int argc, char* argv[])
 	      }
 	    else
 	      {
-		ConcurrentPatternPool::setDefaultPatterns();
+		ConcurrentPatternPool::setDefaultPatterns(maxNbOfInitialPatterns);
 	      }
 	    if (vm.count("expectation"))
 	      {
@@ -284,7 +284,6 @@ int main(int argc, char* argv[])
 	    patternElementSeparator = vm["pes"].as<string>();
 	    patternDimensionSeparator = vm["pds"].as<string>();
 	    isGrow = vm.count("grow");
-	    modifiedPatterns.resize(vm["jobs"].as<int>());
 	  }
 	catch (unknown_option& e)
 	  {
@@ -311,23 +310,25 @@ int main(int argc, char* argv[])
 	    cerr << e.what() << '\n';
 	    return EX_CANTCREAT;
 	  }
-	threads.reserve(modifiedPatterns.size());
+	threads.reserve(nbOfJobs);
 	if (isGrow)
 	  {
-	    for (ModifiedPattern& c : modifiedPatterns)
+	    do
 	      {
-		threads.emplace_back(&ModifiedPattern::grow, &c);
+		threads.emplace_back(ModifiedPattern::grow);
 	      }
+	    while (--nbOfJobs);
 	  }
 	else
 	  {
-	    for (ModifiedPattern& c : modifiedPatterns)
+	    do
 	      {
-		threads.emplace_back(&ModifiedPattern::modify, &c);
+		threads.emplace_back(ModifiedPattern::modify);
 	      }
+	    while (--nbOfJobs);
 	  }
       }
-      if (ConcurrentPatternPool::readFromFile(maxNbOfInitialPatterns))
+      if (ConcurrentPatternPool::readFromFile())
 	{
 	  PatternFileReader::read(patternDimensionSeparator.c_str(), patternElementSeparator.c_str(), AbstractRoughTensor::getIds2Labels(), maxNbOfInitialPatterns);
 	}

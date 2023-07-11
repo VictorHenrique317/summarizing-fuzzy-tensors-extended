@@ -198,7 +198,7 @@ void RankPatterns::output(const AbstractRoughTensor* roughTensor, const bool isR
 #endif
 }
 
-void RankPatterns::rank(const unsigned int nbOfCandidateVariablesHavingAllElements, AbstractRoughTensor* roughTensor, const float verboseStep, const int maxSelectionSize, const SelectionCriterion selectionCriterion, const bool isRSSPrinted)
+void RankPatterns::rank(const unsigned int nbOfCandidateVariablesHavingAllElements, AbstractRoughTensor* roughTensor, const float verboseStep, const unsigned int maxSelectionSize, const SelectionCriterion selectionCriterion, const bool isRSSPrinted)
 {
 #ifdef NB_OF_PATTERNS
 #ifdef GNUPLOT
@@ -289,7 +289,7 @@ void RankPatterns::rank(const unsigned int nbOfCandidateVariablesHavingAllElemen
       cout << " to decrease the RSS the most, by " << static_cast<double>(-rssVariation) / AbstractRoughTensor::getUnit() / AbstractRoughTensor::getUnit() << " > " << static_cast<double>(-maxRSSVariation) / AbstractRoughTensor::getUnit() / AbstractRoughTensor::getUnit() << ", the minimum allowed\n";
       roughTensorForDebug = roughTensor;
 #endif
-      rssHistory.reserve(min(static_cast<int>(candidateEnd - selectionEnd), maxSelectionSize));
+      rssHistory.reserve(min(static_cast<unsigned int>(candidateEnd - selectionEnd), maxSelectionSize));
       rssHistory.push_back(AbstractRoughTensor::getNullModelRSS() + rssVariation);
       maxRSSVariation = rssMultiplier * rssHistory.back();
       swap(*selectionEnd, *selectedIt);

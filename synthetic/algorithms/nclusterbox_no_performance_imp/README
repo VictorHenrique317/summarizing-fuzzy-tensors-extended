@@ -43,11 +43,13 @@ line.  Only long names can be used though.  Arguments passed to an
 option are separated from the name of the option by "=".  As an
 example, these lines may constitute an option file:
 
-verbose
+verbose = 2
 tds = ": "
 out = res/out
 max = 1000
-ms = 100
+forget
+jobs = 6
+mss = 10
 
 
 *** VERBOSITY ***
@@ -147,16 +149,22 @@ default " : ").
 
 nclusterbox starts with initial patterns.  It gradually modifies each
 of them to increase its explanatory power until a local maximum.  By
-default, nclusterbox modifies one initial pattern per fiber with at
-least one shifted value exceeding 0.  That may require too much time
-and/or memory.  Even if the default requirements are not prohibitive,
-the same summary is often more efficiently obtained by modifying only
-a few initial patterns.  Option --max (or -m) sets a maximum number,
-in argument, of initial patterns to modify, those with the greatest
-initial explanatory powers.  For instance, complementing our running
-example to modify at most 1000 initial patterns:
+default, nclusterbox modifies every single cell of the tensor with a
+shifted value exceeding 0.  That may require too much time and/or
+memory.  Even if the default requirements are not prohibitive, the
+same summary is often more efficiently obtained by modifying only a
+few initial patterns.  Option --max (or -m) sets a maximum number, in
+argument, of initial patterns to modify.  For instance, complementing
+our running example to modify at most 1000 initial patterns:
 
 $ nclusterbox -v 2 --tds ': ' -o res/out -m 1000 tensor
+
+The initial patterns become the single cells with the greatest shifted
+values.  In case of equality (of the 1000th greatest shifted value and
+the 1001th, in the example), for instance with Boolean tensors, a
+random subset of the cells implied in the equality is drawn, to get
+exactly as many initial patterns as asked.  Repeating the same
+execution, the drawn subset is usually different.
 
 
 *** PERFORMANCE TUNING ***
@@ -247,11 +255,10 @@ substitute the default ones.  If option --patterns is used, option
 --max truncates the list: no more pattern is input after reading as
 many patterns as in argument of --max.
 
-The format of an input pattern matches that of the n first fields in a
-line of an input tensor or an output summary.  For instance, this line
-stands for the 2x3x1-pattern including the six 3-tuples in the
-Cartesian product of {01-09-2007, 02-09-2007} and {Thomas, Harry, Max}
-and {basketball}:
+The first n fields of an input pattern match those in a line of an
+input tensor or an output summary.  For instance, this line stands for
+the 2x3x1-pattern including the six 3-tuples in the Cartesian product
+of {01-09-2007, 02-09-2007} and {Thomas, Harry, Max} and {basketball}:
 
 01-09-2007,02-09-2007: Thomas,Harry,Max;basketball
 
@@ -265,6 +272,11 @@ the contrary, there is no need here to use option --pes, because its
 default argument is "," and, in the example, only commas separate the
 elements of any dimension of the input pattern.
 
+If more fields than necessary are in a line specifying an input
+pattern, the additional fields are silently ignored.  That allows the
+argument of option --patterns (or -p) to be the output of one or more
+executions of nclusterbox --ns or even the file also specifying the
+input tensor, if it was sorted to first list the initial patterns.
 Any element appearing in some input pattern must be present in the
 input tensor.  If an input pattern is not properly formatted,
 nclusterbox displays a warning and ignores the malformed pattern.
@@ -306,18 +318,20 @@ reduced-fiber-input outputs everything reduced-fiber-input-one-way
 would output if repetitively called with every integer from 1 to n, as
 the second argument.  The expected arguments are the same, but with
 the second argument removed.  reduced-fiber-input provides the
-smallest subfibers locally maximizing the explanatory power.  They are
-smaller than nclusterbox's default, the global maxima.
+smallest subfibers locally maximizing the explanatory power.
+
+The output of slice-input or fiber-input is arbitrarily ordered.  That
+of reduced-fiber-input-one-way or reduced-fiber-input is in descending
+order explanatory power and truncating the list using nclusterbox's
+--max (or -m) option makes sense.
 
 
 *** FORBDDING REMOVALS ***
 
 By default, nclusterbox can both add and remove elements to/from every
 initial pattern.  With option --grow (or -g), initially present
-elements cannot be removed.  Do not use that option, unless many tiny
-patterns are input through option --patterns.  Forbidding elements
-from being removed prevents the discovery of patterns with better
-explanatory powers.
+elements cannot be removed.  Forbidding elements from being removed
+prevents the discovery of patterns with better explanatory powers.
 
 
 *** BUGS ***
