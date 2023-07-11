@@ -13,7 +13,11 @@ from models.experiment import Experiment
 
 
 class Controller():
-    def __init__(self) -> None:
+    def __init__(self, delete_iterations=None, delete_post_analysis=None, calculate_metrics=None) -> None:
+        self.delete_iterations = delete_iterations
+        self.delete_post_analysis = delete_post_analysis
+        self.calculate_metrics = calculate_metrics
+
         self.dataset = None
         self.__configs_folder = "configs"
         self.dataset_folder = "../datasets"
@@ -73,8 +77,11 @@ class Controller():
             algorithm.resetTimeOutInfo()
 
     def initiateSession(self):
-        delete_iteration_folder = str(input("Delete previous iteration folder? Y/N: ")).strip().lower()
-        if delete_iteration_folder == "y":
+        delete_iterations = self.delete_iterations
+        if delete_iterations is None:
+            delete_iterations = str(input("Delete previous iterations? Y/N: ")).strip().lower()
+
+        if delete_iterations == "y":
             FileSystem.deleteIterationFolder()
 
         FileSystem.deletePostAnalysisFolder()
@@ -120,7 +127,10 @@ class Controller():
         print("#"*120)
         FileSystem.deletePostAnalysisFolder()
 
-        calculate_rss_evolution = str(input("Calculate RSS evolution? Y/N: ")).strip().lower()
+        calculate_rss_evolution = self.calculate_metrics
+        if calculate_rss_evolution is None:
+            calculate_rss_evolution = str(input("Calculate RSS evolution? Y/N: ")).strip().lower()
+            
         if calculate_rss_evolution == "y":
             self.__calculate_rss_evolution = True
 

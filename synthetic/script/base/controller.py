@@ -15,7 +15,11 @@ from base.crisp_translator import CrispTranslator
 
 
 class Controller:
-    def __init__(self) -> None:
+    def __init__(self, delete_iterations=None, delete_post_analysis=None, calculate_metrics=None) -> None:
+        self.delete_iterations = delete_iterations
+        self.delete_post_analysis = delete_post_analysis
+        self.calculate_metrics = calculate_metrics
+
         self.algorithms = []
         self.__sorting_blacklist = ['nclusterbox', 'tribiclusterbox', 'nclusterboxnoperformanceimp']
         #self.__sorting_blacklist = []
@@ -90,7 +94,10 @@ class Controller:
             algorithm.resetTimeOutInfo()
 
     def initiateSession(self):
-        delete_iterations = str(input("Delete previous iterations? Y/N: ")).strip().lower()
+        delete_iterations = self.delete_iterations
+        if delete_iterations is None:
+            delete_iterations = str(input("Delete previous iterations? Y/N: ")).strip().lower()
+
         if delete_iterations == "y":
             FileSystem.deleteIterationFolders()
         elif delete_iterations == "n":
@@ -143,15 +150,24 @@ class Controller:
     def initiatePostAnalysis(self, save=True):
         print("#"*120)
 
-        delete_post_analysis = str(input("Delete post analysis folder? Y/N: ")).strip().lower()
+        delete_post_analysis = self.delete_post_analysis
+        if delete_post_analysis is None:
+            delete_post_analysis = str(input("Delete post analysis folder? Y/N: ")).strip().lower()
+
         if delete_post_analysis == "y":
             FileSystem.deletePostAnalysisFolder()
 
-        calculate_rss_evolution = str(input("Calculate RSS evolution? Y/N: ")).strip().lower()
+        calculate_rss_evolution = self.calculate_metrics
+        if calculate_rss_evolution is None:
+            calculate_rss_evolution = str(input("Calculate RSS evolution? Y/N: ")).strip().lower()
+
         if calculate_rss_evolution == "y":
             self.__calculate_rss_evolution = True
 
-        calculate_quality = str(input("Calculate quality? Y/N: ")).strip().lower()
+        calculate_quality = self.calculate_metrics
+        if calculate_quality is None:
+            calculate_quality = str(input("Calculate quality? Y/N: ")).strip().lower()
+    
         if calculate_quality == "y":
             self.__calculate_quality = True
 
