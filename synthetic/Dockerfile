@@ -1,6 +1,4 @@
 FROM ubuntu:latest
-FROM python:latest
-FROM mathworks/matlab:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 USER root
@@ -11,31 +9,29 @@ RUN apt-get update && \
 	apt-get install -y g++ && \
 	apt-get install -y r-base && \
 	apt-get install -y time && \
-	apt-get install -y gawk
+	apt-get install -y gawk && \
+	apt-get install -y python3 && \
+	apt-get install -y python3-pip
 		
-RUN R -e "install.packages('reticulate')"
-RUN pip install numpy
-RUN pip install psutil
-RUN pip install scipy
-RUN pip install matplotlib
-RUN pip install scikit-learn
-RUN pip install pandas
+RUN R -e "install.packages('reticulate')" && \
+	pip install numpy && \
+	pip install psutil && \
+	pip install scipy && \
+	pip install matplotlib && \
+	pip install scikit-learn && \
+	pip install pandas && \
+	pip install docker
 
-COPY . /app
+COPY algorithms /app/algorithms
 
-WORKDIR /app/algorithms/nclusterbox
-RUN make clean & make
+RUN cd /app/algorithms/nclusterbox && make clean && make && \
+	cd /app/algorithms/tribiclusterbox && make clean && make && \
+	cd /app/algorithms/nclusterbox_no_performance_imp && make clean && make && \
+	cd /app/algorithms/gennsets && make clean && make && \
+	cd /app/algorithms/num-noise && make clean && make
 
-WORKDIR /app/algorithms/tribiclusterbox
-RUN make clean & make
-
-WORKDIR /app/algorithms/nclusterbox_no_performance_imp
-RUN make clean & make
-
-WORKDIR /app/algorithms/gennsets
-RUN make clean & make
-
-WORKDIR /app/algorithms/num-noise
-RUN make clean & make
+COPY script /app/script
+COPY iterations /app/iterations
+COPY post_analysis /app/post_analysis
 
 WORKDIR /app/script
