@@ -75,10 +75,6 @@ class Cancer(Algorithm):
     def run(self, u, observations, timeout):
         if len(Configs.getParameter("dataset_size")) > 2:
             return True
-        
-        matlab_folder = ""
-        # if self.__controller.ufmgMode():
-            # matlab_folder = Configs.ufmgMatlabFolder()
 
         rank = Configs.getParameter("n_patterns")
 
@@ -90,17 +86,6 @@ class Cancer(Algorithm):
         self.experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/cancer.experiment"
         temp_folder = f"{current_iteration_folder}/output/{current_experiment}/experiments/temp"
         self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/cancer.log"
-        
-        # command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "
-        # command += f"{matlab_folder}matlab -nodisplay -r 'cd(\"algorithm\"); "
-        # command += f"cancer({rank},\"../{translated_tensor_path}\","
-        # command += f"\"../{current_iteration_folder}\","
-        # command += f"\"{current_experiment}\");exit' | tail -n +11 "
-        
-        # timedout = Commands.executeWithTimeout(command, timeout)     
-
-        # if timedout is False:
-        #     self.__createCancerFile()
 
         cancer_image = "victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer"
         volume = "summarizing_fuzzy_tensors_extended_synth"
@@ -114,10 +99,10 @@ class Cancer(Algorithm):
         client = docker.from_env()
         args = [f"{rank}", f"{translated_tensor_path}", f"{current_iteration_folder}", f"{current_experiment}"]
         args[0] = str(int(args[0]))
-        container = client.containers.run(cancer_image, detach=False, volumes=volumes, command=args)
+        container = client.containers.run(cancer_image, detach=False, volumes=volumes, command=args, user='root')
         self.__createCancerFile()
 
         FileSystem.delete(temp_folder)
-        return timedout
+        return False
 
         

@@ -1,7 +1,7 @@
 FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
-USER root
+# USER root
 
 RUN apt-get update && \
 	apt-get install -y make && \
