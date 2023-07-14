@@ -1,6 +1,7 @@
 % matlab -nodisplay -r 'cd("."); cancer(8,"../../iterations/1/tensors/plain/matrix9.txt","../../iterations/1","co1-u0.6");exit' | tail -n +11
 function [] = cancer(rank, mat_path, current_iteration_folder, current_experiment)
 
+rank = str2num(rank);
 matrix = load(mat_path).matrix;
 % matrix = str2num(matrix);
 
