@@ -1,6 +1,6 @@
 {
   "configuration_name":"retweets",
-  "dataset": "retweets-sparser",
+  "dataset": "retweets/3d/influences",
   "timeout": 72000
 }
  

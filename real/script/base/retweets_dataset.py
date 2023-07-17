@@ -4,19 +4,25 @@ import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import LabelEncoder
+import os
 
 
 class RetweetsDataset():
     def __init__(self):
-        self.__path = "../datasets/retweets-sparser"
+        self.__path = "../datasets/retweets/3d/influences"
+        self.__processed_path = self.__path + "_processed"
+        self.__initial_patterns_path = "../datasets/retweets/3d/init_patterns"
         self.__preprocess()
         self.__matrix = self.__toMatrix()
         self.__tensor_density = 0.0006762951656337755
         # self.__tensor_density = self.__calculateTensorDensity()
         # self.__empty_model_rss = self.__calculateEmptyModelRss()
         self.__empty_model_rss = 29649.31304061235
-
+    
     def path(self):
+        return self.__processed_path
+    
+    def rawPath(self):
         return self.__path
 
     def getMatrix(self):
@@ -93,8 +99,7 @@ class RetweetsDataset():
         dataset[:, 2] = le.fit_transform(dataset[:, 2])
         dataset = pd.DataFrame(data=dataset)
 
-        self.__path = "../datasets/retweets-sparser-processed.txt"
-        dataset.to_csv(self.__path, header=False, sep=" ", index=False)
+        dataset.to_csv(self.__processed_path, header=False, sep=" ", index=False)
 
         print("Dataset was pre-processed!")
 
@@ -111,3 +116,6 @@ class RetweetsDataset():
         
         density /= area
         return density
+    
+    def getInitialPatternsPath(self):
+        return self.__initial_patterns_path

@@ -6,7 +6,9 @@ from sklearn.preprocessing import LabelEncoder
 
 class Retweets2DDataset:
     def __init__(self):
-        self.__path = "../datasets/retweets-sparser-2D"
+        self.__path = "../datasets/retweets/2d/influences"
+        self.__processed_path = self.__path + "_processed"
+        self.__initial_patterns_path = "../datasets/retweets/2d/init_patterns"
         self.__preprocess()
         self.__matrix = self.__toMatrix()
         #self.__tensor_density = 0.0027397870054304196
@@ -15,6 +17,9 @@ class Retweets2DDataset:
         #self.__empty_model_rss = 3931.52761766638
 
     def path(self):
+        return self.__processed_path
+    
+    def rawPath(self):
         return self.__path
 
     def getMatrix(self):
@@ -91,7 +96,9 @@ class Retweets2DDataset:
         # dataset[:, 2] = le.fit_transform(dataset[:, 2])
         dataset = pd.DataFrame(data=dataset)
 
-        self.__path = "../datasets/retweets-sparser-2D-processed.txt"
-        dataset.to_csv(self.__path, header=False, sep=" ", index=False)
+        dataset.to_csv(self.__processed_path, header=False, sep=" ", index=False)
 
         print("Dataset was pre-processed!")
+
+    def getInitialPatterns(self):
+        return self.__initial_patterns_path

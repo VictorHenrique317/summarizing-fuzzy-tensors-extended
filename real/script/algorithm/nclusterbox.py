@@ -76,15 +76,10 @@ class NclusterBox(Algorithm):
         self.experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/nclusterbox.experiment"
         self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/nclusterbox.log"
         dataset_path = self.__controller.current_dataset_path
-        # multidupehack_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/multidupehack.experiment"
-
-        if dimension == 3:
-            tube_dim = 2
-        if dimension == 2:
-            tube_dim = 1
+        initial_patterns = self.__controller.current_dataset.getInitialPatternsPath()
 
         command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "
-        command += f"../algorithms/nclusterbox/nclusterbox -j8 -m1000 {dataset_path} -o {self.experiment_path}"
+        command += f"../algorithms/nclusterbox/nclusterbox -j8 -m1000 {dataset_path} -p {initial_patterns} -o {self.experiment_path}"
         command += f">> {self.log_path}"
 
         print(command)

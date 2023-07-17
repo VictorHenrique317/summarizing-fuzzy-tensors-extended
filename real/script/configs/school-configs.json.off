@@ -1,0 +1,9 @@
+{
+  "configuration_name":"school",
+  "dataset": "primaryschool/per-hour",
+  "timeout": 72000
+}
+ 
+ 
+ 
+ 

@@ -1,8 +1,10 @@
+import os
 from numpy import True_
 from base.configs import Configs
 from base.numpy_translator import NumpyTranslator
 from models.attribute import Attribute
 from base.crisp_translator import CrispTranslator
+from real.script.base.school_dataset import SchoolDataset
 from utils.commands import Commands
 from post_analysis.grapher import Grapher
 from base.file_system import FileSystem
@@ -86,24 +88,34 @@ class Controller():
 
         FileSystem.deletePostAnalysisFolder()
 
+        print("Preprocessing datasets...")
+        os.system("../datasets/retweets/preprocess.sh")
+        os.system("../datasets/primaryschool/preprocess.sh")
+        print("Preprocessing done!")
+
         for config_file in Commands.listFolder(self.__configs_folder):
+            if config_file.strip().split(".")[-1] == "off":
+                print(f"Skipping {config_file}")
+                continue
+
             Configs.readConfigFile(f"{self.__configs_folder}/{config_file}")
             self.current_configuration_name = Configs.getParameter("configuration_name")
             
             if self.current_configuration_name == "retweets":
                 self.dataset = RetweetsDataset()
-                self.current_dataset = self.dataset
-                self.base_dataset_path = f"{self.dataset_folder}/retweets-sparser-processed"
-                self.current_dataset_path = f"{self.dataset_folder}/retweets-sparser-processed.txt"
-
+                
             elif self.current_configuration_name == "retweets-2d":
                 self.dataset = Retweets2DDataset()
-                self.current_dataset = self.dataset
-                self.base_dataset_path = f"{self.dataset_folder}/retweets-sparser-2D-processed"
-                self.current_dataset_path = f"{self.dataset_folder}/retweets-sparser-2D-processed.txt"
+                
+            elif self.current_configuration_name == "school":
+                self.dataset = SchoolDataset()
 
             else:
                 raise ValueError(f"Configuration name {self.current_configuration_name} not supported")
+            
+            self.current_dataset = self.dataset
+            self.base_dataset_path = self.current_dataset.path()
+            self.current_dataset_path = self.current_dataset.path()
 
             Configs.setDimension(len(self.dataset.getDimension()))
 
@@ -135,23 +147,28 @@ class Controller():
             self.__calculate_rss_evolution = True
 
         for config_file in Commands.listFolder(self.__configs_folder):
+            if config_file.strip().split(".")[-1] == "off":
+                print(f"Skipping {config_file}")
+                continue
+            
             Configs.readConfigFile(f"{self.__configs_folder}/{config_file}")
             self.current_configuration_name = Configs.getParameter("configuration_name")
 
             if self.current_configuration_name == "retweets":
                 self.dataset = RetweetsDataset()
-                self.current_dataset = self.dataset
-                self.base_dataset_path = f"{self.dataset_folder}/retweets-sparser-processed"
-                self.current_dataset_path = f"{self.dataset_folder}/retweets-sparser-processed.txt"
 
             elif self.current_configuration_name == "retweets-2d":
                 self.dataset = Retweets2DDataset()
-                self.current_dataset = self.dataset
-                self.base_dataset_path = f"{self.dataset_folder}/retweets-sparser-2D-processed"
-                self.current_dataset_path = f"{self.dataset_folder}/retweets-sparser-2D-processed.txt"
+
+            elif self.current_configuration_name == "school":
+                self.dataset = SchoolDataset()
 
             else:
                 raise ValueError(f"Configuration name {self.current_configuration_name} not supported")
+            
+            self.current_dataset = self.dataset
+            self.base_dataset_path = self.current_dataset.path()
+            self.current_dataset_path = self.current_dataset.path()
 
             Configs.setDimension(len(self.dataset.getDimension()))
             

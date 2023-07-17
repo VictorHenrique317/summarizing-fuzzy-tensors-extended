@@ -1,3 +1,4 @@
+import os
 import matplotlib
 
 matplotlib.use('agg')
@@ -145,16 +146,22 @@ class Grapher:
     def __isEmpty(self, x, y):
         return len(x) == 0 and len(y) == 0
 
-    def __savePlottingData(self, x, y, base_folder, filename):
-        path = f"{base_folder}/plotting_data/{filename}.json"
+    def __savePlottingData(self, x, y, path):
+        # path = f"{base_folder}/plotting_data/{filename}.json"
         data = {"x": list(x), "y": list(y)}
         json_object = json.dumps(data, indent=4)
         with open(path, "w") as outfile:
             outfile.write(json_object)
 
     def __drawRssEvolutionGraphs(self, save, figure_width, figure_height, folder):
+        if os.path.exists(folder) is False:
+            os.makedirs(folder)
+        
+        if os.path.exists(f"{folder}/rss_evolutions") is False:
+            os.makedirs(f"{folder}/rss_evolutions")
+
         for algorithm in Configs.getAlgorithms():
-            algorithm_folder = f"{folder}/rss-evolutions/{algorithm.lower().replace(' ', '-')}"
+            algorithm_folder = f"{folder}/rss_evolutions/{algorithm.lower().replace(' ', '_')}"
             algorithm_runned = False
 
             for correct_observations in Configs.getParameter("correct_obs"):
@@ -163,10 +170,6 @@ class Grapher:
                 xlabel = "Nb. of patterns"
                 y_label = "RSS"
                 title = f"Elbow analysis for co={correct_observations}"
-
-                filename = self.__attribute.value.lower().replace(" ", "-")
-                filename = f"{filename}-for-co-{correct_observations}.png"
-                path = f"{algorithm_folder}/{filename}"
 
                 u = 0.0
                 self.__plotting_data.setAlgorithm(algorithm)
@@ -186,10 +189,15 @@ class Grapher:
 
                 if self.__isEmpty(x, y):  # algorithm not runned
                     continue
+                
+                attribute_name = "rssevolution"
+                path = f"{folder}/plotting_data/{attribute_name}"
+                plotting_data_filename = f"{algorithm.lower().replace(' ','')}_co{correct_observations}.json"
 
-                plotting_data_filename = f"synthetic-{self.__dimension}d-rssevolution#" \
-                                            f"{algorithm.lower().replace(' ','')}-co{correct_observations}"
-                self.__savePlottingData(x, y, folder, plotting_data_filename)
+                if not os.path.exists(path):
+                    os.mkdir(path)
+
+                self.__savePlottingData(x, y, f"{path}/{plotting_data_filename}")
 
                 algorithm_runned = True
 
@@ -213,8 +221,14 @@ class Grapher:
                 if algorithm_runned is False:
                     continue
 
-                # self.__saveGraph(False, fig, path)
+                if os.path.exists(algorithm_folder) is False:
+                    os.mkdir(algorithm_folder)
+
+                filename = f"co{correct_observations}.png"
+                path = f"{algorithm_folder}/{filename}"
                 self.__saveGraph(save, fig, path)
+
+        os.system(f"rm -rf {folder}/rss-evolutions")
 
     def __drawUDependentGraphs(self, save, figure_width, figure_height, folder):
         u = 0.0
@@ -232,10 +246,15 @@ class Grapher:
             
             if self.__isEmpty(x, y):  # algorithm not runned
                 continue
-
-            plotting_data_filename = f"synthetic-{self.__dimension}d-{self.__attribute.value.lower().replace(' ','')}-" \
-                                        f"#{algorithm.lower().replace(' ','')}-"
-            self.__savePlottingData(x, y, folder, plotting_data_filename)
+            
+            attribute_name = self.__attribute.value.lower().replace(' ','')
+            path = f"{folder}/plotting_data/{attribute_name}"
+            plotting_data_filename = f"{algorithm.lower().replace(' ','')}.json"
+            
+            if not os.path.exists(path):
+                    os.mkdir(path)
+            
+            self.__savePlottingData(x, y, f"{path}/{plotting_data_filename}")
 
             self.__configureCurve(x, y, algorithm, u, xlabel, y_label, title, "algorithm")
 
@@ -247,8 +266,8 @@ class Grapher:
 
                 self.__configureCurve(x, y, curve, u, xlabel, y_label, title, "algorithm")
 
-        filename = self.__attribute.value.lower().replace(" ", "-")
-        filename = f"{filename}-for-u-{u}.png"
+        filename = self.__attribute.value.lower().replace(" ", "_")
+        filename = f"{filename}.png"
         path = f"{folder}/{filename}"
 
         self.__saveGraph(save, fig, path)
