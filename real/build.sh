@@ -1,10 +1,10 @@
 NAME="victorhenrique5800/summarizing_fuzzy_tensors_extended_real"
 
-if [ -d "iterations" ]; then
+if [ -d "iteration" ]; then
   # The directory exists, do nothing
   :
 else
-    mkdir iterations
+    mkdir iteration
 fi
 
 if [ -d "post_analysis" ]; then
