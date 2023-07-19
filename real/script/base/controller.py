@@ -4,7 +4,7 @@ from base.configs import Configs
 from base.numpy_translator import NumpyTranslator
 from models.attribute import Attribute
 from base.crisp_translator import CrispTranslator
-from real.script.base.school_dataset import SchoolDataset
+from base.school_dataset import SchoolDataset
 from utils.commands import Commands
 from post_analysis.grapher import Grapher
 from base.file_system import FileSystem
@@ -49,9 +49,9 @@ class Controller():
     
     def __run(self):
         FileSystem.createIterationFolder()
-        self.__numpy_translator.run(self.dataset)
-        #self.__crisp_translator.run()
         dimension = len(self.dataset.getDimension())
+        if dimension == 3:
+            self.__numpy_translator.run(self.dataset)
         self.current_iteration_folder = f"../iteration/{self.current_configuration_name}"
 
         u = 0.0
@@ -62,7 +62,8 @@ class Controller():
         for algorithm in self.algorithms:
             if algorithm.hasTimedOut(u):
                 continue
-
+            
+            print(f"Running {algorithm.name}...")
             timedout = algorithm.run(u, Configs.getParameter("timeout"))
             if timedout:
                 algorithm.timedOut(u)
@@ -88,16 +89,16 @@ class Controller():
 
         FileSystem.deletePostAnalysisFolder()
 
-        print("Preprocessing datasets...")
-        os.system("../datasets/retweets/preprocess.sh")
-        os.system("../datasets/primaryschool/preprocess.sh")
-        print("Preprocessing done!")
+        print("Building datasets from raw data...")
+        os.system("/app/datasets/retweets/preprocess.sh")
+        os.system("/app/datasets/primaryschool/preprocess.sh")
 
         for config_file in Commands.listFolder(self.__configs_folder):
             if config_file.strip().split(".")[-1] == "off":
                 print(f"Skipping {config_file}")
                 continue
 
+            print("#"*60 + f" CONFIGURATION = {config_file}")
             Configs.readConfigFile(f"{self.__configs_folder}/{config_file}")
             self.current_configuration_name = Configs.getParameter("configuration_name")
             

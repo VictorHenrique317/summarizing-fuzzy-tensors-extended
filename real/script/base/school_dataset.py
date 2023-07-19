@@ -62,7 +62,7 @@ class SchoolDataset():
         return tensor_density
 
     def __toMatrix(self):
-        dataset = pd.read_csv(self.__path, sep=' ', header=None)
+        dataset = pd.read_csv(self.__processed_path, sep=' ', header=None)
         dataset = dataset.iloc[:, :].values
         matrix = np.zeros(self.getDimension())
 

@@ -18,6 +18,7 @@ class RetweetsDataset():
         # self.__tensor_density = self.__calculateTensorDensity()
         # self.__empty_model_rss = self.__calculateEmptyModelRss()
         self.__empty_model_rss = 29649.31304061235
+        self__encoders = [LabelEncoder(), LabelEncoder(), LabelEncoder()]
     
     def path(self):
         return self.__processed_path
@@ -63,7 +64,7 @@ class RetweetsDataset():
         return tensor_density
 
     def __toMatrix(self):
-        dataset = pd.read_csv(self.__path, sep=' ', header=None)
+        dataset = pd.read_csv(self.__processed_path, sep=' ', header=None)
         dataset = dataset.iloc[:, :].values
         matrix = np.zeros(self.getDimension())
 

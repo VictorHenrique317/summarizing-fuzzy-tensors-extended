@@ -7,15 +7,15 @@ from algorithm.nclusterbox_no_performance_imp import NclusterBoxNoPerformanceImp
 
 controller = Controller(delete_post_analysis="y", 
                         calculate_metrics="y", 
-                        delete_iterations="n")
+                        delete_iterations="y")
 
 # ========================== ALGORITHMS USED ========================== #
 getf = Getf(controller)
-# cancer = Cancer(controller)
+cancer = Cancer(controller)
 triclusterbox = TriBiclusterBox(controller)
-# nclusterboxnoperformanceimp = NclusterBoxNoPerformanceImp(controller)
-# nclusterbox = NclusterBox(controller)
+nclusterboxnoperformanceimp = NclusterBoxNoPerformanceImp(controller)
+nclusterbox = NclusterBox(controller)
 # ========================== ALGORITHMS USED ========================== #
 
-#controller.initiateSession()
+controller.initiateSession()
 controller.initiatePostAnalysis()

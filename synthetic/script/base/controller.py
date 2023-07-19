@@ -111,7 +111,7 @@ class Controller:
                 print(f"Skipping {config_file}")
                 continue
             
-            print("#"*120 + f" CONFIGURATION = {config_file}")
+            print("#"*60 + f" CONFIGURATION = {config_file}")
             Configs.readConfigFile(f"{self.__configs_folder}/{config_file}")
             self.__current_configuration_name = Configs.getParameter("configuration_name")
             self.__current_iteration_number = Configs.getParameter("nb_iterations")

@@ -30,6 +30,7 @@ RUN cd /app/algorithms/nclusterbox && make clean && make && \
 
 COPY script /app/script
 COPY iterations /app/iterations
+COPY datasets /app/datasets
 COPY post_analysis /app/post_analysis
 
 WORKDIR /app/script

@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import LabelEncoder
+from models.pattern import Pattern
 
 
 class Retweets2DDataset:
@@ -11,10 +12,11 @@ class Retweets2DDataset:
         self.__initial_patterns_path = "../datasets/retweets/2d/init_patterns"
         self.__preprocess()
         self.__matrix = self.__toMatrix()
-        #self.__tensor_density = 0.0027397870054304196
-        self.__tensor_density = self.__calculateTensorDensity()
-        self.__empty_model_rss = self.__calculateEmptyModelRss()
-        #self.__empty_model_rss = 3931.52761766638
+        self.__tensor_density = 0.002739787075376616
+        # self.__tensor_density = self.__calculateTensorDensity()
+        # self.__empty_model_rss = self.__calculateEmptyModelRss()
+        self.__empty_model_rss = 3931.5276375190374
+        self.__encoders = [LabelEncoder(), LabelEncoder()]
 
     def path(self):
         return self.__processed_path
@@ -60,7 +62,7 @@ class Retweets2DDataset:
         return tensor_density
 
     def __toMatrix(self):
-        dataset = pd.read_csv(self.__path, sep=' ', header=None)
+        dataset = pd.read_csv(self.__processed_path, sep=' ', header=None)
         dataset = dataset.iloc[:, :].values
         matrix = np.zeros(self.getDimension())
 
@@ -90,15 +92,29 @@ class Retweets2DDataset:
 
         dataset = pd.read_csv(self.__path, sep=' ', header=None)
         dataset = dataset.iloc[:, :].values
-        le = LabelEncoder()
-        dataset[:, 0] = le.fit_transform(dataset[:, 0])
-        dataset[:, 1] = le.fit_transform(dataset[:, 1])
-        # dataset[:, 2] = le.fit_transform(dataset[:, 2])
+        dataset[:, 0] = self.__encoders[0].fit_transform(dataset[:, 0])
+        dataset[:, 1] = self.__encoders[1].fit_transform(dataset[:, 1])
         dataset = pd.DataFrame(data=dataset)
 
         dataset.to_csv(self.__processed_path, header=False, sep=" ", index=False)
 
         print("Dataset was pre-processed!")
 
-    def getInitialPatterns(self):
+    def __inverseEncodeColumn(self, column_index, values):
+        return self.__encoders[column_index].inverse_transform(values)
+
+    def inverseEncode(self, pattern):
+        pattern = Pattern(pattern, 2)
+        pattern_dims_values = pattern.get()
+        inverse_encoded_pattern = ""
+        for column_index in range(2):
+            dim_values = [int(value) for value in pattern_dims_values[column_index]]
+            dim_values = self.__inverseEncodeColumn(column_index, dim_values)
+            dim_values = dim_values.join(",")
+            inverse_encoded_pattern += f"{dim_values} "
+
+        inverse_encoded_pattern += f"{pattern.getDensity()}"
+        return inverse_encoded_pattern
+    
+    def getInitialPatternsPath(self):
         return self.__initial_patterns_path

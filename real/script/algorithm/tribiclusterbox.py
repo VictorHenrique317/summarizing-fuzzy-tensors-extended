@@ -75,7 +75,7 @@ class TriBiclusterBox(Algorithm):
 
         self.experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/tribiclusterbox.experiment"
         self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/tribiclusterbox.log"
-        dataset_path = self.__controller.current_dataset_path
+        dataset_path = self.__controller.current_dataset.rawPath()
 
 
         if dimension == 3:

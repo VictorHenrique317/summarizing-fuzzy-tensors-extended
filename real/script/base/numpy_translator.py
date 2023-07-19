@@ -20,7 +20,7 @@ class NumpyTranslator():
                 exec(replacer_string)
 
         print("Translated dataset to numpy tensor")
-        output_folder = self.__controller.dataset_folder
+        output_folder = self.__controller.dataset_folder + "/retweets/3d"
         filename = dataset_path.split("/")[-1]
         filename = re.sub(".txt", "", filename)
 

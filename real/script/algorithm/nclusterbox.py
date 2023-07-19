@@ -75,7 +75,7 @@ class NclusterBox(Algorithm):
 
         self.experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/nclusterbox.experiment"
         self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/nclusterbox.log"
-        dataset_path = self.__controller.current_dataset_path
+        dataset_path = self.__controller.current_dataset.rawPath()
         initial_patterns = self.__controller.current_dataset.getInitialPatternsPath()
 
         command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "
@@ -84,9 +84,10 @@ class NclusterBox(Algorithm):
 
         print(command)
         start = time.time()
-        timedout = Commands.executeWithTimeout(command, timeout)
+        Commands.execute(command)
         end = time.time()
         elapsed_time = end - start
+        timedout = False
 
         if timedout is False:
             experiment = Experiment(self.experiment_path, u, dimension)

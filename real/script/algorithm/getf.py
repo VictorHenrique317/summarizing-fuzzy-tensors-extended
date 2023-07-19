@@ -52,6 +52,7 @@ class Getf(Algorithm):
 
     def run(self, u, timeout):
         if Configs.getDimensions() < 3:
+            print("2D dataset, skipping getf...")
             return True
 
         max_pattern_number = 7

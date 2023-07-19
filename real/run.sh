@@ -12,9 +12,9 @@ docker run -it -v /var/run/docker.sock:/var/run/docker.sock -v $VOLUME_NAME:/app
 
 # Copying volume files to disk
 CONTAINER_ID=$(docker ps -a --filter ancestor=$NAME -q)
-rm -rf iterations
+rm -rf iteration
 rm -rf post_analysis
-docker cp $CONTAINER_ID:/app/iterations/. iterations
+docker cp $CONTAINER_ID:/app/iteration/. iteration
 docker cp $CONTAINER_ID:/app/post_analysis/. post_analysis
 
 # Unmounting and clearing volumes from the main image
