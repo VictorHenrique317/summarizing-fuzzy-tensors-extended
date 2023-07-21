@@ -4,14 +4,20 @@ import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import LabelEncoder
+from models.pattern import Pattern
 import os
 
 
 class RetweetsDataset():
     def __init__(self):
+        self.__encoders = [LabelEncoder(), LabelEncoder(), LabelEncoder()]
+
         self.__path = "../datasets/retweets/3d/influences"
         self.__processed_path = self.__path + "_processed"
+        
         self.__initial_patterns_path = "../datasets/retweets/3d/init_patterns"
+        self.__initial_patterns_path_processed = self.__initial_patterns_path + "_processed"
+
         self.__preprocess()
         self.__matrix = self.__toMatrix()
         self.__tensor_density = 0.0006762951656337755
@@ -94,14 +100,14 @@ class RetweetsDataset():
 
         dataset = pd.read_csv(self.__path, sep=' ', header=None)
         dataset = dataset.iloc[:, :].values
-        le = LabelEncoder()
-        dataset[:, 0] = le.fit_transform(dataset[:, 0])
-        dataset[:, 1] = le.fit_transform(dataset[:, 1])
-        dataset[:, 2] = le.fit_transform(dataset[:, 2])
+        dataset[:, 0] = self.__encoders[0].fit_transform(dataset[:, 0])
+        dataset[:, 1] = self.__encoders[1].fit_transform(dataset[:, 1])
+        dataset[:, 2] = self.__encoders[2].fit_transform(dataset[:, 2])
         dataset = pd.DataFrame(data=dataset)
 
         dataset.to_csv(self.__processed_path, header=False, sep=" ", index=False)
-
+        
+        self.__preprocessInitialPatterns()
         print("Dataset was pre-processed!")
 
     def calculateTuplesDensity(self, pattern):  # tuples = [{}, {}, {}]
@@ -118,5 +124,51 @@ class RetweetsDataset():
         density /= area
         return density
     
+    def __decodeColumn(self, column_index, values):
+        return self.__encoders[column_index].inverse_transform(values)
+    
+    def encodePattern(self, pattern_str):
+        pattern = Pattern(pattern_str, 3)
+        pattern_dims_values = pattern.get()
+        encoded_pattern = ""
+        
+        for column_index in range(3):
+            dim_values = None
+            try:
+                dim_values = [int(value) for value in pattern_dims_values[column_index]]
+            except ValueError:
+                dim_values = [value for value in pattern_dims_values[column_index]]
+            
+            dim_values = self.__encoders[column_index].transform(dim_values)
+
+            dim_values = ",".join(str(value) for value in dim_values)
+            encoded_pattern += f"{dim_values} "
+
+        encoded_pattern += f"{pattern.getDensity()}"
+        return encoded_pattern
+
+    def decodePattern(self, pattern):
+        pattern = Pattern(pattern, 3)
+        pattern_dims_values = pattern.get()
+        inverse_encoded_pattern = ""
+        for column_index in range(3):
+            dim_values = [int(value) for value in pattern_dims_values[column_index]]
+            dim_values = self.__decodeColumn(column_index, dim_values)
+            dim_values = ",".join(str(value) for value in dim_values)
+            inverse_encoded_pattern += f"{dim_values} "
+
+        inverse_encoded_pattern += f"{pattern.getDensity()}"
+        return inverse_encoded_pattern
+    
     def getInitialPatternsPath(self):
-        return self.__initial_patterns_path
+        return self.__initial_patterns_path_processed
+
+    def __preprocessInitialPatterns(self):
+        initial_patterns = pd.read_csv(self.__initial_patterns_path, sep=' ', header=None)
+        initial_patterns = initial_patterns.iloc[:, :].values
+        initial_patterns[:, 0] = self.__encoders[0].transform(initial_patterns[:, 0])
+        initial_patterns[:, 1] = self.__encoders[1].transform(initial_patterns[:, 1])
+        initial_patterns[:, 2] = self.__encoders[2].transform(initial_patterns[:, 2])
+        initial_patterns = pd.DataFrame(data=initial_patterns)
+
+        initial_patterns.to_csv(self.__initial_patterns_path_processed, header=False, sep=" ", index=False)

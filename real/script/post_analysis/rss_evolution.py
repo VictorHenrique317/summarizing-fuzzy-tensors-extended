@@ -70,7 +70,12 @@ class RssEvolution:
 
     @staticmethod
     def calculateCellRSS(dataset_matrix, dims, prediction):
-        actual_value = dataset_matrix[dims[0], dims[1], dims[2]]
+        actual_value = None
+        try:
+            actual_value = dataset_matrix[dims[0], dims[1], dims[2]]
+        except IndexError:
+            actual_value = dataset_matrix[dims[0], dims[1]]
+
         return (actual_value - prediction) ** 2
 
     @staticmethod
@@ -110,6 +115,10 @@ class RssEvolution:
         considerated_patterns = []
         counter = 0
         for pattern in patterns:
+            pattern = pattern.getPatternString()
+            pattern = dataset.encodePattern(pattern)
+            pattern = Pattern(pattern, len(dataset.getDimension()))
+
             counter += 1
 
             if counter > max_pattern_nb:

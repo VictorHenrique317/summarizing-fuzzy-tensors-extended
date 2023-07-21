@@ -46,6 +46,20 @@ class Controller():
     def addAlgorithm(self, algorithm):
         if algorithm not in self.algorithms:
             self.algorithms.append(algorithm)
+
+    def __decodeExperiment(self, experiment_path):
+        print("Inverse decoding experiment...")
+        with open(experiment_path, "r") as file:
+            lines = file.readlines()
+
+        with open(experiment_path, "w") as file:
+            for (i, line) in enumerate(lines):
+                inverse_decoded_line = self.current_dataset.decodePattern(line)
+
+                if i < len(lines) - 1:
+                    inverse_decoded_line += "\n"
+    
+                file.write(inverse_decoded_line)
     
     def __run(self):
         FileSystem.createIterationFolder()
@@ -73,6 +87,9 @@ class Controller():
                 if algorithm.name not in self.__sorting_blacklist:
                     experiment = Experiment(algorithm.experiment_path, u, dimension)
                     experiment.sortPatterns(self.dataset)
+
+                self.__decodeExperiment(algorithm.experiment_path)
+
             print("-"*120)
 
     def __resetAlgorithms(self):

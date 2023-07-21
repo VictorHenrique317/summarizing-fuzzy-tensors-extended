@@ -10,11 +10,11 @@ controller = Controller(delete_post_analysis="y",
                         delete_iterations="y")
 
 # ========================== ALGORITHMS USED ========================== #
-getf = Getf(controller)
-cancer = Cancer(controller)
+# getf = Getf(controller)
+# cancer = Cancer(controller)
 triclusterbox = TriBiclusterBox(controller)
-nclusterboxnoperformanceimp = NclusterBoxNoPerformanceImp(controller)
-nclusterbox = NclusterBox(controller)
+# nclusterboxnoperformanceimp = NclusterBoxNoPerformanceImp(controller)
+# nclusterbox = NclusterBox(controller)
 # ========================== ALGORITHMS USED ========================== #
 
 controller.initiateSession()

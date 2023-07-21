@@ -1,3 +1,5 @@
+synthetic/activate_screen_logging.sh
+
 synthetic/algorithms/gennsets/gennsets
 synthetic/algorithms/gennsets/src/*.o
 

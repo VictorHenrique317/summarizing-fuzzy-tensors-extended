@@ -75,7 +75,7 @@ class NclusterBox(Algorithm):
 
         self.experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/nclusterbox.experiment"
         self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/nclusterbox.log"
-        dataset_path = self.__controller.current_dataset.rawPath()
+        dataset_path = self.__controller.current_dataset.path()
         initial_patterns = self.__controller.current_dataset.getInitialPatternsPath()
 
         command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "

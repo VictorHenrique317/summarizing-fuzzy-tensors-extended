@@ -75,9 +75,9 @@ class TriBiclusterBox(Algorithm):
 
         self.experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/tribiclusterbox.experiment"
         self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/tribiclusterbox.log"
-        dataset_path = self.__controller.current_dataset.rawPath()
+        dataset_path = self.__controller.current_dataset.path()
 
-
+        tube_dim = None
         if dimension == 3:
             tube_dim = 2
         if dimension == 2:
@@ -85,7 +85,7 @@ class TriBiclusterBox(Algorithm):
     
         command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "
         command += f"../algorithms/tribiclusterbox/slice-input {dataset_path} {tube_dim} | "
-        command += f"../algorithms/tribiclusterbox/nclusterbox -f {dataset_path} -o {self.experiment_path}"
+        command += f"../algorithms/tribiclusterbox/nclusterbox -f -j1 -p - {dataset_path} -o {self.experiment_path}"
         command += f">> {self.log_path}"
 
         print(command)

@@ -79,7 +79,7 @@ class TriBiclusterBox(Algorithm):
 
         command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "
         command += f"../algorithms/tribiclusterbox/slice-input {dataset_path} 1 | "
-        command += f"../algorithms/tribiclusterbox/nclusterbox -f {dataset_path} -o {self.experiment_path}"
+        command += f"../algorithms/tribiclusterbox/nclusterbox -f -j1 -p - {dataset_path} -o {self.experiment_path}"
         command += f">> {self.log_path}"
 
         print(command)
