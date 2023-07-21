@@ -16,6 +16,7 @@ rm -rf iteration
 rm -rf post_analysis
 docker cp $CONTAINER_ID:/app/iteration/. iteration
 docker cp $CONTAINER_ID:/app/post_analysis/. post_analysis
+# docker cp $CONTAINER_ID:/app/datasets/. datasets
 
 # Unmounting and clearing volumes from the main image
 CONTAINERS=$(docker ps -a --filter volume=$VOLUME_NAME -q)

@@ -76,7 +76,7 @@ class NclusterBoxNoPerformanceImp(Algorithm):
         print(f"{deletions_counter} duplicated patterns deleted!")
         experiment.rewritePatterns(unique_patterns)
 
-    def run(self, u, timeout):
+    def run(self, u, timeout, boolean_tensor=False):
         current_experiment = self.__controller.current_experiment
         current_iteration_folder = self.__controller.current_iteration_folder
         dimension = Configs.getDimensions()
@@ -84,14 +84,18 @@ class NclusterBoxNoPerformanceImp(Algorithm):
         self.experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/nclusterboxnoperformanceimp.experiment"
         self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/nclusterboxnoperformanceimp.log"
         dataset_path = self.__controller.current_dataset.path()
-        initial_patterns = self.__controller.current_dataset.getInitialPatternsPath()
-
+        
         if dimension == 3:
             tube_dim = 2
         if dimension == 2:
             tube_dim = 1
+        
+        if boolean_tensor is False:
+            initial_patterns = self.__controller.current_dataset.getInitialPatternsPath()
+            command = f"../algorithms/nclusterbox_no_performance_imp/nclusterbox -f -j1 -m1000 {dataset_path} -p {initial_patterns} -o {self.experiment_path}"
+        else:
+            command = f"../algorithms/nclusterbox_no_performance_imp/nclusterbox -b -f -j1 -m1000 {dataset_path} -o {self.experiment_path}"
 
-        command = f"../algorithms/nclusterbox_no_performance_imp/nclusterbox -f -j1 -m1000 {dataset_path} -p {initial_patterns} -o {self.experiment_path}"
         command += f">> {self.log_path}"
 
         print(command)

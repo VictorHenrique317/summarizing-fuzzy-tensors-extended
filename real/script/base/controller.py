@@ -78,7 +78,7 @@ class Controller():
                 continue
             
             print(f"Running {algorithm.name}...")
-            timedout = algorithm.run(u, Configs.getParameter("timeout"))
+            timedout = algorithm.run(u, Configs.getParameter("timeout"), boolean_tensor=True)
             if timedout:
                 algorithm.timedOut(u)
                 print("Deleting files...")

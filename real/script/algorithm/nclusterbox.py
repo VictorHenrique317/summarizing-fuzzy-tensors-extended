@@ -68,7 +68,7 @@ class NclusterBox(Algorithm):
         print(f"{deletions_counter} duplicated patterns deleted!")
         experiment.rewritePatterns(unique_patterns)
 
-    def run(self, u, timeout):
+    def run(self, u, timeout, boolean_tensor=False):
         current_experiment = self.__controller.current_experiment
         current_iteration_folder = self.__controller.current_iteration_folder
         dimension = Configs.getDimensions()
@@ -76,10 +76,16 @@ class NclusterBox(Algorithm):
         self.experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/nclusterbox.experiment"
         self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/nclusterbox.log"
         dataset_path = self.__controller.current_dataset.path()
-        initial_patterns = self.__controller.current_dataset.getInitialPatternsPath()
 
         command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "
-        command += f"../algorithms/nclusterbox/nclusterbox -j8 -m1000 {dataset_path} -p {initial_patterns} -o {self.experiment_path}"
+
+        if boolean_tensor is False:
+            initial_patterns = self.__controller.current_dataset.getInitialPatternsPath()
+            command += f"../algorithms/nclusterbox/nclusterbox -j8 -m1000 {dataset_path} -p {initial_patterns} -o {self.experiment_path}"
+
+        else:
+            command += f"../algorithms/nclusterbox/nclusterbox -b -j8 -m1000 {dataset_path} -o {self.experiment_path}"
+
         command += f">> {self.log_path}"
 
         print(command)

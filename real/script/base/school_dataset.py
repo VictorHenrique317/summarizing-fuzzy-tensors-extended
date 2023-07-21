@@ -4,19 +4,22 @@ import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import LabelEncoder
-import os
+from models.pattern import Pattern
 
 
 class SchoolDataset():
     def __init__(self):
+        self.__encoders = [LabelEncoder(), LabelEncoder(), LabelEncoder()]
+        
         self.__path = "../datasets/primaryschool/per-hour"
         self.__processed_path = self.__path + "_processed"
+        
         self.__preprocess()
         self.__matrix = self.__toMatrix()
-        # self.__tensor_density = None
-        self.__tensor_density = self.__calculateTensorDensity()
-        self.__empty_model_rss = self.__calculateEmptyModelRss()
-        # self.__empty_model_rss = None
+        self.__tensor_density = 0.04912745031077112
+        # self.__tensor_density = self.__calculateTensorDensity()
+        # self.__empty_model_rss = self.__calculateEmptyModelRss()
+        self.__empty_model_rss = 54715.10825276863
     
     def path(self):
         return self.__processed_path
@@ -44,7 +47,7 @@ class SchoolDataset():
                     columns[column] = column_set
 
         columns = {column: len(column_set) for column, column_set in columns.items()}
-        return [size for size in columns.values()][:-1]
+        return [size for size in columns.values()][:]
 
     def getDensity(self):
         return self.__tensor_density
@@ -69,8 +72,8 @@ class SchoolDataset():
         nb_indices = dataset.shape[0]
         print("Loading dataset matrix into memory...")
         for line in range(nb_indices):
-            index = [int(dimension) for dimension in dataset[:, :-1][line]]
-            density = dataset[:, -1][line]
+            index = [int(dimension) for dimension in dataset[:, :][line]]
+            density = 1
             replacer_string = f"matrix{index} = {density}"
             exec(replacer_string)
 
@@ -92,10 +95,9 @@ class SchoolDataset():
 
         dataset = pd.read_csv(self.__path, sep=' ', header=None)
         dataset = dataset.iloc[:, :].values
-        le = LabelEncoder()
-        dataset[:, 0] = le.fit_transform(dataset[:, 0])
-        dataset[:, 1] = le.fit_transform(dataset[:, 1])
-        # dataset[:, 2] = le.fit_transform(dataset[:, 2])
+        dataset[:, 0] = self.__encoders[0].fit_transform(dataset[:, 0])
+        dataset[:, 1] = self.__encoders[1].fit_transform(dataset[:, 1])
+        dataset[:, 2] = self.__encoders[2].fit_transform(dataset[:, 2])
         dataset = pd.DataFrame(data=dataset)
 
         dataset.to_csv(self.__processed_path, header=False, sep=" ", index=False)
@@ -115,3 +117,39 @@ class SchoolDataset():
         
         density /= area
         return density
+    
+    def __decodeColumn(self, column_index, values):
+        return self.__encoders[column_index].inverse_transform(values)
+    
+    def encodePattern(self, pattern_str):
+        pattern = Pattern(pattern_str, 3)
+        pattern_dims_values = pattern.get()
+        encoded_pattern = ""
+        
+        for column_index in range(3):
+            dim_values = None
+            try:
+                dim_values = [int(value) for value in pattern_dims_values[column_index]]
+            except ValueError:
+                dim_values = [value for value in pattern_dims_values[column_index]]
+            
+            dim_values = self.__encoders[column_index].transform(dim_values)
+
+            dim_values = ",".join(str(value) for value in dim_values)
+            encoded_pattern += f"{dim_values} "
+
+        encoded_pattern += f"{pattern.getDensity()}"
+        return encoded_pattern
+
+    def decodePattern(self, pattern):
+        pattern = Pattern(pattern, 3)
+        pattern_dims_values = pattern.get()
+        inverse_encoded_pattern = ""
+        for column_index in range(3):
+            dim_values = [int(value) for value in pattern_dims_values[column_index]]
+            dim_values = self.__decodeColumn(column_index, dim_values)
+            dim_values = ",".join(str(value) for value in dim_values)
+            inverse_encoded_pattern += f"{dim_values} "
+
+        inverse_encoded_pattern += f"{pattern.getDensity()}"
+        return inverse_encoded_pattern

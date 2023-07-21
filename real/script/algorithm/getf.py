@@ -50,7 +50,7 @@ class Getf(Algorithm):
                 line += "\n"
                 getf_file.write(line)
 
-    def run(self, u, timeout):
+    def run(self, u, timeout, boolean_tensor=False):
         if Configs.getDimensions() < 3:
             print("2D dataset, skipping getf...")
             return True

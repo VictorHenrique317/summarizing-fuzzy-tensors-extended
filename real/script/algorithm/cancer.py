@@ -70,7 +70,7 @@ class Cancer(Algorithm):
                 line += "\n"
                 cancer_file.write(line)
 
-    def run(self, u, timeout):
+    def run(self, u, timeout, boolean_tensor=False):
         if Configs.getDimensions() > 2:
             return True
 

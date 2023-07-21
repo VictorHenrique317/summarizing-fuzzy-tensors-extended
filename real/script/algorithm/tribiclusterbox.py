@@ -68,7 +68,7 @@ class TriBiclusterBox(Algorithm):
             file.write(memory)
             file.write(f"Nb of patterns: {nb_patterns}")
 
-    def run(self, u, timeout):
+    def run(self, u, timeout, boolean_tensor=False):
         current_experiment = self.__controller.current_experiment
         current_iteration_folder = self.__controller.current_iteration_folder
         dimension = Configs.getDimensions()
@@ -85,7 +85,12 @@ class TriBiclusterBox(Algorithm):
     
         command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "
         command += f"../algorithms/tribiclusterbox/slice-input {dataset_path} {tube_dim} | "
-        command += f"../algorithms/tribiclusterbox/nclusterbox -f -j1 -p - {dataset_path} -o {self.experiment_path}"
+        
+        if boolean_tensor is False:
+            command += f"../algorithms/tribiclusterbox/nclusterbox -f -j1 -p - {dataset_path} -o {self.experiment_path}"
+        else:
+            command += f"../algorithms/tribiclusterbox/nclusterbox -b -f -j1 -p - {dataset_path} -o {self.experiment_path}"
+
         command += f">> {self.log_path}"
 
         print(command)

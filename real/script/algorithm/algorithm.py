@@ -11,7 +11,7 @@ class Algorithm(ABC):
         self.log_path = None
 
     @abstractmethod
-    def run(self, u, timeout):
+    def run(self, u, timeout, boolean_tensor=False):
         pass
 
     def timedOut(self, u):
