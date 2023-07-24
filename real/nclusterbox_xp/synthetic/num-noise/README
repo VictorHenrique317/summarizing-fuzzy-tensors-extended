@@ -1,0 +1,79 @@
+*** DESCRIPTION ***
+
+num-noise turns a "perfect" Boolean tensor fuzzy.
+
+
+*** USAGE ***
+
+Usage: num-noise dataset-sizes nb-of-correct-observations-per-tuple [nb-of-incorrect-observations-per-tuple]
+
+dataset-sizes is a string of integers giving the sizes of the tensor,
+e.g., "4 8 16" (here three integers, hence a 3-way tensor).
+
+The arguments nb-of-correct-observations-per-tuple and
+nb-of-incorrect-observations-per-tuple must be two double float
+values.  They respectively fix the number of correct observations per
+tuple and the number of incorrect observations per tuple.  The latter
+is 0 if not given.  The more correct observations and the less
+incorrect ones, the less perturbed the tensor.  The probability
+distribution of the altered '0' (respectively '1') values is the
+inverse of the beta distribution with the parameters
+nb-of-correct-observations-per-tuple + 1 and
+nb-of-incorrect-observations-per-tuple + 1 (respectively the same
+parameters but switched).
+
+
+*** RETURN VALUES ***
+
+num-noise returns values which can be used when called from a
+script. They are conformed to sysexit.h.
+* 0 is returned when num-noise terminates successfully.
+* 64 is returned when num-noise is called incorrectly.
+
+
+*** INPUT DATA ***
+
+The input data is read on the standard input.  It is a list of
+patterns, whose dimensions (as many as in the tensor) are
+space-separated.  The elements of a dimension must be comma-separated
+unsigned integers.  Those exceeding the size of the related dimension
+of the tensor are silently ignored.
+
+That input can be every index of a cell of the Boolean tensor whose
+value is '1'.  It can also be the output of the gennsets command.  The
+dataset-sizes argument of gennsets would typically be the same as that
+of the num-noise command.  Nevertheless, when calling num-noise,
+setting higher values may be useful: it forces the noisy tensor to
+contain elements (those with the highest values) that are not involved
+in any pattern.
+
+
+*** OUTPUT DATA ***
+
+num-noise writes on every line of the standard output the index of a
+cell of the tensor and its value, between 0 and 1.  Like in the input
+format, the elements are space-separated integers between 0 and the
+size of the dimension minus 1.  Notice that this is the input format
+of DCE and a particular case of that of multidupehack or nclusterbox.
+
+
+*** EXAMPLE ***
+
+That command line noises with two correct observations per tuple and
+no incorrect observation a 40x60x80 Boolean tensor containing ten
+2x3x4 all-ones sub-tensors:
+$ yes 2 3 4 | head | gennsets '40 60 80' | num-noise '40 60 80' 2
+
+
+*** BUGS ***
+
+Report bugs to <lcerf@dcc.ufmg.br>.
+
+
+*** COPYRIGHT ***
+
+Copyright 2009,2010,2011,2023 Loïc Cerf (lcerf@dcc.ufmg.br)
+This is free software. You may redistribute copies of it under the
+terms of the GNU General Public License
+<http://www.gnu.org/licenses/gpl.html>.  There is NO WARRANTY, to the
+extent permitted by law.

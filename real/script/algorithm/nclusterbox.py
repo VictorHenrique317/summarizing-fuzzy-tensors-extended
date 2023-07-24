@@ -68,23 +68,38 @@ class NclusterBox(Algorithm):
         print(f"{deletions_counter} duplicated patterns deleted!")
         experiment.rewritePatterns(unique_patterns)
 
-    def run(self, u, timeout, boolean_tensor=False):
+    def run(self, u, timeout, boolean_tensor=False, custom_experiment_path=None, custom_log_path=None, 
+            initial_patterns_nb=1000):
+        
         current_experiment = self.__controller.current_experiment
         current_iteration_folder = self.__controller.current_iteration_folder
         dimension = Configs.getDimensions()
 
-        self.experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/nclusterbox.experiment"
-        self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/nclusterbox.log"
+        if custom_experiment_path is None:
+            self.experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/nclusterbox.experiment"
+        else:
+            self.experiment_path = custom_experiment_path
+
+        if custom_log_path is None:
+            self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/nclusterbox.log"
+        else:
+            self.log_path = custom_log_path
+
         dataset_path = self.__controller.current_dataset.path()
 
         command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "
 
         if boolean_tensor is False:
             initial_patterns = self.__controller.current_dataset.getInitialPatternsPath()
-            command += f"../algorithms/nclusterbox/nclusterbox -j8 -m1000 {dataset_path} -p {initial_patterns} -o {self.experiment_path}"
+            command += f"../algorithms/nclusterbox/nclusterbox -j8 {dataset_path} -p {initial_patterns} -o {self.experiment_path} "
 
         else:
-            command += f"../algorithms/nclusterbox/nclusterbox -b -j8 -m1000 {dataset_path} -o {self.experiment_path}"
+            command += f"../algorithms/nclusterbox/nclusterbox -b -j8 {dataset_path} -o {self.experiment_path} "
+
+        if initial_patterns_nb is None:
+            pass
+        else:
+            command += f"-m{initial_patterns_nb}"
 
         command += f">> {self.log_path}"
 
@@ -96,7 +111,7 @@ class NclusterBox(Algorithm):
         timedout = False
 
         if timedout is False:
-            experiment = Experiment(self.experiment_path, u, dimension)
+            experiment = Experiment(self.experiment_path, u, dimension, custom_log_path=custom_log_path)
             #self.__deleteEqualPatterns(experiment)
             self.__writeLog(elapsed_time)
             pass

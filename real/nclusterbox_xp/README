@@ -1,0 +1,8 @@
+In addition to make, clang++ (or g++, deleting "#" in the third lines
+of nclusterbox/Makefile, synthetic/gennsets/Makefile and
+synthetic/num-noise/Makefile), and the Boost library (see
+nclusterbox/INSTALL for details), GNU AWK is required to run the
+experiments.  Most of GNU/Linux distributions have it in their
+repositories.  The package is usually named gawk.
+
+Executing xp.sh builds the binaries and reruns all the experiments.

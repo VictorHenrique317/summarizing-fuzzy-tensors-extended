@@ -1,1 +1,0 @@
-"/mnt/d/Dev/summarazing-fuzzy-tensors-extended/real/nclusterbox-xp/nclusterbox"/slice-input "$1" 1 | "/mnt/d/Dev/summarazing-fuzzy-tensors-extended/real/nclusterbox-xp/nclusterbox"/nclusterbox-no-update-sum -fj 1 -p - "$@"

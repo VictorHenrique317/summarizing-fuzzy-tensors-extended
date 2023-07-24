@@ -78,7 +78,12 @@ class Controller():
                 continue
             
             print(f"Running {algorithm.name}...")
-            timedout = algorithm.run(u, Configs.getParameter("timeout"), boolean_tensor=True)
+
+            boolean_tensor = False
+            if Configs.getParameter("configuration_name") == "school":
+                boolean_tensor = True
+
+            timedout = algorithm.run(u, Configs.getParameter("timeout"), boolean_tensor=boolean_tensor)
             if timedout:
                 algorithm.timedOut(u)
                 print("Deleting files...")
@@ -139,6 +144,9 @@ class Controller():
 
             self.__resetAlgorithms()
             self.__run()
+
+            if Configs.getParameter("configuration_name") == "school":
+                self.__initiateRandomStudy()
                     
     def __analyseConfiguration(self, configuration_name, save):
         FileSystem.createPostAnalysisFolder(configuration_name)
@@ -193,5 +201,121 @@ class Controller():
             print(f"Initiating post analysis for {self.current_configuration_name}...")
             self.__analyseConfiguration(self.current_configuration_name, save=save)
 
+            if Configs.getParameter("configuration_name") == "school":
+                self.__initiateRandomStudyAnalysis()
+
     def getParameter(self, parameter):
         return Configs.getParameter(parameter)
+    
+    def __initiateRandomStudy(self):
+        print("\n ============================ Initiating random analysis on school dataset...")
+        current_iteration_folder = f"../iteration/{self.current_configuration_name}/random_study"
+        Commands.execute(f"rm -rf {current_iteration_folder}")
+        Commands.execute(f"mkdir {current_iteration_folder}")
+
+        nb_iterations = 2
+        for iteration in range(0, nb_iterations+1):
+            dimension = len(self.dataset.getDimension())
+
+            u = 0.0
+            print("="*120 + f"")
+            self.current_experiment = f"u{u}"
+            
+            initial_patterns_nb = 1000
+            if iteration == 0:
+                iteration = "ground_patterns"
+                initial_patterns_nb = None
+
+            self.current_iteration_folder = f"{current_iteration_folder}/{iteration}"
+            Commands.execute(f"mkdir {self.current_iteration_folder}")
+
+            for algorithm in self.algorithms:
+                if algorithm.hasTimedOut(u):
+                    continue
+
+                if algorithm.name != "nclusterbox":
+                    continue
+                
+                print(f"Running {algorithm.name}...")
+
+                if Configs.getParameter("configuration_name") != "school":
+                    raise ValueError("Random study only supported for school dataset")
+                
+                dataset_path = self.current_dataset.path()
+                
+                experiment_path = f"{self.current_iteration_folder}/experiments/"
+                Commands.execute(f"mkdir {experiment_path}")
+                experiment_path += "nclusterbox.experiment"
+                
+                log_path = f"{self.current_iteration_folder}/logs/"
+                Commands.execute(f"mkdir {log_path}")
+                log_path += "nclusterbox.log"
+
+                algorithm.run(u, Configs.getParameter("timeout"), boolean_tensor=True,
+                                        custom_experiment_path=experiment_path, custom_log_path=log_path,
+                                        initial_patterns_nb=initial_patterns_nb)
+               
+                if algorithm.name not in self.__sorting_blacklist:
+                    experiment = Experiment(algorithm.experiment_path, u, dimension)
+                    experiment.sortPatterns(self.dataset)
+
+                self.__decodeExperiment(algorithm.experiment_path)
+
+                print("-"*120)
+
+    def __initiateRandomStudyAnalysis(self):
+        print("\n ============================ Initiating random analysis on school dataset...")
+        results_folder = f"../post_analysis/random_study"
+        Commands.execute(f"rm -rf {results_folder}")
+        Commands.execute(f"mkdir {results_folder}")
+        
+        dimension = len(self.dataset.getDimension())
+        jaccard_sums = dict()
+        ground_experiment = None
+        ground_patterns = None
+        nb_iterations = 0
+
+        base_folder = f"../iteration/{self.current_configuration_name}/random_study"
+
+        ground_experiment_path = f"{base_folder}/ground_patterns/experiments/nclusterbox.experiment"
+        ground_experiment = Experiment(ground_experiment_path, 0.0, dimension)
+        ground_patterns = list(ground_experiment.getPatterns())
+
+        for iteration in Commands.listFolder(base_folder):
+            if iteration == "ground_patterns":
+                continue
+
+            print(f"Initiating analysis for {iteration}...")
+            nb_iterations += 1
+            experiment_path = f"{base_folder}/{iteration}/experiments/nclusterbox.experiment"
+            log_path = f"{base_folder}/{iteration}/logs/nclusterbox.log"
+            
+            experiment = Experiment(experiment_path, 0.0, dimension, custom_log_path=log_path)
+
+            i =-1
+            for ground_pattern in ground_patterns:
+                i += 1
+
+                highest_jaccard = 0
+                for other_pattern in experiment.getPatterns():
+
+                    jaccard = ground_pattern.jaccardIndex(other_pattern)
+                    if jaccard > highest_jaccard:
+                        highest_jaccard = jaccard
+
+                jaccard_sums[i] = jaccard_sums.get(i, 0) + highest_jaccard
+        
+        jaccard_means = {i: jaccard_sum/nb_iterations for i, jaccard_sum in jaccard_sums.items()}
+
+        with open(f"{results_folder}/full_mean_jaccards.txt", "w") as result_file:
+            for (i, jaccard_mean) in jaccard_means.items():
+                ground_pattern = ground_patterns[i]
+                ground_pattern = ground_pattern.get()
+                ground_pattern = [",".join(pattern_tuple) for pattern_tuple in ground_pattern]
+                ground_pattern = " ".join(ground_pattern)
+
+                result_file.write(f"{ground_pattern}: {jaccard_mean}\n")
+
+        with open(f"{results_folder}/mean_jaccards.txt", "w") as result_file:
+            for (i, jaccard_mean) in jaccard_means.items():
+                result_file.write(f"{jaccard_mean}\n")

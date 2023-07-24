@@ -9,7 +9,7 @@ from base.retweets_dataset import RetweetsDataset
 
 
 class Experiment():
-    def __init__(self, experiment_path, u, dimension) -> None:
+    def __init__(self, experiment_path, u, dimension, custom_log_path=None) -> None:
         self.__path:str = experiment_path
         # self.__patterns = []
         self.__log = None
@@ -17,15 +17,20 @@ class Experiment():
         self.__u = u
         self.__dimension = dimension
         self.__dataset = None
-        self.__initialize()
+        self.__initialize(custom_log_path=custom_log_path)
 
-    def __initialize(self):
+    def __initialize(self, custom_log_path=None):
         algorithm = self.__path.split("/")[-1].split(".")[0]
         self.__algorithm = algorithm
 
         log_name = f"{algorithm}.log"
-        log_path = self.__path.replace(f"/experiments/{algorithm}.experiment", "")
-        log_path = f"{log_path}/logs/{log_name}"
+        if custom_log_path is None:
+            log_path = self.__path.replace(f"/experiments/{algorithm}.experiment", "")
+            log_path = f"{log_path}/logs/{log_name}"
+
+        else:
+            log_path = custom_log_path
+            
         self.__log = Log(log_path)
 
     def rewritePatterns(self, new_patterns):
