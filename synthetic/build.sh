@@ -14,5 +14,5 @@ else
     mkdir post_analysis
 fi
 
-docker build -t $NAME .
+docker build -t $NAME $1 .
 docker tag $NAME $NAME:latest

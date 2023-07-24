@@ -5,5 +5,5 @@
   "pattern_size": 25,
   "n_patterns":10,
   "correct_obs":[1,2,4,8,16],
-  "nb_iterations":30
+  "nb_iterations":5
 }

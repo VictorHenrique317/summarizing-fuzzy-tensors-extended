@@ -21,10 +21,10 @@ docker cp $CONTAINER_ID:/app/post_analysis/. post_analysis
 CONTAINERS=$(docker ps -a --filter volume=$VOLUME_NAME -q)
 
 for CONTAINER_ID in $CONTAINERS; do
-  echo "Unmounting volume $VOLUME_NAME from container $CONTAINER_ID"
-  docker rm -v $CONTAINER_ID
+  # echo "Unmounting volume $VOLUME_NAME from container $CONTAINER_ID"
+  # docker rm -v $CONTAINER_ID
 done
 
-echo "Volume $VOLUME_NAME unmounted from all containers!"
-docker volume rm $VOLUME_NAME
-echo "Volume $VOLUME_NAME removed!"
+# echo "Volume $VOLUME_NAME unmounted from all containers!"
+# docker volume rm $VOLUME_NAME
+# echo "Volume $VOLUME_NAME removed!"
