@@ -213,7 +213,7 @@ class Controller():
         Commands.execute(f"rm -rf {current_iteration_folder}")
         Commands.execute(f"mkdir {current_iteration_folder}")
 
-        nb_iterations = 2
+        nb_iterations = 30
         for iteration in range(0, nb_iterations+1):
             dimension = len(self.dataset.getDimension())
 

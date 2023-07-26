@@ -6,8 +6,8 @@ from algorithm.nclusterbox import NclusterBox
 from algorithm.nclusterbox_no_performance_imp import NclusterBoxNoPerformanceImp
 
 controller = Controller(delete_post_analysis="y", 
-                        calculate_metrics="y", 
-                        delete_iterations="y")
+                        calculate_metrics="n", 
+                        delete_iterations="n")
 
 # ========================== ALGORITHMS USED ========================== #
 getf = Getf(controller)
@@ -17,5 +17,5 @@ nclusterboxnoperformanceimp = NclusterBoxNoPerformanceImp(controller)
 nclusterbox = NclusterBox(controller)
 # ========================== ALGORITHMS USED ========================== #
 
-controller.initiateSession()
+# controller.initiateSession()
 controller.initiatePostAnalysis()
