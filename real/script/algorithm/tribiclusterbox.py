@@ -45,7 +45,10 @@ class TriBiclusterBox(Algorithm):
         # with open(self.log_path, "r") as file:
         #     selection_time = file.readlines()[-2]
 
-        total_time = float(re.findall("(\d*\.\d*)s", total_time)[0])
+        try:
+            total_time = float(re.findall("(\d*\.\d*)s", total_time)[0])
+        except IndexError:
+            total_time = float(re.findall("(\d*)s", total_time)[0])
 
         # match = re.findall("(\d*\.\d*)s", selection_time)
         # if len(match) > 0:
@@ -93,11 +96,14 @@ class TriBiclusterBox(Algorithm):
 
         command += f">> {self.log_path}"
 
-        print(command)
-        start = time.time()
-        timedout = Commands.executeWithTimeout(command, timeout)
-        end = time.time()
-        elapsed_time = end - start
+        # print(command)
+        # start = time.time()
+        # timedout = Commands.executeWithTimeout(command, timeout)
+        # end = time.time()
+        # elapsed_time = end - start
+
+        timedout = False
+        elapsed_time = None
 
         if timedout is False:
             experiment = Experiment(self.experiment_path, u, dimension)

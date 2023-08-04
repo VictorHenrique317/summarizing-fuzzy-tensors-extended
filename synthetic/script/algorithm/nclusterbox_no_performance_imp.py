@@ -30,7 +30,10 @@ class NclusterBoxNoPerformanceImp(Algorithm):
         # with open(self.log_path, "r") as file:
         #     selection_time = file.readlines()[-2]
 
-        total_time = float(re.findall("(\d*\.\d*)s", total_time)[0])
+        try:
+            total_time = float(re.findall("(\d*\.\d*)s", total_time)[0])
+        except IndexError:
+            total_time = float(re.findall("(\d*)s", total_time)[0])
 
         # match = re.findall("(\d*\.\d*)s", selection_time)
         # if len(match) > 0:

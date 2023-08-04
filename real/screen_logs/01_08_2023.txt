@@ -1,4 +1,74 @@
-[5A[2Kbd89a318b01f: Downloading [=>                                                 ]  2.101kB/86.22kB[5B[5A[2Kbd89a318b01f: Download complete [5B[5A[2Kbd89a318b01f: Extracting [===================>                               ]  32.77kB/86.22kB[5B[5A[2Kbd89a318b01f: Extracting [==================================================>]  86.22kB/86.22kB[5B[5A[2Kbd89a318b01f: Extracting [==================================================>]  86.22kB/86.22kB[5B[3A[2Ka57d0b565c8b: Downloading [>                                                  ]  58.12kB/5.8MB[3B[4A[2Kb267dbb0e12d: Downloading [>                                                  ]  12.32kB/1.146MB[4B[5A[2Kbd89a318b01f: Pull complete [5B[4A[2Kb267dbb0e12d: Verifying Checksum [4B[4A[2Kb267dbb0e12d: Download complete [4B[4A[2Kb267dbb0e12d: Extracting [=>                                                 ]  32.77kB/1.146MB[4B[3A[2Ka57d0b565c8b: Downloading [====================>                              ]  2.343MB/5.8MB[3B[4A[2Kb267dbb0e12d: Extracting [==================================================>]  1.146MB/1.146MB[4B[4A[2Kb267dbb0e12d: Extracting [==================================================>]  1.146MB/1.146MB[4B[4A[2Kb267dbb0e12d: Pull complete [4B[3A[2Ka57d0b565c8b: Downloading [=========================================>         ]  4.781MB/5.8MB[3B[3A[2Ka57d0b565c8b: Verifying Checksum [3B[3A[2Ka57d0b565c8b: Download complete [3B[3A[2Ka57d0b565c8b: Extracting [>                                                  ]  65.54kB/5.8MB[3B[3A[2Ka57d0b565c8b: Extracting [=================================================> ]  5.702MB/5.8MB[3B[3A[2Ka57d0b565c8b: Extracting [==================================================>]    5.8MB/5.8MB[3B[3A[2Ka57d0b565c8b: Pull complete [3B[1A[2K4f4fb700ef54: Downloading [==================================================>]      32B/32B[1B[1A[2K4f4fb700ef54: Verifying Checksum [1B[1A[2K4f4fb700ef54: Download complete [1B[2A[2K54945c499302: Downloading [>                                                  ]    2.1kB/126.8kB[2B[2A[2K54945c499302: Downloading [==================================================>]  126.8kB/126.8kB[2B[2A[2K54945c499302: Download complete [2B[2A[2K54945c499302: Extracting [============>                                      ]  32.77kB/126.8kB[2B[2A[2K54945c499302: Extracting [==================================================>]  126.8kB/126.8kB[2B[2A[2K54945c499302: Extracting [==================================================>]  126.8kB/126.8kB[2B[2A[2K54945c499302: Pull complete [2B[1A[2K4f4fb700ef54: Extracting [==================================================>]      32B/32B[1B[1A[2K4f4fb700ef54: Extracting [==================================================>]      32B/32B[1B[1A[2K4f4fb700ef54: Pull complete [1BDigest: sha256:0a7748a06cabaf6e5c7e26bafab0f43c4274df50462ed4dd38761c5ac4fa08b3
+[5A[2K
+bd89a318b01f: Downloading [=>                                                 ]  2.101kB/86.22kB
+[5B[5A[2K
+bd89a318b01f: Download complete 
+[5B[5A[2K
+bd89a318b01f: Extracting [===================>                               ]  32.77kB/86.22kB
+[5B[5A[2K
+bd89a318b01f: Extracting [==================================================>]  86.22kB/86.22kB
+[5B[5A[2K
+bd89a318b01f: Extracting [==================================================>]  86.22kB/86.22kB
+[5B[3A[2K
+a57d0b565c8b: Downloading [>                                                  ]  58.12kB/5.8MB
+[3B[4A[2K
+b267dbb0e12d: Downloading [>                                                  ]  12.32kB/1.146MB
+[4B[5A[2K
+bd89a318b01f: Pull complete 
+[5B[4A[2K
+b267dbb0e12d: Verifying Checksum 
+[4B[4A[2K
+b267dbb0e12d: Download complete 
+[4B[4A[2K
+b267dbb0e12d: Extracting [=>                                                 ]  32.77kB/1.146MB
+[4B[3A[2K
+a57d0b565c8b: Downloading [====================>                              ]  2.343MB/5.8MB
+[3B[4A[2K
+b267dbb0e12d: Extracting [==================================================>]  1.146MB/1.146MB
+[4B[4A[2K
+b267dbb0e12d: Extracting [==================================================>]  1.146MB/1.146MB
+[4B[4A[2K
+b267dbb0e12d: Pull complete 
+[4B[3A[2K
+a57d0b565c8b: Downloading [=========================================>         ]  4.781MB/5.8MB
+[3B[3A[2K
+a57d0b565c8b: Verifying Checksum 
+[3B[3A[2K
+a57d0b565c8b: Download complete 
+[3B[3A[2K
+a57d0b565c8b: Extracting [>                                                  ]  65.54kB/5.8MB
+[3B[3A[2K
+a57d0b565c8b: Extracting [=================================================> ]  5.702MB/5.8MB
+[3B[3A[2K
+a57d0b565c8b: Extracting [==================================================>]    5.8MB/5.8MB
+[3B[3A[2K
+a57d0b565c8b: Pull complete 
+[3B[1A[2K
+4f4fb700ef54: Downloading [==================================================>]      32B/32B
+[1B[1A[2K
+4f4fb700ef54: Verifying Checksum 
+[1B[1A[2K
+4f4fb700ef54: Download complete 
+[1B[2A[2K
+54945c499302: Downloading [>                                                  ]    2.1kB/126.8kB
+[2B[2A[2K
+54945c499302: Downloading [==================================================>]  126.8kB/126.8kB
+[2B[2A[2K
+54945c499302: Download complete 
+[2B[2A[2K
+54945c499302: Extracting [============>                                      ]  32.77kB/126.8kB
+[2B[2A[2K
+54945c499302: Extracting [==================================================>]  126.8kB/126.8kB
+[2B[2A[2K
+54945c499302: Extracting [==================================================>]  126.8kB/126.8kB
+[2B[2A[2K
+54945c499302: Pull complete 
+[2B[1A[2K
+4f4fb700ef54: Extracting [==================================================>]      32B/32B
+[1B[1A[2K
+4f4fb700ef54: Extracting [==================================================>]      32B/32B
+[1B[1A[2K
+4f4fb700ef54: Pull complete 
+[1BDigest: sha256:0a7748a06cabaf6e5c7e26bafab0f43c4274df50462ed4dd38761c5ac4fa08b3
 Status: Downloaded newer image for victorhenrique5800/summarizing_fuzzy_tensors_extended_real:latest
 docker.io/victorhenrique5800/summarizing_fuzzy_tensors_extended_real:latest
 latest: Pulling from victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer
