@@ -14,5 +14,6 @@ else
     mkdir post_analysis
 fi
 
+# docker build -t $NAME $1 --no-cache .
 docker build -t $NAME $1 .
 docker tag $NAME $NAME:latest
