@@ -1,0 +1,9 @@
+Memory (kb): 626688
+Tensor parsing time: 0.76453s
+Tensor shifting time: 0.0990592s
+Explanatory power maximization time: 253048s
+Nb of patterns candidates for selection: 38
+Tensor reduction time: 0.0206446s
+Nb of selected patterns: 34
+Selection time: 0.00352053s
+Total time: 253049s
