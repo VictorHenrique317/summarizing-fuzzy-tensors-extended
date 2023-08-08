@@ -11,9 +11,9 @@ controller = Controller(delete_post_analysis="y",
 
 # ========================== ALGORITHMS USED ========================== #
 # getf = Getf(controller)
-# cancer = Cancer(controller)
-# triclusterbox = TriBiclusterBox(controller)
-# nclusterboxnoperformanceimp = NclusterBoxNoPerformanceImp(controller)
+cancer = Cancer(controller)
+triclusterbox = TriBiclusterBox(controller)
+nclusterboxnoperformanceimp = NclusterBoxNoPerformanceImp(controller)
 nclusterbox = NclusterBox(controller)
 # ========================== ALGORITHMS USED ========================== #
 

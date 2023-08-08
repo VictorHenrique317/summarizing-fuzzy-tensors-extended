@@ -61,15 +61,15 @@ class Controller:
                 print("#"*120 + f" CORRECT OBSEVATIONS = {observations}")
                 if self.__skip_gennsets is False:
                     self.__numnoise.run(observations)
-                    self.__crisp_translator.run(observations)
+                    # self.__crisp_translator.run(observations)
                     self.__numpy_translator.run(observations)
                     self.__mat_translator.run(observations)
 
-                self.current_dataset_path = f"{self.current_iteration_folder}/tensors/crisp"
-                self.current_dataset_path = f"{self.current_dataset_path}/dataset-co{observations}.crisp_tensor"
+                # self.current_dataset_path = f"{self.current_iteration_folder}/tensors/crisp"
+                # self.current_dataset_path = f"{self.current_dataset_path}/dataset-co{observations}.crisp_tensor"
 
-                # self.current_dataset_path = f"{self.current_iteration_folder}/tensors/numnoise"
-                # self.current_dataset_path = f"{self.current_dataset_path}/dataset-co{observations}.fuzzy_tensor"
+                self.current_dataset_path = f"{self.current_iteration_folder}/tensors/numnoise"
+                self.current_dataset_path = f"{self.current_dataset_path}/dataset-co{observations}.fuzzy_tensor"
 
                 self.current_dataset = RandomDataset(self.current_dataset_path)
                 dimension = len(self.current_dataset.getDimension())
