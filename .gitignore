@@ -27,3 +27,4 @@ synthetic/algorithms/tribiclusterbox/src/utilities/*.o
 nohup.out
 
 speedup/logs
+speedup/screen_logs
