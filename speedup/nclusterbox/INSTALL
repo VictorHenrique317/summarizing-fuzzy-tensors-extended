@@ -1,0 +1,95 @@
+*** Dependencies ***
+
+To run, nclusterbox requires the Boost library.  Most of GNU/Linux
+distributions have it in their repositories.  Simply use your package
+manager to install it.  Notice however that Debian and its derivatives
+(including the *buntu) split that library into several packages.  If
+you run one of them, you must install libboost-dev,
+libboost-program-options and libboost-program-options-dev.
+
+To manually install the Boost library (for example if you are running
+a proprietary operating system), this Web page may help you:
+http://www.boost.org/more/getting_started/index.html
+
+
+*** Compilation ***
+
+nclusterbox was meant to be built with either GCC version 4.9 or later
+or Clang.  One can modify the variable CXX in Makefile to use another
+compiler.
+
+To install nclusterbox and its man page on a *NIX-like operating
+system, execute (with administrator privileges):
+# make install
+
+If you do not have access to administrator privileges or if you do not
+run a *NIX-like operating system, execute:
+$ make
+The executable, called nclusterbox, is created in the working
+directory.  You can then move it to a personal directory listed in
+your PATH variable.
+
+
+*** Compilation Options ***
+
+Several options can be easily enabled (respectively disabled) in
+Parameters.h by uncommenting (respectively commenting) them:
+
+UPDATES_SUM makes nclusterbox update (rather than compute from
+scratch) the sums of the membership degrees on all elements after each
+addition/remotion step.  Use #define UPDATE_SUMS.
+
+REMEMBER makes nclusterbox store or not (#define REMEMBER 0) every
+pattern that it visits, either in a hash set (#define REMEMBER 1) or
+in a homemade trie (#define REMEMBER 2) to avoid redundant computation
+if it is visited again.  Use #define REMEMBER 1.
+
+VERBOSE_PARSER turns on the output (on the standard output) of
+information when the input data are parsed.
+
+DEBUG_MODIFY turns on the output (on the standard output) of
+information during the execution of nclusterbox --jobs 1.  This option
+may be enabled by who wishes to understand how nclusterbox modifies a
+small number of patterns.
+
+DEBUG_SELECT turns on the output (on the standard output) of
+information during the selection of the patterns.  This option may be
+enabled by who wishes to understand how a small number of patterns are
+selected.
+
+NUMERIC_PRECISION turns ou the output (on the standard output) of the
+maximal possible round-off error when internally storing a membership
+degree for modifying patterns and, then, for selecting them.
+
+NB_OF_PATTERNS turns on the output (on the standard output) of the
+numbers of patterns candidates for selection, and, then, of selected
+patterns.
+
+TIME turns on the output (on the standard output) of the run time of
+nclusterbox.
+
+DETAILED_TIME turns on the output (on the standard output) of a more
+detailed analysis of how the time is spent.  It lists (in this order):
+- the tensor parsing time
+- the tensor shifting time
+- the explanatory power maximization time
+- the tensor reduction time
+- the selection time
+
+GNUPLOT modifies the outputs of NUMERIC_PRECISION, NB_OF_PATTERNS,
+DETAILED_TIME and TIME.  They become tab separated values.  The output
+order is:
+- tensor parsing time (#ifdef DETAILED_TIME)
+- numeric precision for modifying patterns (#ifdef NUMERIC_PRECISION)
+- tensor shifting time (#ifdef DETAILED_TIME)
+- explanatory power maximization time (#ifdef DETAILED_TIME)
+- number of patterns candidates for selection (#ifdef NB_OF_PATTERNS)
+- numeric precision for selecting patterns (#ifdef NUMERIC_PRECISION)
+- tensor reduction time (#ifdef DETAILED_TIME)
+- number of selected patterns (#ifdef NB_OF_PATTERNS)
+- selection time (#ifdef DETAILED_TIME)
+- total time (#ifdef TIME)
+
+If any of those compilation options is used, an output file different
+from the standard output should always be defined through the runtime
+option --out (-o).

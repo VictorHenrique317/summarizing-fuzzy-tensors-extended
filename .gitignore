@@ -25,3 +25,5 @@ synthetic/algorithms/tribiclusterbox/src/paf/*.o
 synthetic/algorithms/tribiclusterbox/src/utilities/*.o
 
 nohup.out
+
+speedup/logs

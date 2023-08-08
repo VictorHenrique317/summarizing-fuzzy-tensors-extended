@@ -1,0 +1,334 @@
+*** DESCRIPTION ***
+
+nclusterbox modifies patterns, which hold in a fuzzy tensor, to
+maximize their explanatory powers and selects an ordered subset of the
+built patterns to summarize this tensor.
+
+
+*** RETURN VALUES ***
+
+nclusterbox returns values which can be used when called from a
+script.  They are conformed to sysexit.h.
+* 0 is returned when nclusterbox successfully terminates.
+* 64 is returned when nclusterbox is incorrectly called.
+* 65 is returned when an input data line is not properly formatted.
+* 66 is returned when an input file cannot be read.
+* 73 is returned when the output file cannot be written.
+
+
+*** GENERAL ***
+
+* nclusterbox called with option --help (or -h) displays a reminder of
+the main options.
+* nclusterbox called with option --hio displays a reminder of the
+options modifying the Input/Output format.
+* nclusterbox called with option --hu displays a reminder of "useless
+options", detailed in the eponymous section of this file.
+* nclusterbox --version (or simply nclusterbox -V) displays version
+information.
+
+
+*** OPTIONS ***
+
+Any option passed to nclusterbox may be either specified on the
+command line or in an option file.  If an option is present both in
+the option file and on the command line, the latter is used.
+
+The option file can be specified through option --opt.  When omitted,
+a file named as the input tensor file + ".opt" is supposed to be the
+option file related to the input tensor file.  For example, if the
+input tensor file name is "tensor" and "tensor.opt" exists, it is
+supposed to be the related option file.
+
+The options have the same name in the option file as on the command
+line.  Only long names can be used though.  Arguments passed to an
+option are separated from the name of the option by "=".  As an
+example, these lines may constitute an option file:
+
+verbose
+tds = ": "
+out = res/out
+max = 1000
+ms = 100
+
+
+*** VERBOSITY ***
+
+Option --verbose (or -v) prints, on the standard output, nclusterbox's
+current step.  That option must be given in argument a number of
+seconds, such as 0.5 for half a second or, in the examples in this
+file, 2 for two seconds.  It is the delay between two consecutive
+updates of the number of input patterns whose modification has not
+started and between two consecutive updates of the number modified
+patterns that may still enter the summary.  Option --verbose indeed
+shows those pieces of information during the longest steps, the
+modification of the input patterns and the selection of the modified
+patterns, unless the given argument is zero or negative.
+
+
+*** INPUT FUZZY TENSOR ***
+
+The name of the file containing the input fuzzy tensor is passed as an
+argument to nclusterbox.  If omitted, /dev/stdin is used.
+
+Every line must be either empty (it is ignored) or contain n + 1
+fields, n sets of elements of each of the dimensions of an n-way fuzzy
+tensor, and a number in [0, 1].  That number, a float, is the
+membership degree associated with every n-tuple in the Cartesian
+product of the n first fields.  Those first fields often have single
+elements.  They index one cell and the value in it follows.  Every
+n-tuple that is undefined in the input tensor is associated with a
+null membership degree.  If the membership degree of an n-tuple is
+defined several times, only the first definition holds.
+
+It is common as well to only have Boolean values.  Since no n-tuple
+with a null membership degree needs to be input, the last field may be
+always 1.  Option --boolean (-b) implicitly adds those 1.  The input
+lines must then be either empty (they are ignored) or only contain the
+n first fields.
+
+Several different characters may be used to separate the fields.  The
+same goes for the separations of the elements of any of the n first
+fields.  The elements can be any string not including any of the
+separatoring characters.  They must be all distinct.  Let us take an
+example.  This line stands for the two 3-tuples in the Cartesian
+product of {01-09-2007}, {Thomas, Harry}, and {basketball}, both
+associated with the membership degree 0.1:
+
+01-09-2007: Thomas,Harry basketball .1
+
+Here, the characters ":" or/and " " separate the dimensions and the
+membership degree.  "," separates the elements of a same dimension.
+Having several characters possibly separating the dimensions (or the
+elements) is OK.  Options --tds and --tes set the sets of characters
+separating the dimensions and the elements in a dimension,
+respectively, or defaults (" " and ",", respectively) are used.
+Assuming the file named "tensor" specifies the tensor with lines as
+above example, (verbose) nclusterbox is to be called as follows:
+
+$ nclusterbox -v 2 --tds ': ' tensor
+
+There is, here, no need for option --pes because "," is the default
+value, and option --boolean is not used because the last field
+contains membership degrees.
+
+
+*** OUTPUT SUMMARY ***
+
+Output data looks like input data.  Each line starts with a pattern
+followed by either its density in the input tensor or, using the
+option --pl, its density in the shifted tensor (see Section SHIFT).
+The elements of every dimension of every pattern are ordered by
+increasing density of the related slices of the shifted fuzzy tensor.
+
+Option --out (or -o) sets the name of the file where patterns are
+output.  If omitted, /dev/stdout is used.  For instance, to write in
+res/out the summary of the tensor exemplifying the previous section:
+
+$ nclusterbox -v 2 --tds ': ' -o res/out tensor
+
+The output dimensions are separated by a string specified through
+option --ods (by default " ").  The elements are separated by a string
+specified through option --oes (by default ",").
+
+nclusterbox can append to each output pattern, additional information.
+When called with option --ps, nclusterbox prints the number of
+elements in each dimension of the pattern.  When called with option
+--pa, nclusterbox prints its area.  When called with option --pr,
+nclusterbox prints the residual sum of squares of the summary
+truncated after the pattern.  The separators can be specified:
+* --sp sets the string prefixing the number of elements in each
+dimension (by default " : ").
+* --ss sets the string separating such numbers (by default " ").
+* --ap sets the string prefixing the area (by default " : ").
+* --rp sets the string prefixing the residual sum of squares (by
+default " : ").
+
+
+*** DEFAULT INITIAL PATTERNS ***
+
+nclusterbox starts with initial patterns.  It gradually modifies each
+of them to increase its explanatory power until a local maximum.  By
+default, nclusterbox modifies one initial pattern per fiber with at
+least one shifted value exceeding 0.  That may require too much time
+and/or memory.  Even if the default requirements are not prohibitive,
+the same summary is often more efficiently obtained by modifying only
+a few initial patterns.  Option --max (or -m) sets a maximum number,
+in argument, of initial patterns to modify, those with the greatest
+initial explanatory powers.  For instance, complementing our running
+example to modify at most 1000 initial patterns:
+
+$ nclusterbox -v 2 --tds ': ' -o res/out -m 1000 tensor
+
+
+*** PERFORMANCE TUNING ***
+
+Giving a smaller argument to option --max, which has just been
+presented, is the main way to decrease time and memory requirements.
+That may worsen the output summary, unlike the following options.
+
+Option --jobs (or -j) sets how many patterns are simultaneously
+modified, thanks to multithreading.  The default argument, shown by
+option --help, is the detected number of supported concurrent threads.
+A smaller number may actually lower the run time.  With the following
+call, at most six patterns are simultaneously modified:
+
+$ nclusterbox -v 2 --tds ': ' -o res/out -m 1000 -j 6 tensor
+
+nclusterbox can store the shifted fuzzy tensor in a hybrid way: part
+of it in sparse structures and part of it in dense structures.  Option
+--density (or -d) must be given a float number in [0, 1] in argument.
+It defines a threshold at which a denser structure is preferred.  It
+is 1 by default, to minimize the memory requirements.  A value closer
+to 0 (or even 0, to always use dense structures) may turn nclusterbox
+faster, especially if only a few patterns are simultaneously modified.
+
+
+*** SELECTION ***
+
+By default, nclusterbox selects as many patterns as useful to
+heuristically minimize the Bayesian information criterion.  Option
+--msc sets another criterion: the Akaike information criterion if
+"aic" (or a prefix) is in argument of the option, the residual sum of
+squares if that argument is "rss" (or a prefix).  Summarizing fuzzy
+tensors with many cells, the selection criterion usually makes little
+to no difference: too many patterns tend to be selected for the whole
+output to be considered a summary.
+
+Nevertheless, the selection process is such that it makes sense to
+truncate the output, especially at an elbow (if any) in the curve of
+the RSS (see option --pr).  Anyway, for a faster selection of a better
+short summary, option --mss should be used.  It stops the selection if
+the number of patterns in argument is reached.  The first output
+patterns using that option are not necessarily the same as those
+output with a greater bound or no bound (not using --mss).  Indeed, to
+heuristically minimize the selection criterion, shorter summaries
+favor larger and less dense patterns.  For the last time (it is not
+essential to read the rest of that README), let us complement the
+command line to have at most 100 output patterns:
+
+$ nclusterbox -v 2 --tds ': ' -o res/out -m 1000 -j 6 --mss 100 tensor
+
+Option --ns disables the selection and the ranking: every pattern that
+is built is directly output.
+
+
+*** SHIFT ***
+
+By default, every membership value in the fuzzy tensor, including the
+zeros associated with tuples that are not specified in the input
+tensor, is subtracted the density of the tensor.  Option --shift (or
+-s) sets another constant, in argument.  It must be a float in [0, 1].
+A larger constant focuses the search on smaller and denser patterns.
+
+Option --expectation (or -e) subtracts to every membership value the
+max average density among those of the slices including the associated
+tuple.  For example, the membership value associated with the tuple
+(01-09-2007, Thomas, basketball) is decreased by either the average
+membership value over all tuples involving 01-09-2007, or over all
+tuples involving Thomas, or over all tuples involving basketball,
+whichever is the greatest.  That option amounts to considering the
+histograms of the slice densities have been analyzed and patterns of
+interest are not mere consequences of these histograms: positive
+correlations between the elements of the pattern exist.
+
+
+*** CUSTOM INITIAL PATTERNS ***
+
+Option --patterns (or -p), followed by a file name or "-" for the
+standard input, provides a custom list of initial patterns.  They
+substitute the default ones.  If option --patterns is used, option
+--max truncates the list: no more pattern is input after reading as
+many patterns as in argument of --max.
+
+The format of an input pattern matches that of the n first fields in a
+line of an input tensor or an output summary.  For instance, this line
+stands for the 2x3x1-pattern including the six 3-tuples in the
+Cartesian product of {01-09-2007, 02-09-2007} and {Thomas, Harry, Max}
+and {basketball}:
+
+01-09-2007,02-09-2007: Thomas,Harry,Max;basketball
+
+The sets of characters to separate the dimensions and the elements in
+a dimensions are set with --pds and --pes.  Here, strings made of the
+characters ":", " " and ";" separate the dimensions.  That is why
+--pds ': ;' must be used.  Since --pds's default argument is " ", not
+using option --pds would make nclusterbox understand the above line as
+two dimensions including elements with the characters ":" and ";".  On
+the contrary, there is no need here to use option --pes, because its
+default argument is "," and, in the example, only commas separate the
+elements of any dimension of the input pattern.
+
+Any element appearing in some input pattern must be present in the
+input tensor.  If an input pattern is not properly formatted,
+nclusterbox displays a warning and ignores the malformed pattern.
+
+
+*** GENERATING INPUT PATTERNS ***
+
+The scripts slice-input, fiber-input, reduced-fiber-input-one-way, and
+reduced-fiber-input define four different sets of initial patterns
+that nclusterbox can modify.  The first argument any of those scripts
+takes is the tensor file.  Nevertheless, only one simple format is
+accepted: on every nonempty line, one single and always different
+n-tuple followed by its membership degree.  Also, spaces must separate
+the n + 1 fields.
+
+slice-input outputs the initial patterns as defined in "Approximate
+Bicluster and Tricluster Boxes in the Analysis of Binary Data", by
+Boris G. Mirkin and Andrey V. Kramarenko.  It takes a second argument,
+the id (starting at 1) of the dimension in which every initial pattern
+contains one single element.  It optionally takes a third argument, a
+minimal membership degree, by default the density of the tensor.
+
+fiber-input outputs the initial patterns as defined in "Summarizing
+Fuzzy Tensors with Sub-Tensors", by Victor H. S. Ribeiro and Loïc
+Cerf.  It takes a second argument, the id (starting at 1) of the
+dimension in which initial patterns can contain more than one element.
+It optionally takes a third argument, the minimal membership degree
+for an n-tuple to enter an initial pattern, by default the density of
+the tensor.
+
+reduced-fiber-input-one-way outputs subpatterns of those fiber-input
+would output.  Its second argument is analog to fiber-input's.  It
+optionally takes a third argument, to filter patterns: a threshold, by
+default 0, of the product of the area and the shifted density that any
+output pattern must exceed.  The (necessarily constant) shift is an
+optional fourth argument, by default the density of the tensor.
+
+reduced-fiber-input outputs everything reduced-fiber-input-one-way
+would output if repetitively called with every integer from 1 to n, as
+the second argument.  The expected arguments are the same, but with
+the second argument removed.  Wasting more time, reduced-fiber-input
+actually provides nclusterbox's default initial patterns.
+
+
+*** USELESS OPTIONS ***
+
+By default, nclusterbox can both add and remove elements to/from every
+initial pattern.  With option --grow (or -g), initially present
+elements cannot be removed.  Do not use that option!  Unless many tiny
+patterns are input through option --patterns, forbidding elements from
+being removed prevents the discovery of patterns with better
+explanatory powers.
+
+By default, every input pattern leads to at most one pattern that is
+candidate to enter the summary, one with a locally maximal explanatory
+power.  With option --intermediary (or -i), all the visited patterns,
+from the input pattern to the local maximal (including them), are
+candidates.  Do not use that option!  The resulting number of
+candidates makes the selection take ages.
+
+
+*** BUGS ***
+
+Report bugs to <lcerf@dcc.ufmg.br>.
+
+
+*** COPYRIGHT ***
+
+Copyright 2018-2023 Loïc Cerf (lcerf@dcc.ufmg.br)
+This is free software.  You may redistribute copies of it under the
+terms of the GNU General Public License
+<http://www.gnu.org/licenses/gpl.html>.  There is NO WARRANTY, to the
+extent permitted by law.
