@@ -1,26 +1,4 @@
-FROM ubuntu:latest
-
-ENV DEBIAN_FRONTEND=noninteractive
-# USER root
-
-RUN apt-get update && \
-	apt-get install -y make && \
-	apt-get install -y libboost-all-dev && \
-	apt-get install -y g++ && \
-	apt-get install -y r-base && \
-	apt-get install -y time && \
-	apt-get install -y gawk && \
-	apt-get install -y python3 && \
-	apt-get install -y python3-pip
-		
-RUN R -e "install.packages('reticulate')" && \
-	pip install numpy && \
-	pip install psutil && \
-	pip install scipy && \
-	pip install matplotlib && \
-	pip install scikit-learn && \
-	pip install pandas && \
-	pip install docker
+FROM victorhenrique5800/summarizing_fuzzy_tensors_extended_base
 
 COPY algorithms /app/algorithms
 

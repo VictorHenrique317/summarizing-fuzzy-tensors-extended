@@ -1,0 +1,4 @@
+docker pull victorhenrique5800/summarizing_fuzzy_tensors_extended_base:latest
+docker pull victorhenrique5800/summarizing_fuzzy_tensors_extended_real:latest
+docker pull victorhenrique5800/summarizing_fuzzy_tensors_extended_synth:latest
+docker pull victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer:latest

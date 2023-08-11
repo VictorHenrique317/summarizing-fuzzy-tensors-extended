@@ -1,7 +1,6 @@
 #!/bin/bash
-VOLUME_NAME="summarizing_fuzzy_tensors_extended_real"
-NAME="victorhenrique5800/summarizing_fuzzy_tensors_extended_real"
-CANCER_NAME="victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer"
+VOLUME_NAME="summarizing_fuzzy_tensors_extended_speedup"
+NAME="victorhenrique5800/summarizing_fuzzy_tensors_extended_speedup"
 
 # Unmounting and clearing volumes from the main image
 CONTAINERS=$(docker ps -a --filter volume=$VOLUME_NAME -q)
@@ -15,16 +14,11 @@ echo "Volume $VOLUME_NAME unmounted from all containers!"
 docker volume rm $VOLUME_NAME
 echo "Volume $VOLUME_NAME removed!"
 
-docker pull $NAME:latest
-docker pull $CANCER_NAME:latest
-
 docker volume create $VOLUME_NAME
 echo -e "\n"
-docker run -it -v /var/run/docker.sock:/var/run/docker.sock -v $VOLUME_NAME:/app $NAME:latest python3 main.py
+docker run -it -v $VOLUME_NAME:/app $NAME:latest ./main.sh --rerun
 
 # Copying volume files to disk
 CONTAINER_ID=$(docker ps -a --filter ancestor=$NAME -q)
-rm -rf iteration
-rm -rf post_analysis
-docker cp $CONTAINER_ID:/app/iteration/. iteration
-docker cp $CONTAINER_ID:/app/post_analysis/. post_analysis
+rm -rf plots
+docker cp $CONTAINER_ID:/app/plots plots

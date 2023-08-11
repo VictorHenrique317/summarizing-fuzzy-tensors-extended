@@ -1,14 +1,4 @@
-FROM ubuntu
-
-RUN apt-get update && \
-    apt-get install -y python3 python3-pip && \
-    apt-get install -y make && \
-    apt-get install -y libboost-all-dev && \
-    apt-get install -y g++
-
-RUN pip3 install matplotlib && \
-    pip install numpy && \
-    pip install scipy
+FROM victorhenrique5800/summarizing_fuzzy_tensors_extended_base
 
 COPY nclusterbox /app/nclusterbox
 

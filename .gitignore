@@ -28,3 +28,5 @@ nohup.out
 
 speedup/logs
 speedup/screen_logs
+
+push_images.sh

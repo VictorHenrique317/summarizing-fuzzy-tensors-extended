@@ -1,8 +1,7 @@
 #!/bin/bash
-
+VOLUME_NAME="summarizing_fuzzy_tensors_extended_synth"
 NAME="victorhenrique5800/summarizing_fuzzy_tensors_extended_synth"
 CANCER_NAME="victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer"
-VOLUME_NAME="summarizing_fuzzy_tensors_extended_synth"
 
 # Unmounting and clearing volumes from the main image
 CONTAINERS=$(docker ps -a --filter volume=$VOLUME_NAME -q)
@@ -16,8 +15,6 @@ echo "Volume $VOLUME_NAME unmounted from all containers!"
 docker volume rm $VOLUME_NAME
 echo "Volume $VOLUME_NAME removed!"
 
-docker pull victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer:latest
-
 docker volume create $VOLUME_NAME
 echo -e "\n"
 docker run -it -v /var/run/docker.sock:/var/run/docker.sock -v $VOLUME_NAME:/app $NAME:latest python3 main.py
@@ -28,5 +25,3 @@ rm -rf iterations
 rm -rf post_analysis
 docker cp $CONTAINER_ID:/app/iterations/. iterations
 docker cp $CONTAINER_ID:/app/post_analysis/. post_analysis
-
-
