@@ -10,10 +10,10 @@ controller = Controller(delete_post_analysis="y",
                         delete_iterations="n")
 
 # ========================== ALGORITHMS USED ========================== #
-# nclusterbox = NclusterBox(controller)
+nclusterbox = NclusterBox(controller)
 # getf = Getf(controller)
 # nclusterboxnoperformanceimp = NclusterBoxNoPerformanceImp(controller)
-triclusterbox = TriBiclusterBox(controller)
+# triclusterbox = TriBiclusterBox(controller)
 # cancer = Cancer(controller)
 # ========================== ALGORITHMS USED ========================== #
 

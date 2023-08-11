@@ -1,19 +1,17 @@
-FROM ubuntu:latest
+FROM alpine:latest
 
-ENV DEBIAN_FRONTEND=noninteractive
-# USER root
+RUN apk update && \
+	apk add make && \
+	apk add boost-dev && \
+	apk add g++ && \
+	apk add R && \
+	apk add R-dev && \
+	apk add gawk && \
+	apk add python3 && \
+	apk add python3-dev && \
+	apk add py3-pip
 
-RUN apt-get update && \
-	apt-get install -y make && \
-	apt-get install -y libboost-all-dev && \
-	apt-get install -y g++ && \
-	apt-get install -y r-base && \
-	apt-get install -y time && \
-	apt-get install -y gawk && \
-	apt-get install -y python3 && \
-	apt-get install -y python3-pip
-		
-RUN R -e "install.packages('reticulate')" && \
+RUN R -e "install.packages('reticulate', repos='https://cloud.r-project.org')" && \
 	pip install numpy && \
 	pip install psutil && \
 	pip install scipy && \
