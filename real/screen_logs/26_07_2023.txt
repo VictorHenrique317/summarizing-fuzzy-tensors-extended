@@ -25,7 +25,13 @@ Running getf...
 [1] "Time spent:"
 [1] 89.65617
 Starting to extract 6 patterns
- 1 done 2 done 3 done 4 done 5 done 6 done[1] "Finished"
+
+ 1 done
+ 2 done
+ 3 done
+ 4 done
+ 5 done
+ 6 done[1] "Finished"
 [1] TRUE
 [1] "Log file created!"
 GETF was executed sucessfully!

@@ -20,10 +20,10 @@ class RetweetsDataset():
 
         self.__preprocess()
         self.__matrix = self.__toMatrix()
-        self.__tensor_density = 0.0006762951656337755
+        self.__tensor_density = 0.001106460225179777
         # self.__tensor_density = self.__calculateTensorDensity()
         # self.__empty_model_rss = self.__calculateEmptyModelRss()
-        self.__empty_model_rss = 29649.31304061235
+        self.__empty_model_rss = 39432.31305600426
         self__encoders = [LabelEncoder(), LabelEncoder(), LabelEncoder()]
     
     def path(self):
