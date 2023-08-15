@@ -40,6 +40,7 @@ class Controller():
 
         self.__calculate_rss_evolution = False
         self.__calculate_quality = False
+        self.__datasets_built = False
 
         
 
@@ -101,6 +102,15 @@ class Controller():
         for algorithm in self.algorithms:
             algorithm.resetTimeOutInfo()
 
+    def __buildDatasets(self):
+        if self.__datasets_built:
+            return
+        
+        self.__datasets_built = True
+        print("Building datasets from raw data...")
+        os.system("/app/datasets/retweets/preprocess.sh")
+        os.system("/app/datasets/primaryschool/preprocess.sh")
+
     def initiateSession(self):
         delete_iterations = self.delete_iterations
         if delete_iterations is None:
@@ -111,9 +121,7 @@ class Controller():
 
         FileSystem.deletePostAnalysisFolder()
 
-        print("Building datasets from raw data...")
-        os.system("/app/datasets/retweets/preprocess.sh")
-        os.system("/app/datasets/primaryschool/preprocess.sh")
+        self.__buildDatasets()
 
         for config_file in Commands.listFolder(self.__configs_folder):
             if config_file.strip().split(".")[-1] == "off":
@@ -171,6 +179,8 @@ class Controller():
             
         if calculate_rss_evolution == "y":
             self.__calculate_rss_evolution = True
+
+        self.__buildDatasets()
 
         for config_file in Commands.listFolder(self.__configs_folder):
             if config_file.strip().split(".")[-1] == "off":
