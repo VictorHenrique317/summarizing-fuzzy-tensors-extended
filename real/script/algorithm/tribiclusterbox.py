@@ -96,11 +96,11 @@ class TriBiclusterBox(Algorithm):
 
         command += f">> {self.log_path}"
 
-        # print(command)
-        # start = time.time()
-        # timedout = Commands.executeWithTimeout(command, timeout)
-        # end = time.time()
-        # elapsed_time = end - start
+        print(command)
+        start = time.time()
+        timedout = Commands.executeWithTimeout(command, timeout)
+        end = time.time()
+        elapsed_time = end - start
 
         timedout = False
         elapsed_time = None
