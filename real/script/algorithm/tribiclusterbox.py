@@ -82,7 +82,7 @@ class TriBiclusterBox(Algorithm):
 
         tube_dim = None
         if dimension == 3:
-            tube_dim = 2
+            tube_dim = 1
         if dimension == 2:
             tube_dim = 1
     

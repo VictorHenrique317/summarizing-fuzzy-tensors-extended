@@ -110,7 +110,7 @@ class RssEvolution:
         return total_rss, counter
 
     @staticmethod
-    def calculate(dataset:RetweetsDataset, patterns:List[Pattern], max_pattern_nb=20):
+    def calculate(dataset:RetweetsDataset, patterns:List[Pattern], max_pattern_nb=10000):
         rss_evolution = [] # adicionando padrões da primeira linha a ultima
         considerated_patterns = []
         counter = 0
