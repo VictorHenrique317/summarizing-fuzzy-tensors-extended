@@ -1,9 +1,9 @@
 {
   "configuration_name":"test_config_2",
   "timeout":5400,
-  "dataset_size": [1000,1000],
-  "pattern_size": 25,
-  "n_patterns":10,
+  "dataset_size": [8,8,8],
+  "pattern_size": 2,
+  "n_patterns":4,
   "correct_obs":[1,2,4,8,16],
-  "nb_iterations":1
+  "nb_iterations":2
 }

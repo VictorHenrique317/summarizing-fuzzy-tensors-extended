@@ -136,11 +136,11 @@ void CandidateVariable::multiplyRSSVariationByArea()
 {
   const vector<vector<unsigned int>>::const_iterator dimensionEnd = nSet.end();
   vector<vector<unsigned int>>::const_iterator dimensionIt = nSet.begin();
-  rssVariation *= dimensionIt->size();
+  rssVariation *= static_cast<long long>(dimensionIt->size());
   ++dimensionIt;
   do
     {
-      rssVariation *= dimensionIt->size();
+      rssVariation *= static_cast<long long>(dimensionIt->size());
     }
   while (++dimensionIt != dimensionEnd);
 }

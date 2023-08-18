@@ -18,7 +18,7 @@
 class RankPatterns
 {
  public:
-  static void rank(const unsigned int nbOfCandidateVariablesHavingAllElements, AbstractRoughTensor* roughTensor, const float verboseStep, const unsigned int maxSelectionSize, const SelectionCriterion selectionCriterion, const bool isRSSPrinted);
+  static void rank(AbstractRoughTensor* roughTensor, const float verboseStep, const unsigned int maxSelectionSize, const SelectionCriterion selectionCriterion, const bool isRSSPrinted);
 
  private:
   static TrieWithPrediction tensor;

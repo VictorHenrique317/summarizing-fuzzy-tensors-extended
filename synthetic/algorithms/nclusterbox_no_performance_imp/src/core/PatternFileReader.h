@@ -28,6 +28,7 @@ class PatternFileReader
 
  private:
   static string noisyNSetFileName;
+  static istream noisyNSetStream;
   static ifstream noisyNSetFile;
   static vector<unordered_map<string, unsigned int>> labels2Ids;
   static char_separator<char> inputElementSeparator;

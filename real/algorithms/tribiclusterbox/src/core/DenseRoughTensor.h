@@ -1,4 +1,4 @@
-// Copyright 2018-2022 Loïc Cerf (lcerf@dcc.ufmg.br)
+// Copyright 2018-2023 Loïc Cerf (lcerf@dcc.ufmg.br)
 
 // This file is part of nclusterbox.
 
@@ -26,7 +26,7 @@ class DenseRoughTensor final : public AbstractRoughTensor
 
   Trie getTensor() const;
   void setNoSelection();
-  TrieWithPrediction projectTensor(const unsigned int nbOfPatternsHavingAllElements);
+  TrieWithPrediction projectTensor();
 
   double getAverageShift(const vector<vector<unsigned int>>& nSet) const;
 

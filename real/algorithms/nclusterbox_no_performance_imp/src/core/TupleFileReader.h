@@ -30,6 +30,7 @@ class TupleFileReader
 
  private:
   const string tensorFileName;
+  istream tensorStream;
   ifstream tensorFile;
   const char_separator<char> inputDimensionSeparator;
   const char_separator<char> inputElementSeparator;

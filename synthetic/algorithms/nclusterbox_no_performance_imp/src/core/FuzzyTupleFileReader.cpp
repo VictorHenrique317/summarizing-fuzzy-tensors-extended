@@ -1,4 +1,4 @@
-// Copyright 2018-2022 Loïc Cerf (lcerf@dcc.ufmg.br)
+// Copyright 2018-2023 Loïc Cerf (lcerf@dcc.ufmg.br)
 
 // This file is part of nclusterbox.
 
@@ -10,6 +10,7 @@
 
 #include "FuzzyTupleFileReader.h"
 
+#include <iostream>
 #include <boost/lexical_cast.hpp>
 
 #include "../../Parameters.h"
@@ -17,28 +18,32 @@
 #include "../utilities/NoInputException.h"
 #include "../utilities/DataFormatException.h"
 
-#ifdef VERBOSE_PARSER
-#include <iostream>
-#endif
-
-FuzzyTupleFileReader::FuzzyTupleFileReader(const char* tensorFileNameParam, const char* inputDimensionSeparatorParam, const char* inputElementSeparatorParam): tensorFileName(tensorFileNameParam), tensorFile(tensorFileName), inputDimensionSeparator(inputDimensionSeparatorParam), inputElementSeparator(inputElementSeparatorParam), lineNb(0), ids2Labels(), labels2Ids(), nSet(), membership(0), tupleIts()
+FuzzyTupleFileReader::FuzzyTupleFileReader(const char* tensorFileNameParam, const char* inputDimensionSeparatorParam, const char* inputElementSeparatorParam): tensorFileName(tensorFileNameParam), tensorStream(nullptr), tensorFile(), inputDimensionSeparator(inputDimensionSeparatorParam), inputElementSeparator(inputElementSeparatorParam), lineNb(0), ids2Labels(), labels2Ids(), nSet(), membership(0), tupleIts()
 {
-  if (!tensorFile)
+   if (tensorFileName == "-")
+    {
+      tensorStream.rdbuf(cin.rdbuf());
+      init();
+      return;
+    }
+   tensorFile.open(tensorFileNameParam);
+   if (!tensorFile)
     {
       throw NoInputException(tensorFileNameParam);
     }
+  tensorStream.rdbuf(tensorFile.rdbuf());
   init();
 }
 
 void FuzzyTupleFileReader::init()
 {
-  if (tensorFile.eof())
+  if (tensorStream.eof())
     {
       throw UsageException(("No fuzzy tuple in " + tensorFileName + '!').c_str());
     }
   ++lineNb;
   string nSetString;
-  getline(tensorFile, nSetString);
+  getline(tensorStream, nSetString);
   tokenizer<char_separator<char>> dimensions(nSetString, inputDimensionSeparator);
   tokenizer<char_separator<char>>::const_iterator dimensionIt = dimensions.begin();
   if (dimensionIt == dimensions.end())
@@ -56,12 +61,12 @@ void FuzzyTupleFileReader::init()
   tupleIts.resize(ids2Labels.size());
   while (!parseLine(dimensions.begin(), dimensions.end()))
     {
-      if (tensorFile.eof())
+      if (tensorStream.eof())
 	{
 	  throw UsageException(("All fuzzy tuples in " + tensorFileName + " have null membership degrees!").c_str());
 	}
       ++lineNb;
-      getline(tensorFile, nSetString);
+      getline(tensorStream, nSetString);
       dimensions = tokenizer<char_separator<char>>(nSetString, inputDimensionSeparator);
     }
 #ifdef VERBOSE_PARSER
@@ -87,7 +92,7 @@ pair<vector<FuzzyTuple>, bool> FuzzyTupleFileReader::read()
 	  // All tuples in nSet enumerated: find and parse the next line (if any) with nonzero membership
 	  for (; ; )
 	    {
-	      if (tensorFile.eof())
+	      if (tensorStream.eof())
 		{
 		  tensorFile.close();
 		  fuzzyTuples.shrink_to_fit();
@@ -97,7 +102,7 @@ pair<vector<FuzzyTuple>, bool> FuzzyTupleFileReader::read()
 		}
 	      ++lineNb;
 	      string nSetString;
-	      getline(tensorFile, nSetString);
+	      getline(tensorStream, nSetString);
 	      tokenizer<char_separator<char>> dimensions(nSetString, inputDimensionSeparator);
 	      if (dimensions.begin() != dimensions.end() && parseLine(dimensions.begin(), dimensions.end()))
 		{

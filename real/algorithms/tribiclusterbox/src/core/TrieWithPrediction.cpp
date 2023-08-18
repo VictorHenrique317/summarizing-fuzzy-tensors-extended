@@ -108,11 +108,11 @@ int TrieWithPrediction::density(const vector<vector<unsigned int>>& nSet) const
       sum += sumOnSlice;
     }
   while (++idIt != idEnd);
-  sum /= (dimensionIt - 1)->size();
+  sum /= static_cast<long long>((dimensionIt - 1)->size());
   const vector<vector<unsigned int>>::const_iterator dimensionEnd = nSet.end();
   do
     {
-      sum /= dimensionIt->size();
+      sum /= static_cast<long long>(dimensionIt->size());
     }
   while (++dimensionIt != dimensionEnd);
   return sum;

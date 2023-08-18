@@ -56,7 +56,7 @@ ModifiedPattern::~ModifiedPattern()
   if (isEveryVisitedPatternStored && !AbstractRoughTensor::isDirectOutput())
     {
       const lock_guard<mutex> lock(candidateVariablesLock);
-      move(candidateVariables.begin(), candidateVariables.end(), AbstractRoughTensor::getIteratorToInsertCandidateVariables());
+      move(candidateVariables.begin(), candidateVariables.end(), back_inserter<vector<vector<vector<unsigned int>>>>(AbstractRoughTensor::candidateVariables));
     }
 }
 
@@ -165,7 +165,7 @@ void ModifiedPattern::insertCandidateVariables()
       VisitedPatterns::clear();
       return;
     }
-  move(distinctCandidateVariables.begin(), distinctCandidateVariables.end(), AbstractRoughTensor::getIteratorToInsertCandidateVariables());
+  move(distinctCandidateVariables.begin(), distinctCandidateVariables.end(), back_inserter<vector<vector<vector<unsigned int>>>>(AbstractRoughTensor::candidateVariables));
   distinctCandidateVariables.clear();
 }
 

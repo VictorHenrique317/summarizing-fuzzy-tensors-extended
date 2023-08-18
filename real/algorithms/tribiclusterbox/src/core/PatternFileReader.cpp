@@ -19,6 +19,7 @@
 #include "AbstractRoughTensor.h"
 
 string PatternFileReader::noisyNSetFileName;
+istream PatternFileReader::noisyNSetStream(nullptr);
 ifstream PatternFileReader::noisyNSetFile;
 vector<unordered_map<string, unsigned int>> PatternFileReader::labels2Ids;
 char_separator<char> PatternFileReader::inputElementSeparator;
@@ -41,13 +42,19 @@ unordered_map<string, unsigned int> labels2IdsInDimension(const vector<string>& 
 
 void PatternFileReader::openFile(const char* noisyNSetFileNameParam)
 {
+  ConcurrentPatternPool::setReadFromFile();
   noisyNSetFileName = noisyNSetFileNameParam;
+  if (noisyNSetFileName == "-")
+    {
+      noisyNSetStream.rdbuf(cin.rdbuf());
+      return;
+    }
   noisyNSetFile.open(noisyNSetFileNameParam);
   if (!noisyNSetFile)
     {
       throw NoInputException(noisyNSetFileNameParam);
     }
-  ConcurrentPatternPool::setReadFromFile();
+  noisyNSetStream.rdbuf(noisyNSetFile.rdbuf());
 }
 
 void PatternFileReader::read(const char* inputDimensionSeparatorParam, const char* inputElementSeparatorParam, const vector<vector<string>>& ids2Labels, unsigned long long maxNbOfInitialPatterns)
@@ -65,11 +72,11 @@ void PatternFileReader::read(const char* inputDimensionSeparatorParam, const cha
     }
   while (++labelsInDimensionIt != labelsInDimensionEnd);
   const char_separator<char> inputDimensionSeparator(inputDimensionSeparatorParam);
-  while (!noisyNSetFile.eof())
+  while (!noisyNSetStream.eof())
     {
       ++lineNb;
       string noisyNSetString;
-      getline(noisyNSetFile, noisyNSetString);
+      getline(noisyNSetStream, noisyNSetString);
       tokenizer<char_separator<char>> dimensions(noisyNSetString, inputDimensionSeparator);
       if (dimensions.begin() != dimensions.end())
 	{

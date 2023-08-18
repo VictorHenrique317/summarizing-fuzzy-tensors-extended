@@ -10,6 +10,7 @@
 
 #include "TupleFileReader.h"
 
+#include <iostream>
 #include <boost/lexical_cast.hpp>
 
 #include "../../Parameters.h"
@@ -17,28 +18,32 @@
 #include "../utilities/NoInputException.h"
 #include "../utilities/DataFormatException.h"
 
-#ifdef VERBOSE_PARSER
-#include <iostream>
-#endif
-
-TupleFileReader::TupleFileReader(const char* tensorFileNameParam, const char* inputDimensionSeparatorParam, const char* inputElementSeparatorParam): tensorFileName(tensorFileNameParam), tensorFile(tensorFileName), inputDimensionSeparator(inputDimensionSeparatorParam), inputElementSeparator(inputElementSeparatorParam), lineNb(0), ids2Labels(), labels2Ids(), nSet(), tupleIts()
+TupleFileReader::TupleFileReader(const char* tensorFileNameParam, const char* inputDimensionSeparatorParam, const char* inputElementSeparatorParam): tensorFileName(tensorFileNameParam), tensorStream(nullptr), tensorFile(), inputDimensionSeparator(inputDimensionSeparatorParam), inputElementSeparator(inputElementSeparatorParam), lineNb(0), ids2Labels(), labels2Ids(), nSet(), tupleIts()
 {
-  if (!tensorFile)
+   if (tensorFileName == "-")
+    {
+      tensorStream.rdbuf(cin.rdbuf());
+      init();
+      return;
+    }
+   tensorFile.open(tensorFileNameParam);
+   if (!tensorFile)
     {
       throw NoInputException(tensorFileNameParam);
     }
+  tensorStream.rdbuf(tensorFile.rdbuf());
   init();
 }
 
 void TupleFileReader::init()
 {
-  if (tensorFile.eof())
+  if (tensorStream.eof())
     {
       throw UsageException(("No tuple in " + tensorFileName + '!').c_str());
     }
   ++lineNb;
   string nSetString;
-  getline(tensorFile, nSetString);
+  getline(tensorStream, nSetString);
   tokenizer<char_separator<char>> dimensions(nSetString, inputDimensionSeparator);
   tokenizer<char_separator<char>>::const_iterator dimensionIt = dimensions.begin();
   if (dimensionIt == dimensions.end())
@@ -77,7 +82,7 @@ vector<FuzzyTuple> TupleFileReader::read()
 	  // All tuples in nSet enumerated: find and parse the next line (if any)
 	  for (; ; )
 	    {
-	      if (tensorFile.eof())
+	      if (tensorStream.eof())
 		{
 		  tensorFile.close();
 		  fuzzyTuples.shrink_to_fit();
@@ -87,7 +92,7 @@ vector<FuzzyTuple> TupleFileReader::read()
 		}
 	      ++lineNb;
 	      string nSetString;
-	      getline(tensorFile, nSetString);
+	      getline(tensorStream, nSetString);
 	      tokenizer<char_separator<char>> dimensions(nSetString, inputDimensionSeparator);
 	      if (dimensions.begin() != dimensions.end())
 		{

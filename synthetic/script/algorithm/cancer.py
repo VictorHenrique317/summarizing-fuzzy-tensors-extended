@@ -72,6 +72,18 @@ class Cancer(Algorithm):
                 line += "\n"
                 cancer_file.write(line)
 
+    def __fixLog(self):
+        with open(self.experiment_path, 'r') as f:
+            lines_file_content = f.read()
+
+        non_empty_lines = len([line for line in lines_file_content.split('\n') if line.strip() != ''])
+        with open(self.log_path, 'r') as f:
+            file_content = f.read()
+
+        file_content = re.sub(r'Nb of patterns: \d+', f'Nb of patterns: {non_empty_lines}', file_content)
+        with open(self.log_path, 'w') as f:
+            f.write(file_content)
+
     def run(self, u, observations, timeout):
         if len(Configs.getParameter("dataset_size")) > 2:
             return True
@@ -83,9 +95,14 @@ class Cancer(Algorithm):
         current_iteration_folder = re.sub("\.\./", "/app/", current_iteration_folder)
 
         translated_tensor_path = f"{current_iteration_folder}/tensors/mat/dataset-co{observations}.mat"
+
+        temp_experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/temp.txt"
         self.experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/cancer.experiment"
+        
         temp_folder = f"{current_iteration_folder}/output/{current_experiment}/experiments/temp"
         self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/cancer.log"
+
+        dataset_path = self.__controller.current_dataset_path
 
         cancer_image = "victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer"
         volume = "summarizing_fuzzy_tensors_extended_synth"
@@ -103,6 +120,12 @@ class Cancer(Algorithm):
         self.__createCancerFile()
 
         FileSystem.delete(temp_folder)
+
+        Commands.execute(f"mv {self.experiment_path} {temp_experiment_path}")
+        Commands.execute(f"nclusterbox --os {temp_experiment_path} {dataset_path} -o {self.experiment_path}")
+        Commands.execute(f"rm {temp_experiment_path}")
+
+        self.__fixLog()
         return False
 
         

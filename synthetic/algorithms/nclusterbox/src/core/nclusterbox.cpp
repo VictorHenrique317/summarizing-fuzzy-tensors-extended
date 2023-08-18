@@ -28,6 +28,8 @@ using namespace boost::program_options;
 
 int main(int argc, char* argv[])
 {
+  ios::sync_with_stdio(false);
+  cin.tie(nullptr);
   AbstractRoughTensor* roughTensor;
   float verboseStep = 0;
   long long maxNbOfInitialPatterns = 0;
@@ -39,6 +41,7 @@ int main(int argc, char* argv[])
     steady_clock::time_point startingPoint;
 #endif
     vector<thread> threads;
+    bool isModifyingOrGrowing;
     {
       string patternDimensionSeparator;
       string patternElementSeparator;
@@ -75,6 +78,7 @@ int main(int argc, char* argv[])
 	      ("shift,s", value<float>(), "shift memberhip degrees by constant in argument (by default, density of input tensor)")
 	      ("expectation,e", "shift every memberhip degree by the max density of the slices covering it")
 	      ("patterns,p", value<string>(), "set initial patterns, instead of the default ones")
+	      ("os", value<string>(), "only select and rank the provided patterns")
 	      ("grow,g", "remove nothing from the initial patterns");
 	    options_description io("Input/Output format (on the command line or in the option file)");
 	    io.add_options()
@@ -94,7 +98,7 @@ int main(int argc, char* argv[])
 	      ("rp", value<string>()->default_value(" : "), "set string prefixing residual sum of squares in output");
 	    options_description hidden("Hidden options");
 	    hidden.add_options()
-	      ("file", value<string>(&tensorFileName)->default_value("/dev/stdin"), "set tensor file");
+	      ("file", value<string>(&tensorFileName)->default_value("-"), "set tensor file");
 	    positional_options_description p;
 	    p.add("file", -1);
 	    options_description commandLineOptions;
@@ -114,40 +118,39 @@ int main(int argc, char* argv[])
 	      }
 	    if (vm.count("version"))
 	      {
-		cout << "nclusterbox version 0.43\nCopyright (C) 2023 Loïc Cerf.\nLicense GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n";
+		cout << "nclusterbox version 0.46\nCopyright (C) 2023 Loïc Cerf.\nLicense GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n";
 		return EX_OK;
 	      }
-	    ifstream optionFile;
 	    if (vm.count("opt"))
 	      {
+		options_description config;
+		config.add(basicConfig).add(io).add(hidden);
 		if (vm["opt"].as<string>() == "-")
 		  {
-		    optionFile.open("/dev/stdin");
+		    store(parse_config_file(cin, config), vm);
 		  }
 		else
 		  {
-		    optionFile.open(vm["opt"].as<string>());
+		    ifstream optionFile(vm["opt"].as<string>());
 		    if (!optionFile)
 		      {
 			throw NoInputException(vm["opt"].as<string>().c_str());
 		      }
+		    store(parse_config_file(optionFile, config), vm);
 		  }
+		notify(vm);
 	      }
 	    else
 	      {
 		if (vm.count("file"))
 		  {
-		    optionFile.open((tensorFileName + ".opt").c_str());
+		    ifstream optionFile((tensorFileName + ".opt").c_str());
+		    options_description config;
+		    config.add(basicConfig).add(io).add(hidden);
+		    store(parse_config_file(optionFile, config), vm);
+		    optionFile.close();
+		    notify(vm);
 		  }
-	      }
-	    options_description config;
-	    config.add(basicConfig).add(io).add(hidden);
-	    store(parse_config_file(optionFile, config), vm);
-	    optionFile.close();
-	    notify(vm);
-	    if (vm["jobs"].as<int>() < 1)
-	      {
-		throw UsageException("jobs option should provide a positive integer!");
 	      }
 	    if (vm.count("max"))
 	      {
@@ -188,15 +191,11 @@ int main(int argc, char* argv[])
 		      }
 		  }
 	      }
-	    if (outputFileName == "-")
-	      {
-		outputFileName = "/dev/stdout";
-	      }
 	    if (vm.count("verbose"))
 	      {
-		if (vm.count("ns") && outputFileName == "/dev/stdout")
+		if (vm.count("ns") && outputFileName == "-")
 		  {
-		    throw UsageException("ns and verbose together forbid the output (set with option output) to be /dev/stdout!");
+		    throw UsageException("ns and verbose together forbid to output to the standard output!");
 		  }
 		verboseStep = vm["verbose"].as<float>();
 		if (!verboseStep)
@@ -217,24 +216,42 @@ int main(int argc, char* argv[])
 	      {
 		density = 1;
 	      }
-	    if (tensorFileName == "-")
+	    if (vm.count("os"))
 	      {
-		tensorFileName = "/dev/stdin";
-	      }
-	    if (vm.count("patterns"))
-	      {
-		if (vm["patterns"].as<string>() == "-")
+		const vector<string> ignoredOptions {"forget", "ns", "patterns", "grow"};
+		for (const string& ignoredOption : ignoredOptions)
 		  {
-		    PatternFileReader::openFile("/dev/stdin");
+		    if (vm.count(ignoredOption))
+		      {
+			cerr << "Warning: " << ignoredOption << " option has no effect here, because os option used\n";
+		      }
 		  }
-		else
-		  {
-		    PatternFileReader::openFile(vm["patterns"].as<string>().c_str());
-		  }
+		isModifyingOrGrowing = false;
+		PatternFileReader::openFile(vm["os"].as<string>().c_str());
 	      }
 	    else
 	      {
-		ConcurrentPatternPool::setDefaultPatterns(maxNbOfInitialPatterns);
+		if (vm["jobs"].as<int>() < 1)
+		  {
+		    throw UsageException("jobs option should provide a positive integer!");
+		  }
+		isModifyingOrGrowing = true;
+		if (vm.count("patterns"))
+		  {
+		    PatternFileReader::openFile(vm["patterns"].as<string>().c_str());
+		  }
+		else
+		  {
+		    if (vm.count("os"))
+		      {
+			PatternFileReader::openFile(vm["os"].as<string>().c_str());
+		      }
+		    else
+		      {
+			ConcurrentPatternPool::setDefaultPatterns(maxNbOfInitialPatterns);
+		      }
+		  }
+		isGrow = vm.count("grow");
 	      }
 	    if (vm.count("expectation"))
 	      {
@@ -244,7 +261,7 @@ int main(int argc, char* argv[])
 		  }
 		if (vm.count("density") && density)
 		  {
-		    cerr << "Warning: no effect of the density option here; the expectation option always triggers a completely dense storage of the tensor\n";
+		    cerr << "Warning: density option has no effect here; the expectation option always triggers a completely dense storage of the tensor\n";
 		  }
 		roughTensor = new DenseRoughTensor(tensorFileName.c_str(), vm["tds"].as<string>().c_str(), vm["tes"].as<string>().c_str(), vm.count("boolean"), verboseStep);
 	      }
@@ -275,7 +292,14 @@ int main(int argc, char* argv[])
 	      }
 	    if (verboseStep)
 	      {
-		cout << "Getting and modifying initial patterns ..." << flush;
+		if (isModifyingOrGrowing)
+		  {
+		    cout << "Getting and modifying initial patterns ..." << flush;
+		  }
+		else
+		  {
+		    cout << "Getting patterns ..." << flush;
+		  }
 	      }
 	    isRSSPrinted = vm.count("pr");
 #ifdef DETAILED_TIME
@@ -283,7 +307,6 @@ int main(int argc, char* argv[])
 #endif
 	    patternElementSeparator = vm["pes"].as<string>();
 	    patternDimensionSeparator = vm["pds"].as<string>();
-	    isGrow = vm.count("grow");
 	  }
 	catch (unknown_option& e)
 	  {
@@ -310,22 +333,25 @@ int main(int argc, char* argv[])
 	    cerr << e.what() << '\n';
 	    return EX_CANTCREAT;
 	  }
-	threads.reserve(nbOfJobs);
-	if (isGrow)
+	if (isModifyingOrGrowing)
 	  {
-	    do
+	    threads.reserve(nbOfJobs);
+	    if (isGrow)
 	      {
-		threads.emplace_back(ModifiedPattern::grow);
+		do
+		  {
+		    threads.emplace_back(ModifiedPattern::grow);
+		  }
+		while (--nbOfJobs);
 	      }
-	    while (--nbOfJobs);
-	  }
-	else
-	  {
-	    do
+	    else
 	      {
-		threads.emplace_back(ModifiedPattern::modify);
+		do
+		  {
+		    threads.emplace_back(ModifiedPattern::modify);
+		  }
+		while (--nbOfJobs);
 	      }
-	    while (--nbOfJobs);
 	  }
       }
       if (ConcurrentPatternPool::readFromFile())
@@ -333,54 +359,68 @@ int main(int argc, char* argv[])
 	  PatternFileReader::read(patternDimensionSeparator.c_str(), patternElementSeparator.c_str(), AbstractRoughTensor::getIds2Labels(), maxNbOfInitialPatterns);
 	}
     }
-    if (verboseStep)
+    if (isModifyingOrGrowing)
       {
-	if (verboseStep > 0)
+	if (verboseStep)
 	  {
-	    thread(ConcurrentPatternPool::printProgressionOnSTDIN, verboseStep).detach();
+	    if (verboseStep > 0)
+	      {
+		thread(ConcurrentPatternPool::printProgressionOnSTDIN, verboseStep).detach();
+	      }
+	    else
+	      {
+		cout << "\rGetting initial patterns: done.           \nModifying patterns ... " << flush;
+	      }
+	    for (thread& t : threads)
+	      {
+		t.join();
+	      }
+	    if (AbstractRoughTensor::isDirectOutput())
+	      {
+		cout << "\rModifying patterns: " << ModifiedPattern::getNbOfOutputPatterns() << " patterns with locally maximal explanatory powers.\n";
+	      }
+	    else
+	      {
+		ModifiedPattern::insertCandidateVariables();
+		cout << "\rModifying patterns: " << AbstractRoughTensor::candidateVariables.size() << " patterns with locally maximal explanatory powers.\n";
+	      }
 	  }
 	else
 	  {
-	    cout << "\rGetting initial patterns: done.           \nModifying patterns ... " << flush;
+	    for (thread& t : threads)
+	      {
+		t.join();
+	      }
+	    if (!AbstractRoughTensor::isDirectOutput())
+	      {
+		ModifiedPattern::insertCandidateVariables();
+	      }
 	  }
-	for (thread& t : threads)
-	  {
-	    t.join();
-	  }
-	if (AbstractRoughTensor::isDirectOutput())
-	  {
-	    cout << "\rModifying patterns: " << ModifiedPattern::getNbOfOutputPatterns() << " patterns with locally maximal explanatory powers.\n";
-	  }
-	else
-	  {
-	    ModifiedPattern::insertCandidateVariables();
-	    cout << "\rModifying patterns: " << AbstractRoughTensor::getCandidateVariables().size() << " patterns with locally maximal explanatory powers.\n";
-	  }
+#ifdef DETAILED_TIME
+#ifdef GNUPLOT
+	cout << '\t' << duration_cast<duration<double>>(steady_clock::now() - startingPoint).count();
+#else
+	cout << "Explanatory power maximization time: " << duration_cast<duration<double>>(steady_clock::now() - startingPoint).count() << "s\n";
+#endif
+#endif
       }
     else
       {
-	for (thread& t : threads)
+	ConcurrentPatternPool::moveTo(AbstractRoughTensor::candidateVariables);
+	if (verboseStep)
 	  {
-	    t.join();
+	    cout << "\rGetting patterns: " << AbstractRoughTensor::candidateVariables.size() << " patterns.\n";
 	  }
-	if (!AbstractRoughTensor::isDirectOutput())
-	  {
-	    ModifiedPattern::insertCandidateVariables();
-	  }
-      }
 #ifdef DETAILED_TIME
 #ifdef GNUPLOT
-    cout << '\t' << duration_cast<duration<double>>(steady_clock::now() - startingPoint).count();
+	cout << "\t0";
 #else
-    cout << "Explanatory power maximization time: " << duration_cast<duration<double>>(steady_clock::now() - startingPoint).count() << "s\n";
+	cout << "Explanatory power maximization time: 0s\n";
 #endif
 #endif
+      }
   }
-  if (AbstractRoughTensor::getNbOfCandidateVariables())
-    {
-      RankPatterns::rank(AbstractRoughTensor::getNbOfCandidateVariables(), roughTensor, verboseStep, maxSelectionSize, selectionCriterion, isRSSPrinted);
-    }
-  else
+  if (AbstractRoughTensor::candidateVariables.empty())
     {
 #if defined NUMERIC_PRECISION || defined NB_OF_PATTERNS || defined DETAILED_TIME
 #ifdef GNUPLOT
@@ -391,7 +431,7 @@ int main(int argc, char* argv[])
       cout << "\t0";
 #endif
 #ifdef DETAILED_TIME
-      cout << "\t0";
+      cout << "\t0\t0";
 #endif
 #else
 #ifdef NB_OF_PATTERNS
@@ -399,6 +439,9 @@ int main(int argc, char* argv[])
 #endif
 #ifdef NUMERIC_PRECISION
       cout << "Numeric precision: 0\n";
+#endif
+#ifdef DETAILED_TIME
+      cout << "Tensor reduction time: 0s\n";
 #endif
 #ifdef NB_OF_PATTERNS
       cout << "Nb of selected patterns: 0\n";
@@ -408,6 +451,10 @@ int main(int argc, char* argv[])
 #endif
 #endif
 #endif
+    }
+  else
+    {
+      RankPatterns::rank(roughTensor, verboseStep, maxSelectionSize, selectionCriterion, isRSSPrinted);
     }
   delete roughTensor;
 #ifdef TIME

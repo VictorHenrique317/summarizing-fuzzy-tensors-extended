@@ -1,4 +1,4 @@
-// Copyright 2018-2022 Loïc Cerf (lcerf@dcc.ufmg.br)
+// Copyright 2018-2023 Loïc Cerf (lcerf@dcc.ufmg.br)
 
 // This file is part of nclusterbox.
 
@@ -30,6 +30,7 @@ class FuzzyTupleFileReader
 
  private:
   const string tensorFileName;
+  istream tensorStream;
   ifstream tensorFile;
   const char_separator<char> inputDimensionSeparator;
   const char_separator<char> inputElementSeparator;

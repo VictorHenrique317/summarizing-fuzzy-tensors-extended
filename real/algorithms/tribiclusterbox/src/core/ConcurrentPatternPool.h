@@ -29,6 +29,7 @@ class ConcurrentPatternPool
   static void setNewDimensionOrderAndNewIds(const vector<unsigned int>& old2NewDimensionOrder, const vector<vector<pair<double, unsigned int>>>& elementPositiveMemberships);
   static void allPatternsAdded();
   static vector<vector<unsigned int>> next();
+  static void moveTo(vector<vector<vector<unsigned int>>>& candidateVariables);
 
   static void printProgressionOnSTDIN(const float stepInSeconds);
 

@@ -21,7 +21,7 @@ class Controller:
         self.calculate_metrics = calculate_metrics
 
         self.algorithms = []
-        self.__sorting_blacklist = ['nclusterbox', 'tribiclusterbox', 'nclusterboxnoperformanceimp']
+        self.__sorting_blacklist = ['nclusterbox', 'tribiclusterbox', 'nclusterboxnoperformanceimp', "nclusterboxcrisp"]
         #self.__sorting_blacklist = []
         self.__configs_folder = "configs"
 
@@ -37,6 +37,7 @@ class Controller:
         self.current_iteration_folder = None
         self.current_experiment = None
         self.current_dataset = None
+        self.current_crisp_dataset_path = None
         self.current_dataset_path = None
 
         self.__skip_gennsets = False
@@ -59,14 +60,15 @@ class Controller:
 
             for observations in Configs.getParameter("correct_obs"):
                 print("#"*120 + f" CORRECT OBSEVATIONS = {observations}")
+
                 if self.__skip_gennsets is False:
                     self.__numnoise.run(observations)
-                    # self.__crisp_translator.run(observations)
+                    self.__crisp_translator.run(observations)
                     self.__numpy_translator.run(observations)
                     self.__mat_translator.run(observations)
 
-                # self.current_dataset_path = f"{self.current_iteration_folder}/tensors/crisp"
-                # self.current_dataset_path = f"{self.current_dataset_path}/dataset-co{observations}.crisp_tensor"
+                self.current_crisp_dataset_path = f"{self.current_iteration_folder}/tensors/crisp"
+                self.current_crisp_dataset_path = f"{self.current_crisp_dataset_path}/dataset-co{observations}.crisp_tensor"
 
                 self.current_dataset_path = f"{self.current_iteration_folder}/tensors/numnoise"
                 self.current_dataset_path = f"{self.current_dataset_path}/dataset-co{observations}.fuzzy_tensor"
@@ -173,7 +175,7 @@ class Controller:
         calculate_quality = self.calculate_metrics
         if calculate_quality is None:
             calculate_quality = str(input("Calculate quality? Y/N: ")).strip().lower()
-    
+        
         if calculate_quality == "y":
             self.__calculate_quality = True
 

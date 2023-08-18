@@ -344,7 +344,7 @@ void DenseRoughTensor::setNoSelection()
   memberships.shrink_to_fit();
 }
 
-TrieWithPrediction DenseRoughTensor::projectTensor(const unsigned int nbOfPatternsHavingAllElements)
+TrieWithPrediction DenseRoughTensor::projectTensor()
 {
   // Compute the offsets to access memberships from the non-updated cardinalities
   vector<unsigned int>::const_reverse_iterator cardinalityRIt = cardinalities.rbegin();
@@ -357,7 +357,7 @@ TrieWithPrediction DenseRoughTensor::projectTensor(const unsigned int nbOfPatter
       *offsetRIt = offset;
     }
   // Update cardinalities, ids2Labels and candidateVariables
-  const vector<vector<unsigned int>> newIds2OldIds = projectMetadata(nbOfPatternsHavingAllElements, false);
+  const vector<vector<unsigned int>> newIds2OldIds = projectMetadata(false);
   // Inform the shift of the new ids
   shift->setNewIds(newIds2OldIds);
   // Compute last tuple and nb of tuples, according to new cardinalities
@@ -399,7 +399,7 @@ TrieWithPrediction DenseRoughTensor::projectTensor(const unsigned int nbOfPatter
 	  elementPositiveMemberships[tuple.front()] += membership;
 	}
       rss += membership * membership;
-      if (--nbOfSelectedTuples == 0)
+      if (!--nbOfSelectedTuples)
 	{
 	  break;
 	}

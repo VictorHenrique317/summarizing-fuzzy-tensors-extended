@@ -289,6 +289,11 @@ vector<vector<unsigned int>> ConcurrentPatternPool::next()
   return pattern;
 }
 
+void ConcurrentPatternPool::moveTo(vector<vector<vector<unsigned int>>>& candidateVariables)
+{
+  candidateVariables = std::move(patterns);
+}
+
 void ConcurrentPatternPool::printProgressionOnSTDIN(const float stepInSeconds)
 {
   cout << "\rGetting initial patterns: done.           \n";
