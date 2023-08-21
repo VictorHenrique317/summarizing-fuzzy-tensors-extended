@@ -84,9 +84,10 @@ class NclusterBoxCrisp(Algorithm):
         dataset_path = self.__controller.current_dataset_path
 
         initial_patterns_folder = self.__controller.initial_patterns_folder
+        initial_patterns = f"{initial_patterns_folder}/init_patterns_co{observations}"
 
         command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "
-        command += f"../algorithms/nclusterbox/nclusterbox -b -j8 --ns -p {initial_patterns_folder} {crisp_dataset_path} -o {temp_experiment_path}"
+        command += f"../algorithms/nclusterbox/nclusterbox -b -j8 --ns -p {initial_patterns} {crisp_dataset_path} -o {temp_experiment_path}"
         command += f">> {self.log_path}"
 
         print(command)
