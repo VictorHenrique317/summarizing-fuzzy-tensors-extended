@@ -1,0 +1,39 @@
+sort: write failed: 'standard output': Broken pipe
+sort: write error
+sort: write failed: 'standard output': Broken pipe
+sort: write error
+Skipping retweets2d_configs.json.off
+Skipping school_configs.json.off
+############################################################ CONFIGURATION = retweets3d_configs.json
+Pre-processing retweets dataset...
+Dataset was pre-processed!
+Loading dataset matrix into memory...
+Done!
+Translated dataset to numpy tensor
+------------------------------------------------------------------------------------------------------------------------
+========================================================================================================================
+Running tribiclusterbox...
+/usr/bin/time -o ../iteration/retweets/output/u0.0/logs/tribiclusterbox.log -f 'Memory (kb): %M' ../algorithms/tribiclusterbox/slice-input ../datasets/retweets/3d/influences_processed 1 | ../algorithms/tribiclusterbox/nclusterbox -f -j1 -p - ../datasets/retweets/3d/influences_processed -o ../iteration/retweets/output/u0.0/experiments/tribiclusterbox.experiment>> ../iteration/retweets/output/u0.0/logs/tribiclusterbox.log
+Inverse decoding experiment...
+------------------------------------------------------------------------------------------------------------------------
+########################################################################################################################
+Error: ../post_analysis - No such file or directory.
+Skipping retweets2d_configs.json.off
+Skipping school_configs.json.off
+Pre-processing retweets dataset...
+Dataset was pre-processed!
+Loading dataset matrix into memory...
+Done!
+Initiating post analysis for retweets...
+Creating plotting data
+Getting clusters of configuration retweets...
+Calculating RSS evolution for retweets...
+Getting clusters of configuration retweets...
+============================
+1 cluster of 1:
+
+    Experiment: ../iteration/retweets/output/u0.0/experiments/tribiclusterbox.experiment, nb_patterns: 1.0
+    1 patterns done...
+Creating plotting data
+Getting clusters of configuration retweets...
+Plotting RSS Evolution graph
