@@ -17,5 +17,5 @@ triclusterbox = TriBiclusterBox(controller)
 # cancer = Cancer(controller)
 # ========================== ALGORITHMS USED ========================== #
 
-controller.initiateSession()
+# controller.initiateSession()
 controller.initiatePostAnalysis()

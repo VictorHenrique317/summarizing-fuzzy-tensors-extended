@@ -30,6 +30,7 @@ class CrispTranslator:
         print(command)
         Commands.execute(command)
 
+
     def run(self, observations):
         fuzzy_path = self.__controller.current_iteration_folder
         fuzzy_path += f"/tensors/numnoise/dataset-co{observations}.fuzzy_tensor"

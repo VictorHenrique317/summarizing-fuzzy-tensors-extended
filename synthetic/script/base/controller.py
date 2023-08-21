@@ -39,6 +39,7 @@ class Controller:
         self.current_dataset = None
         self.current_crisp_dataset_path = None
         self.current_dataset_path = None
+        self.initial_patterns_folder = None
 
         self.__skip_gennsets = False
         self.__calculate_rss_evolution = False
@@ -72,6 +73,9 @@ class Controller:
 
                 self.current_dataset_path = f"{self.current_iteration_folder}/tensors/numnoise"
                 self.current_dataset_path = f"{self.current_dataset_path}/dataset-co{observations}.fuzzy_tensor"
+
+                self.initial_patterns_folder = self.current_iteration_folder
+                self.initial_patterns_folder += f"/tensors/initial_patterns"
 
                 self.current_dataset = RandomDataset(self.current_dataset_path)
                 dimension = len(self.current_dataset.getDimension())
