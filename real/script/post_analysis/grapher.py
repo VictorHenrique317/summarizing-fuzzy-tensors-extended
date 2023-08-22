@@ -39,10 +39,12 @@ class Grapher():
         nclusterbox = algorithms[2]
         tribiclusterbox = algorithms[3]
         nclusterboxminussect51 = algorithms[4]
+        nclusterboxcrisp = algorithms[5]
         planted_patterns_number = "Number of planted patterns"
 
         self.__curves = {getf: "darkgreen", planted_patterns_number: "orange", nclusterbox: "blue",
                          cancer: "lime", tribiclusterbox: "red", nclusterboxminussect51: "slateblue",
+                         nclusterboxcrisp: "black"
                         }
 
         self.__u_curves = {0.0: "deepskyblue", 0.6: "deepskyblue", 0.7: "blue", 0.8: "black"}
