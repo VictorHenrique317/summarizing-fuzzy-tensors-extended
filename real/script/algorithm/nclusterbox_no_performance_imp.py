@@ -92,12 +92,12 @@ class NclusterBoxNoPerformanceImp(Algorithm):
             tube_dim = 2
         if dimension == 2:
             tube_dim = 1
-        
+
         if boolean_tensor is False:
             initial_patterns = self.__controller.current_dataset.getInitialPatternsPath()
-            command = f"../algorithms/nclusterbox_no_performance_imp/nclusterbox -f -j8 -m1000 {dataset_path} -p {initial_patterns} -o {self.experiment_path}"
+            command = f"../algorithms/nclusterbox_no_performance_imp/nclusterbox -f -j8 {dataset_path} -p {initial_patterns} -o {self.experiment_path}"
         else:
-            command = f"../algorithms/nclusterbox_no_performance_imp/nclusterbox -b -f -j8 -m1000 {dataset_path} -o {self.experiment_path}"
+            command = f"../algorithms/nclusterbox_no_performance_imp/nclusterbox -b -f -j8 {dataset_path} -o {self.experiment_path}"
 
         command += f">> {self.log_path}"
 
