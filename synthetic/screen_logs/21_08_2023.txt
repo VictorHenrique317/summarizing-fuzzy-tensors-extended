@@ -1,0 +1,21 @@
+    Dataset path: ../iterations/100x100x100/1/tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.33400142542206446
+    Empty model rss: 55582.79996128824
+/usr/bin/time -o ../iterations/100x100x100/1/output/co1/logs/nclusterboxcrisp.log -f 'Memory (kb): %M' ../algorithms/nclusterbox/nclusterbox -b -j8 --ns -p ../iterations/100x100x100/1/tensors/initial_patterns ../iterations/100x100x100/1/tensors/crisp/dataset-co1.crisp_tensor -o ../iterations/100x100x100/1/output/co1/experiments/temp.txt>> ../iterations/100x100x100/1/output/co1/logs/nclusterboxcrisp.log
+^CTraceback (most recent call last):
+  File "/app/script/main.py", line 22, in <module>
+    controller.initiateSession()
+  File "/app/script/base/controller.py", line 128, in initiateSession
+    self.__runIterations()
+  File "/app/script/base/controller.py", line 91, in __runIterations
+    timedout = algorithm.run(u, observations, Configs.getParameter("timeout"))
+  File "/app/script/algorithm/nclusterbox_crisp.py", line 94, in run
+    timedout = Commands.executeWithTimeout(command, timeout)
+  File "/app/script/utils/commands.py", line 48, in executeWithTimeout
+    process.wait(timeout=timeout)
+  File "/usr/lib/python3.10/subprocess.py", line 1209, in wait
+    return self._wait(timeout=timeout)
+  File "/usr/lib/python3.10/subprocess.py", line 1953, in _wait
+    time.sleep(delay)
+KeyboardInterrupt
+Error: No such container:path: 168c5c5ff9e1:/app/post_analysis/.
