@@ -82,13 +82,13 @@ class NclusterBoxCrisp(Algorithm):
         self.experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/nclusterboxcrisp.experiment"
         self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/nclusterboxcrisp.log"
 
-        crisp_dataset_path = self.__controller.current_crisp_dataset_path
         dataset_path = self.__controller.current_dataset_path
-
         initial_patterns = self.__controller.current_dataset.getInitialPatternsPath()
 
         command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "
-        command += f"../algorithms/nclusterbox/nclusterbox -b -j8 --ns -p {initial_patterns} {crisp_dataset_path} -o {temp_experiment_path}"
+        command += "awk '$NF >= .5 { --NF; print }' "
+        command += f"{dataset_path} | "
+        command += f"../algorithms/nclusterbox/nclusterbox -b -j8 --ns -p {initial_patterns} -o {temp_experiment_path}"
         command += f">> {self.log_path}"
 
         print(command)
