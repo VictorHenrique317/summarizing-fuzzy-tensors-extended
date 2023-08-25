@@ -62,7 +62,7 @@ class Log:
                 if attribute == variants:
                     return translated_attribute
 
-            if self.__algorithm == "tribiterbox":
+            if self.__algorithm == "tribiclusterbox":
                 if attribute == variants:
                     return translated_attribute
 
@@ -70,6 +70,10 @@ class Log:
                 if attribute == variants:
                     return translated_attribute
 
+            if self.__algorithm == "nclusterboxcrisp":
+                if attribute == variants:
+                    return translated_attribute
+                
             if attribute == translated_attribute: # generic case
                 return translated_attribute
                 

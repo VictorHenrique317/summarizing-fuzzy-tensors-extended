@@ -20,10 +20,11 @@ class NumpyTranslator():
                 exec(replacer_string)
 
         print("Translated dataset to numpy tensor")
-        output_folder = self.__controller.dataset_folder + "/retweets/3d"
-        filename = dataset_path.split("/")[-1]
-        filename = re.sub(".txt", "", filename)
+        translated_tensor_path = self.__controller.current_dataset.path()
+        translated_tensor_path += ".npy"
+        # filename = dataset_path.split("/")[-1]
+        # filename = re.sub(".txt", "", filename)
 
-        translated_tensor_path = f"{output_folder}/{filename}"
+        # translated_tensor_path = f"{output_folder}/{filename}"
         np.save(translated_tensor_path, translated_tensor)
         print("-"*120)
