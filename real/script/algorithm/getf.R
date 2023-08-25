@@ -386,11 +386,21 @@ Get_Patterns<-function(TENS,BASIS, experiment_path){
         TENS_temp<-TENS_temp%o%BASIS[[i]][,j]
       }
 
+
         Pattern <- array(as.numeric(TENS_temp>0),dim=dim(TENS_temp))
-    # pattern processing into string
+        # pattern processing into string
         one_cells_indices = which(Pattern==1, arr.ind=TRUE)
         index_string <- ""
+
+        # cat("\nd", ncol(one_cells_indices))
+        # cat("\nd", nrow(one_cells_indices))
+
+        # i = 1166440
+        # j = 3
+        # 3i = 3499320
+
         for (j in 1:ncol(one_cells_indices)){
+            # cat("\nj", j)
             for (i in 1:nrow(one_cells_indices)){
                 index_string <- paste(index_string, one_cells_indices[i,j] - 1, ",")
                 index_string  <- gsub(" ", "", index_string)
@@ -398,6 +408,7 @@ Get_Patterns<-function(TENS,BASIS, experiment_path){
             index_string <- substring(index_string,1, nchar(index_string)-1)
             index_string <- paste(index_string, "-")
         }
+
         index_string <- substring(index_string,1, nchar(index_string)-2)
 
         indices_as_strings <- strsplit(index_string, "-")[[1]]

@@ -15,7 +15,7 @@ nclusterbox = NclusterBox(controller)
 getf = Getf(controller)
 # nclusterboxnoperformanceimp = NclusterBoxNoPerformanceImp(controller)
 # nclusterboxcrisp = NclusterBoxCrisp(controller)
-# triclusterbox = TriBiclusterBox(controller)
+triclusterbox = TriBiclusterBox(controller)
 # cancer = Cancer(controller)
 # ========================== ALGORITHMS USED ========================== #
 
