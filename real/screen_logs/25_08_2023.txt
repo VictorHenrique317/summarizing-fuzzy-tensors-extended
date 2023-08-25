@@ -1,0 +1,26 @@
+sort: write failed: 'standard output': Broken pipe
+sort: write error
+sort: write failed: 'standard output': Broken pipe
+sort: write error
+Skipping retweets2d_configs.json.off
+############################################################ CONFIGURATION = school_configs.json
+Pre-processing school dataset...
+Dataset was pre-processed!
+Loading dataset matrix into memory...
+Done!
+Translated dataset to numpy tensor
+------------------------------------------------------------------------------------------------------------------------
+========================================================================================================================
+Running nclusterbox...
+/usr/bin/time -o ../iteration/school/output/u0.0/logs/nclusterbox.log -f 'Memory (kb): %M' ../algorithms/nclusterbox/nclusterbox -b -j8 ../datasets/primaryschool/per-hour_processed -o ../iteration/school/output/u0.0/experiments/nclusterbox.experiment -m1000>> ../iteration/school/output/u0.0/logs/nclusterbox.log
+Inverse decoding experiment...
+------------------------------------------------------------------------------------------------------------------------
+Running getf...
+/usr/bin/time -o ../iteration/school/output/u0.0/logs/getf.log -f 'Memory (kb): %M' Rscript algorithm/getf.R ../datasets/primaryschool/per-hour_processed.npy 0.6 7 ../iteration/school u0.0 ../iteration/school/output/u0.0/experiments/getf.experiment
+[1] "==== GETF ===="
+[1] "Starting algorithm"
+[1] "GETF finished with success"
+[1] "Time spent:"
+[1] 0.2427309
+Starting to extract 1 patterns
+ 1 doneError: No such container:path: 688160204fec:/app/post_analysis/.
