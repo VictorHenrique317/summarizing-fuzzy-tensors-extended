@@ -1,0 +1,865 @@
+    Tensor density is: 0.3354483333089381
+    Empty model rss: 56155.62612022217
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/1/tensors/mat/dataset-co1.mat /app/iterations/1000x1000/1 co1
+Tensor parsing time: 1.12742s
+Tensor shifting time: 0.0885008s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0107078s
+Nb of selected patterns: 4
+Selection time: 0.00571066s
+Total time: 1.23345s
+Sorting patterns...
+ => 1 of 4 sortings done...
+ => 2 of 4 sortings done...
+ => 3 of 4 sortings done...
+ => 4 of 4 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 2
+../iterations/1000x1000/1/tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1/tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.2530510082566464
+    Empty model rss: 39014.8901063045
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/1/tensors/mat/dataset-co2.mat /app/iterations/1000x1000/1 co2
+Tensor parsing time: 1.12584s
+Tensor shifting time: 0.0874678s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0104654s
+Nb of selected patterns: 2
+Selection time: 0.0040238s
+Total time: 1.22898s
+Sorting patterns...
+ => 1 of 2 sortings done...
+ => 2 of 2 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 4
+../iterations/1000x1000/1/tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1/tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.1707150428128923
+    Empty model rss: 22551.41511402105
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/1/tensors/mat/dataset-co4.mat /app/iterations/1000x1000/1 co4
+Tensor parsing time: 1.17566s
+Tensor shifting time: 0.087685s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.01033s
+Nb of selected patterns: 3
+Selection time: 0.00447422s
+Total time: 1.27934s
+Sorting patterns...
+ => 1 of 3 sortings done...
+ => 2 of 3 sortings done...
+ => 3 of 3 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 8
+../iterations/1000x1000/1/tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1/tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10499656258070816
+    Empty model rss: 12148.950690750464
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/1/tensors/mat/dataset-co8.mat /app/iterations/1000x1000/1 co8
+Tensor parsing time: 1.13636s
+Tensor shifting time: 0.0877973s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0100637s
+Nb of selected patterns: 2
+Selection time: 0.0034373s
+Total time: 1.23879s
+Sorting patterns...
+ => 1 of 2 sortings done...
+ => 2 of 2 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 16
+../iterations/1000x1000/1/tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1/tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.061086837471957936
+    Empty model rss: 7645.428827578483
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/1/tensors/mat/dataset-co16.mat /app/iterations/1000x1000/1 co16
+Tensor parsing time: 1.14786s
+Tensor shifting time: 0.0874299s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.00978736s
+Nb of selected patterns: 0
+Selection time: 0.00145272s
+Total time: 1.24773s
+Sorting patterns...
+------------------------------------------------------------------------------------------------------------------------
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ITERATION = 2
+######################################################################################################################## CORRECT OBSEVATIONS = 1
+../iterations/1000x1000/2/tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2/tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3351329491828019
+    Empty model rss: 56106.230616039786
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/2/tensors/mat/dataset-co1.mat /app/iterations/1000x1000/2 co1
+Tensor parsing time: 1.15327s
+Tensor shifting time: 0.0883704s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0106827s
+Nb of selected patterns: 3
+Selection time: 0.00432339s
+Total time: 1.25774s
+Sorting patterns...
+ => 1 of 3 sortings done...
+ => 2 of 3 sortings done...
+ => 3 of 3 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 2
+../iterations/1000x1000/2/tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2/tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.2531178294918724
+    Empty model rss: 39072.416018024036
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/2/tensors/mat/dataset-co2.mat /app/iterations/1000x1000/2 co2
+Tensor parsing time: 1.16132s
+Tensor shifting time: 0.0885107s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0105562s
+Nb of selected patterns: 2
+Selection time: 0.00368534s
+Total time: 1.26527s
+Sorting patterns...
+ => 1 of 2 sortings done...
+ => 2 of 2 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 4
+../iterations/1000x1000/2/tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2/tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.17057077506140159
+    Empty model rss: 22546.16990939842
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/2/tensors/mat/dataset-co4.mat /app/iterations/1000x1000/2 co4
+Tensor parsing time: 1.14471s
+Tensor shifting time: 0.0876604s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.010214s
+Nb of selected patterns: 2
+Selection time: 0.00398165s
+Total time: 1.24774s
+Sorting patterns...
+ => 1 of 2 sortings done...
+ => 2 of 2 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 8
+../iterations/1000x1000/2/tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2/tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10510988774631669
+    Empty model rss: 12165.83842024311
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/2/tensors/mat/dataset-co8.mat /app/iterations/1000x1000/2 co8
+Tensor parsing time: 1.15484s
+Tensor shifting time: 0.0882215s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0101571s
+Nb of selected patterns: 2
+Selection time: 0.00345459s
+Total time: 1.25787s
+Sorting patterns...
+ => 1 of 2 sortings done...
+ => 2 of 2 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 16
+../iterations/1000x1000/2/tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2/tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.06108447968358406
+    Empty model rss: 7640.818931734757
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/2/tensors/mat/dataset-co16.mat /app/iterations/1000x1000/2 co16
+Tensor parsing time: 1.17999s
+Tensor shifting time: 0.0873479s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0097678s
+Nb of selected patterns: 1
+Selection time: 0.00202064s
+Total time: 1.28034s
+Sorting patterns...
+ => 1 of 1 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ITERATION = 3
+######################################################################################################################## CORRECT OBSEVATIONS = 1
+../iterations/1000x1000/3/tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3/tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3353057386230754
+    Empty model rss: 56208.98170410196
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/3/tensors/mat/dataset-co1.mat /app/iterations/1000x1000/3 co1
+Tensor parsing time: 1.10452s
+Tensor shifting time: 0.0853069s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0103185s
+Nb of selected patterns: 3
+Selection time: 0.00428714s
+Total time: 1.20551s
+Sorting patterns...
+ => 1 of 3 sortings done...
+ => 2 of 3 sortings done...
+ => 3 of 3 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 2
+../iterations/1000x1000/3/tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3/tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.2531782765103777
+    Empty model rss: 39023.86877385579
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/3/tensors/mat/dataset-co2.mat /app/iterations/1000x1000/3 co2
+Tensor parsing time: 1.1573s
+Tensor shifting time: 0.0884848s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0106276s
+Nb of selected patterns: 2
+Selection time: 0.00388931s
+Total time: 1.2615s
+Sorting patterns...
+ => 1 of 2 sortings done...
+ => 2 of 2 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 4
+../iterations/1000x1000/3/tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3/tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.17074457334265605
+    Empty model rss: 22571.315883189884
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/3/tensors/mat/dataset-co4.mat /app/iterations/1000x1000/3 co4
+Tensor parsing time: 1.1366s
+Tensor shifting time: 0.0888429s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0102926s
+Nb of selected patterns: 2
+Selection time: 0.00333417s
+Total time: 1.24028s
+Sorting patterns...
+ => 1 of 2 sortings done...
+ => 2 of 2 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 8
+../iterations/1000x1000/3/tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3/tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10494691458782249
+    Empty model rss: 12129.266012215727
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/3/tensors/mat/dataset-co8.mat /app/iterations/1000x1000/3 co8
+Tensor parsing time: 1.12016s
+Tensor shifting time: 0.0850894s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.00969739s
+Nb of selected patterns: 3
+Selection time: 0.00424933s
+Total time: 1.22028s
+Sorting patterns...
+ => 1 of 3 sortings done...
+ => 2 of 3 sortings done...
+ => 3 of 3 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 16
+../iterations/1000x1000/3/tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3/tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.06111669684809332
+    Empty model rss: 7639.140095291076
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/3/tensors/mat/dataset-co16.mat /app/iterations/1000x1000/3 co16
+Tensor parsing time: 1.15626s
+Tensor shifting time: 0.0876028s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.00979241s
+Nb of selected patterns: 0
+Selection time: 0.00145328s
+Total time: 1.25631s
+Sorting patterns...
+------------------------------------------------------------------------------------------------------------------------
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ITERATION = 4
+######################################################################################################################## CORRECT OBSEVATIONS = 1
+../iterations/1000x1000/4/tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4/tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3358966569681079
+    Empty model rss: 56292.17906734544
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/4/tensors/mat/dataset-co1.mat /app/iterations/1000x1000/4 co1
+Tensor parsing time: 1.14296s
+Tensor shifting time: 0.0882975s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0106761s
+Nb of selected patterns: 4
+Selection time: 0.00549163s
+Total time: 1.24853s
+Sorting patterns...
+ => 1 of 4 sortings done...
+ => 2 of 4 sortings done...
+ => 3 of 4 sortings done...
+ => 4 of 4 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 2
+../iterations/1000x1000/4/tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4/tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.2532681483555267
+    Empty model rss: 39055.48666109754
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/4/tensors/mat/dataset-co2.mat /app/iterations/1000x1000/4 co2
+Tensor parsing time: 1.1542s
+Tensor shifting time: 0.0880873s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0105855s
+Nb of selected patterns: 2
+Selection time: 0.00380137s
+Total time: 1.25782s
+Sorting patterns...
+ => 1 of 2 sortings done...
+ => 2 of 2 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 4
+../iterations/1000x1000/4/tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4/tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.17105215205768584
+    Empty model rss: 22597.931146518677
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/4/tensors/mat/dataset-co4.mat /app/iterations/1000x1000/4 co4
+Tensor parsing time: 1.15145s
+Tensor shifting time: 0.0878951s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0103474s
+Nb of selected patterns: 3
+Selection time: 0.00417162s
+Total time: 1.25501s
+Sorting patterns...
+ => 1 of 3 sortings done...
+ => 2 of 3 sortings done...
+ => 3 of 3 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 8
+../iterations/1000x1000/4/tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4/tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10504932200794015
+    Empty model rss: 12146.168129662386
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/4/tensors/mat/dataset-co8.mat /app/iterations/1000x1000/4 co8
+Tensor parsing time: 1.14131s
+Tensor shifting time: 0.0883709s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0100936s
+Nb of selected patterns: 3
+Selection time: 0.00397453s
+Total time: 1.24489s
+Sorting patterns...
+ => 1 of 3 sortings done...
+ => 2 of 3 sortings done...
+ => 3 of 3 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 16
+../iterations/1000x1000/4/tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4/tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.06111361667307639
+    Empty model rss: 7646.55694418873
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/4/tensors/mat/dataset-co16.mat /app/iterations/1000x1000/4 co16
+Tensor parsing time: 1.1634s
+Tensor shifting time: 0.0878516s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.00983321s
+Nb of selected patterns: 1
+Selection time: 0.00207465s
+Total time: 1.26478s
+Sorting patterns...
+ => 1 of 1 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ITERATION = 5
+######################################################################################################################## CORRECT OBSEVATIONS = 1
+../iterations/1000x1000/5/tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5/tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3358122426549466
+    Empty model rss: 56340.355112210425
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/5/tensors/mat/dataset-co1.mat /app/iterations/1000x1000/5 co1
+Tensor parsing time: 1.13574s
+Tensor shifting time: 0.0893235s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0107351s
+Nb of selected patterns: 3
+Selection time: 0.00444926s
+Total time: 1.24136s
+Sorting patterns...
+ => 1 of 3 sortings done...
+ => 2 of 3 sortings done...
+ => 3 of 3 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 2
+../iterations/1000x1000/5/tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5/tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.25339153309205736
+    Empty model rss: 39055.108416398536
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/5/tensors/mat/dataset-co2.mat /app/iterations/1000x1000/5 co2
+Tensor parsing time: 1.13894s
+Tensor shifting time: 0.0883896s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0105588s
+Nb of selected patterns: 2
+Selection time: 0.00393385s
+Total time: 1.24297s
+Sorting patterns...
+ => 1 of 2 sortings done...
+ => 2 of 2 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 4
+../iterations/1000x1000/5/tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5/tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.17090980181946586
+    Empty model rss: 22585.305443692163
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/5/tensors/mat/dataset-co4.mat /app/iterations/1000x1000/5 co4
+Tensor parsing time: 1.1181s
+Tensor shifting time: 0.0865882s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0100866s
+Nb of selected patterns: 2
+Selection time: 0.00368346s
+Total time: 1.21963s
+Sorting patterns...
+ => 1 of 2 sortings done...
+ => 2 of 2 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 8
+../iterations/1000x1000/5/tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5/tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10505920611417391
+    Empty model rss: 12168.887859252596
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/5/tensors/mat/dataset-co8.mat /app/iterations/1000x1000/5 co8
+Tensor parsing time: 1.16799s
+Tensor shifting time: 0.0886674s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.0100154s
+Nb of selected patterns: 1
+Selection time: 0.00236556s
+Total time: 1.27018s
+Sorting patterns...
+ => 1 of 1 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+######################################################################################################################## CORRECT OBSEVATIONS = 16
+../iterations/1000x1000/5/tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5/tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.06105560151241553
+    Empty model rss: 7651.379477891102
+docker run -v summarizing_fuzzy_tensors_extended_synth:/app victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer 10 /app/iterations/1000x1000/5/tensors/mat/dataset-co16.mat /app/iterations/1000x1000/5 co16
+Tensor parsing time: 1.15575s
+Tensor shifting time: 0.088406s
+Explanatory power maximization time: 0s
+Nb of patterns candidates for selection: 10
+Tensor reduction time: 0.00997437s
+Nb of selected patterns: 2
+Selection time: 0.00284072s
+Total time: 1.25818s
+Sorting patterns...
+ => 1 of 2 sortings done...
+ => 2 of 2 sortings done...
+------------------------------------------------------------------------------------------------------------------------
+########################################################################################################################
+DELETE POST ANALYSIS FOLDER
+Error: ../post_analysis - No such file or directory.
+WILL CALCULATE METRICS
+Initiating post analysis for 1000x1000...
+Getting clusters of iteration 1
+Calculating qualities for 1000x1000...
+Getting clusters of iteration 5
+Getting clusters of iteration 4
+Getting clusters of iteration 2
+Getting clusters of iteration 1
+Getting clusters of iteration 3
+../iterations/1000x1000/5//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3358122426549466
+    Empty model rss: 56340.355112210425
+ 4.00% done
+../iterations/1000x1000/5//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.17090980181946586
+    Empty model rss: 22585.305443692163
+ 8.00% done
+../iterations/1000x1000/5//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10505920611417391
+    Empty model rss: 12168.887859252596
+ 12.00% done
+../iterations/1000x1000/5//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.06105560151241553
+    Empty model rss: 7651.379477891102
+ 16.00% done
+../iterations/1000x1000/5//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.25339153309205736
+    Empty model rss: 39055.108416398536
+ 20.00% done
+../iterations/1000x1000/4//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3358966569681079
+    Empty model rss: 56292.17906734544
+ 24.00% done
+../iterations/1000x1000/4//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.17105215205768584
+    Empty model rss: 22597.931146518677
+ 28.00% done
+../iterations/1000x1000/4//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10504932200794015
+    Empty model rss: 12146.168129662386
+ 32.00% done
+../iterations/1000x1000/4//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.06111361667307639
+    Empty model rss: 7646.55694418873
+ 36.00% done
+../iterations/1000x1000/4//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.2532681483555267
+    Empty model rss: 39055.48666109754
+ 40.00% done
+../iterations/1000x1000/2//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3351329491828019
+    Empty model rss: 56106.230616039786
+ 44.00% done
+../iterations/1000x1000/2//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.17057077506140159
+    Empty model rss: 22546.16990939842
+ 48.00% done
+../iterations/1000x1000/2//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10510988774631669
+    Empty model rss: 12165.83842024311
+ 52.00% done
+../iterations/1000x1000/2//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.06108447968358406
+    Empty model rss: 7640.818931734757
+ 56.00% done
+../iterations/1000x1000/2//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.2531178294918724
+    Empty model rss: 39072.416018024036
+ 60.00% done
+../iterations/1000x1000/1//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3354483333089381
+    Empty model rss: 56155.62612022217
+ 64.00% done
+../iterations/1000x1000/1//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.1707150428128923
+    Empty model rss: 22551.41511402105
+ 68.00% done
+../iterations/1000x1000/1//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10499656258070816
+    Empty model rss: 12148.950690750464
+ 72.00% done
+../iterations/1000x1000/1//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.061086837471957936
+    Empty model rss: 7645.428827578483
+ 76.00% done
+../iterations/1000x1000/1//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.2530510082566464
+    Empty model rss: 39014.8901063045
+ 80.00% done
+../iterations/1000x1000/3//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3353057386230754
+    Empty model rss: 56208.98170410196
+ 84.00% done
+../iterations/1000x1000/3//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.17074457334265605
+    Empty model rss: 22571.315883189884
+ 88.00% done
+../iterations/1000x1000/3//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10494691458782249
+    Empty model rss: 12129.266012215727
+ 92.00% done
+../iterations/1000x1000/3//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.06111669684809332
+    Empty model rss: 7639.140095291076
+ 96.00% done
+../iterations/1000x1000/3//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.2531782765103777
+    Empty model rss: 39023.86877385579
+ 100.00% done
+Calculating RSS evolution for 1000x1000...
+Getting clusters of iteration 5
+Getting clusters of iteration 4
+Getting clusters of iteration 2
+Getting clusters of iteration 1
+Getting clusters of iteration 3
+============================
+1 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/5/output/co1/experiments/cancer.experiment, nb_patterns: 3.0
+../iterations/1000x1000/5//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3358122426549466
+    Empty model rss: 56340.355112210425
+    1 patterns done...
+    2 patterns done...
+    3 patterns done...
+============================
+2 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/5/output/co4/experiments/cancer.experiment, nb_patterns: 2.0
+../iterations/1000x1000/5//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.17090980181946586
+    Empty model rss: 22585.305443692163
+    1 patterns done...
+    2 patterns done...
+============================
+3 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/5/output/co8/experiments/cancer.experiment, nb_patterns: 1.0
+../iterations/1000x1000/5//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10505920611417391
+    Empty model rss: 12168.887859252596
+    1 patterns done...
+============================
+4 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/5/output/co16/experiments/cancer.experiment, nb_patterns: 2.0
+../iterations/1000x1000/5//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.06105560151241553
+    Empty model rss: 7651.379477891102
+    1 patterns done...
+    2 patterns done...
+============================
+5 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/5/output/co2/experiments/cancer.experiment, nb_patterns: 2.0
+../iterations/1000x1000/5//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/5//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.25339153309205736
+    Empty model rss: 39055.108416398536
+    1 patterns done...
+    2 patterns done...
+============================
+6 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/4/output/co1/experiments/cancer.experiment, nb_patterns: 4.0
+../iterations/1000x1000/4//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3358966569681079
+    Empty model rss: 56292.17906734544
+    1 patterns done...
+    2 patterns done...
+    3 patterns done...
+    4 patterns done...
+============================
+7 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/4/output/co4/experiments/cancer.experiment, nb_patterns: 3.0
+../iterations/1000x1000/4//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.17105215205768584
+    Empty model rss: 22597.931146518677
+    1 patterns done...
+    2 patterns done...
+    3 patterns done...
+============================
+8 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/4/output/co8/experiments/cancer.experiment, nb_patterns: 3.0
+../iterations/1000x1000/4//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10504932200794015
+    Empty model rss: 12146.168129662386
+    1 patterns done...
+    2 patterns done...
+    3 patterns done...
+============================
+9 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/4/output/co16/experiments/cancer.experiment, nb_patterns: 1.0
+../iterations/1000x1000/4//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.06111361667307639
+    Empty model rss: 7646.55694418873
+    1 patterns done...
+============================
+10 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/4/output/co2/experiments/cancer.experiment, nb_patterns: 2.0
+../iterations/1000x1000/4//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/4//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.2532681483555267
+    Empty model rss: 39055.48666109754
+    1 patterns done...
+    2 patterns done...
+============================
+11 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/2/output/co1/experiments/cancer.experiment, nb_patterns: 3.0
+../iterations/1000x1000/2//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3351329491828019
+    Empty model rss: 56106.230616039786
+    1 patterns done...
+    2 patterns done...
+    3 patterns done...
+============================
+12 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/2/output/co4/experiments/cancer.experiment, nb_patterns: 2.0
+../iterations/1000x1000/2//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.17057077506140159
+    Empty model rss: 22546.16990939842
+    1 patterns done...
+    2 patterns done...
+============================
+13 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/2/output/co8/experiments/cancer.experiment, nb_patterns: 2.0
+../iterations/1000x1000/2//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10510988774631669
+    Empty model rss: 12165.83842024311
+    1 patterns done...
+    2 patterns done...
+============================
+14 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/2/output/co16/experiments/cancer.experiment, nb_patterns: 1.0
+../iterations/1000x1000/2//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.06108447968358406
+    Empty model rss: 7640.818931734757
+    1 patterns done...
+============================
+15 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/2/output/co2/experiments/cancer.experiment, nb_patterns: 2.0
+../iterations/1000x1000/2//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/2//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.2531178294918724
+    Empty model rss: 39072.416018024036
+    1 patterns done...
+    2 patterns done...
+============================
+16 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/1/output/co1/experiments/cancer.experiment, nb_patterns: 4.0
+../iterations/1000x1000/1//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3354483333089381
+    Empty model rss: 56155.62612022217
+    1 patterns done...
+    2 patterns done...
+    3 patterns done...
+    4 patterns done...
+============================
+17 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/1/output/co4/experiments/cancer.experiment, nb_patterns: 3.0
+../iterations/1000x1000/1//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.1707150428128923
+    Empty model rss: 22551.41511402105
+    1 patterns done...
+    2 patterns done...
+    3 patterns done...
+============================
+18 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/1/output/co8/experiments/cancer.experiment, nb_patterns: 2.0
+../iterations/1000x1000/1//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10499656258070816
+    Empty model rss: 12148.950690750464
+    1 patterns done...
+    2 patterns done...
+============================
+19 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/1/output/co16/experiments/cancer.experiment, nb_patterns: 0.0
+../iterations/1000x1000/1//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.061086837471957936
+    Empty model rss: 7645.428827578483
+============================
+20 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/1/output/co2/experiments/cancer.experiment, nb_patterns: 2.0
+../iterations/1000x1000/1//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/1//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.2530510082566464
+    Empty model rss: 39014.8901063045
+    1 patterns done...
+    2 patterns done...
+============================
+21 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/3/output/co1/experiments/cancer.experiment, nb_patterns: 3.0
+../iterations/1000x1000/3//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3//tensors/numnoise/dataset-co1.fuzzy_tensor
+    Tensor density is: 0.3353057386230754
+    Empty model rss: 56208.98170410196
+    1 patterns done...
+    2 patterns done...
+    3 patterns done...
+============================
+22 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/3/output/co4/experiments/cancer.experiment, nb_patterns: 2.0
+../iterations/1000x1000/3//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3//tensors/numnoise/dataset-co4.fuzzy_tensor
+    Tensor density is: 0.17074457334265605
+    Empty model rss: 22571.315883189884
+    1 patterns done...
+    2 patterns done...
+============================
+23 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/3/output/co8/experiments/cancer.experiment, nb_patterns: 3.0
+../iterations/1000x1000/3//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3//tensors/numnoise/dataset-co8.fuzzy_tensor
+    Tensor density is: 0.10494691458782249
+    Empty model rss: 12129.266012215727
+    1 patterns done...
+    2 patterns done...
+    3 patterns done...
+============================
+24 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/3/output/co16/experiments/cancer.experiment, nb_patterns: 0.0
+../iterations/1000x1000/3//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3//tensors/numnoise/dataset-co16.fuzzy_tensor
+    Tensor density is: 0.06111669684809332
+    Empty model rss: 7639.140095291076
+============================
+25 cluster of 25:
+
+    Experiment: ../iterations/1000x1000/3/output/co2/experiments/cancer.experiment, nb_patterns: 2.0
+../iterations/1000x1000/3//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Dataset path: ../iterations/1000x1000/3//tensors/numnoise/dataset-co2.fuzzy_tensor
+    Tensor density is: 0.2531782765103777
+    Empty model rss: 39023.86877385579
+    1 patterns done...
+    2 patterns done...
+Creating plotting data
+Getting clusters of iteration 5
+Getting clusters of iteration 4
+Getting clusters of iteration 2
+Getting clusters of iteration 1
+Getting clusters of iteration 3
+Averaging 25 clusters
+Plotting pattern nb graph
+Plotting run time graph
+Plotting quality graph
+Plotting RSS Evolution graph
+/app/script/post_analysis/grapher.py:171: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`). Consider using `matplotlib.pyplot.close()`.
+  fig = plt.figure(figsize=(figure_width, figure_height))

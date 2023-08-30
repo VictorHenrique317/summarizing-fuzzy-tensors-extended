@@ -122,7 +122,7 @@ class Cancer(Algorithm):
         FileSystem.delete(temp_folder)
 
         Commands.execute(f"mv {self.experiment_path} {temp_experiment_path}")
-        Commands.execute(f"nclusterbox --os {temp_experiment_path} {dataset_path} -o {self.experiment_path}")
+        Commands.execute(f"../algorithms/nclusterbox/nclusterbox --os {temp_experiment_path} {dataset_path} -o {self.experiment_path}")
         Commands.execute(f"rm {temp_experiment_path}")
 
         self.__fixLog()
