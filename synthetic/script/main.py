@@ -8,7 +8,7 @@ from algorithm.nclusterbox_crisp import NclusterBoxCrisp
 
 controller = Controller(delete_post_analysis="y", 
                         calculate_metrics="y", 
-                        delete_iterations="n")
+                        delete_iterations="y")
 
 # ========================== ALGORITHMS USED ========================== #
 getf = Getf(controller)
