@@ -41,7 +41,8 @@ class RssEvolution:
 
     @staticmethod
     def calculateAverageRssEvolutionSize(log_groups) -> dict:  # twin logs from different iterations [[m_log, p_log], [m_log, p_log]]
-        average_rss_evolution_size = dict()  # {algorithm1: size, algorithm2: size}
+        # average_rss_evolution_size = dict()  # {algorithm1: size, algorithm2: size}
+        average_rss_evolution_size = dict()  # {algorithm1: [size1, size2]}
         nb_iterations = len(log_groups)
 
         for log_group in log_groups:
@@ -51,21 +52,41 @@ class RssEvolution:
 
                 # if "getf" in algorithm:
                 #     print(f"Log: {log.path}")
-                #     print(rss_evolution)
+                #     # print(rss_evolution)
 
                 if rss_evolution == 0:
                     continue
 
-                
-                average_size = average_rss_evolution_size.setdefault(algorithm, 0)
-                average_size += len(rss_evolution)
-                average_rss_evolution_size[algorithm] = average_size
+                sizes = average_rss_evolution_size.setdefault(algorithm, [])
+                sizes.append(len(rss_evolution))
+                average_rss_evolution_size[algorithm] = sizes
+                # average_size = average_rss_evolution_size.setdefault(algorithm, 0)
+                # average_size += len(rss_evolution)
+                # average_rss_evolution_size[algorithm] = average_size
+
+        # print(f"Rss evolution sizes: {average_rss_evolution_size}")
+        # only retain the minimum size, -1 to avoid null model rss
+        for algorithm, sizes in average_rss_evolution_size.items():
+            min_size = 1
+
+            # remove element with value 1 from the size list
+            sizes = [size for size in sizes if size != 1]
+
+            if len(sizes) > 0:
+                min_size = min(sizes) - 1 # -1 to avoid null model rss
+            
+            average_rss_evolution_size[algorithm] = min_size
+
+        # average_rss_evolution_size = {algorithm: min(sizes) - 1 for algorithm, sizes in average_rss_evolution_size.items()}
         
-        for algorithm, value in average_rss_evolution_size.items():
-            mean = value/nb_iterations
-            # if "getf" in algorithm:
-            #     print(f"Mean: {mean}")
-            average_rss_evolution_size[algorithm] = ceil(mean)
+        for algorithm, size in average_rss_evolution_size.items():
+            # mean = value/nb_iterations
+            # size = ceil(mean) - 1
+
+            if size <= 0:
+                size = 1
+
+            average_rss_evolution_size[algorithm] = size
 
         # print(f"Average rss evolution size: {average_rss_evolution_size}")
         return average_rss_evolution_size
@@ -141,7 +162,7 @@ class RssEvolution:
         for pattern in patterns:
             counter += 1
 
-            if counter > max_pattern_nb:
+            if counter > max_pattern_nb + 1:
                 break
 
             print(f"    {counter} patterns done...")
