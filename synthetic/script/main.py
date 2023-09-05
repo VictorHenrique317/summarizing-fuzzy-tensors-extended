@@ -19,5 +19,5 @@ nclusterboxcrisp = NclusterBoxCrisp(controller)
 triclusterbox = TriBiclusterBox(controller)
 # ========================== ALGORITHMS USED ========================== #
 
-# controller.initiateSession()
+controller.initiateSession()
 controller.initiatePostAnalysis()
