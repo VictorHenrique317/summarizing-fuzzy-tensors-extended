@@ -47,9 +47,12 @@ class CrispTranslator:
                     line = [float(character) for character in line.split(" ")]
                     density = line[-1]
                     density = 1 if density > 0.5 else 0
+                    if density == 0:
+                        continue
 
                     line = [f"{int(value)}" for value in line]
-                    line[-1] = f"{density}"
+                    line.pop()
+                    # line[-1] = f"{density}"
 
                     new_line = " ".join(line)
                     new_line += "\n"
