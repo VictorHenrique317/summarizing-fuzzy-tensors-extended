@@ -88,11 +88,14 @@ class Controller:
                     if algorithm.hasTimedOut(u):
                         continue
 
+                    print(f"Running {algorithm.name}...")
+
                     timedout = algorithm.run(u, observations, Configs.getParameter("timeout"))
-                    if timedout:
+                    if timedout is True:
                         algorithm.timedOut(u)
                         FileSystem.deleteUFromAllIterations(self.__current_configuration_name, u, algorithm.name)
-                    else:
+
+                    if timedout is False:
                         if algorithm.name not in self.__sorting_blacklist:
                             experiment = Experiment(algorithm.experiment_path, iteration, observations, u, dimension)
                             experiment.sortPatterns(self.current_dataset)

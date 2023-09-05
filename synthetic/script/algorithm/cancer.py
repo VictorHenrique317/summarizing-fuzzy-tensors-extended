@@ -86,7 +86,8 @@ class Cancer(Algorithm):
 
     def run(self, u, observations, timeout):
         if len(Configs.getParameter("dataset_size")) > 2:
-            return True
+            print("Cancer only works with 2D datasets, skipping...")
+            return None
 
         rank = Configs.getParameter("n_patterns")
 
