@@ -148,6 +148,10 @@ class AveragedLog():
                 averaged_attributes = averaged_algorithm_attributes.setdefault(algorithm, dict())
                 average_rss_evolution_size = average_rss_evolution_sizes.get(algorithm, 0)
 
+                # if "getf" in algorithm:
+                #     print("==> GETF")
+                #     print(log.path)
+
                 attributes = log.getAttributes()
                 for attribute, value in attributes.items(): # sum phase
                     if type(value) == list: # rss evolution

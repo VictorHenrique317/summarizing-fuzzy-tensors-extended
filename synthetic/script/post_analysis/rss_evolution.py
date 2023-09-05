@@ -1,3 +1,4 @@
+from math import ceil
 from typing import List
 
 from models.random_dataset import RandomDataset
@@ -13,6 +14,9 @@ class RssEvolution:
         final_list = [0 for i in range(0, average_rss_evolution_size)]
         max_list1_index = len(list1) - 1
         max_list2_index = len(list2) - 1
+        # print(f"Average rss evolution size: {average_rss_evolution_size}")
+        # print(f"list1: {list1}")
+        # print(f"list2: {list2}")
 
         for index in range(0, average_rss_evolution_size):
             if index <= max_list1_index:
@@ -32,6 +36,7 @@ class RssEvolution:
                 else:
                     final_list[index] += list2[-1]
 
+        # print(f"final_list: {final_list}\n")
         return final_list
 
     @staticmethod
@@ -41,17 +46,28 @@ class RssEvolution:
 
         for log_group in log_groups:
             for log in log_group:
+                algorithm = log.getAlgorithm()
                 rss_evolution = log.getAttributeValue(Attribute.RSS_EVOLUTION)
+
+                # if "getf" in algorithm:
+                #     print(f"Log: {log.path}")
+                #     print(rss_evolution)
 
                 if rss_evolution == 0:
                     continue
 
-                algorithm = log.getAlgorithm()
+                
                 average_size = average_rss_evolution_size.setdefault(algorithm, 0)
                 average_size += len(rss_evolution)
                 average_rss_evolution_size[algorithm] = average_size
+        
+        for algorithm, value in average_rss_evolution_size.items():
+            mean = value/nb_iterations
+            # if "getf" in algorithm:
+            #     print(f"Mean: {mean}")
+            average_rss_evolution_size[algorithm] = ceil(mean)
 
-        average_rss_evolution_size = {algorithm: round(value/nb_iterations) for algorithm, value in average_rss_evolution_size.items()}
+        # print(f"Average rss evolution size: {average_rss_evolution_size}")
         return average_rss_evolution_size
 
     @staticmethod
