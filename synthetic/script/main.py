@@ -7,7 +7,7 @@ from algorithm.nclusterbox_no_performance_imp import NclusterBoxNoPerformanceImp
 from algorithm.nclusterbox_crisp import NclusterBoxCrisp
 
 controller = Controller(delete_post_analysis="y", 
-                        calculate_metrics="n", 
+                        calculate_metrics="y", 
                         delete_iterations="n")
 
 # ========================== ALGORITHMS USED ========================== #
