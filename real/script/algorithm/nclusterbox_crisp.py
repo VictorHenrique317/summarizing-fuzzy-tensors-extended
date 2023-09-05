@@ -22,24 +22,24 @@ class NclusterBoxCrisp(Algorithm):
         with open(self.log_path, "r") as file:
             total_time = file.readlines()[-1]
 
-        # selection_time = None
-        # with open(self.log_path, "r") as file:
-        #     selection_time = file.readlines()[-2]
+        selection_time = None
+        with open(self.log_path, "r") as file:
+            selection_time = file.readlines()[-2]
 
         try:
             total_time = float(re.findall("(\d*\.\d*)s", total_time)[0])
         except IndexError:
             total_time = float(re.findall("(\d*)s", total_time)[0])
 
-        # match = re.findall("(\d*\.\d*)s", selection_time)
-        # if len(match) > 0:
-        #     selection_time = float(match[0])
-        #     print(f"Selection time: {selection_time}")
-        # else:
-        #     print("Selection time is negligible")
-        #     selection_time = 0
+        match = re.findall("(\d*\.\d*)s", selection_time)
+        if len(match) > 0:
+            selection_time = float(match[0])
+            print(f"Selection time: {selection_time}")
+        else:
+            print("Selection time is negligible")
+            selection_time = 0
 
-        # total_time -= selection_time
+        total_time += selection_time
         total_time = f"Total time: {total_time}s\n"
 
         memory = None

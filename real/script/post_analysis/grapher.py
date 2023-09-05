@@ -179,7 +179,9 @@ class Grapher():
                 continue
 
             y = list(y)[0]
-            x = [index + 1 for index, value in enumerate(y)]
+            # x = [index + 1 for index, value in enumerate(y)]
+            x = [index for index, value in enumerate(y)]
+
 
             if self.__isEmpty(x, y):  # algorithm not runned
                 continue
@@ -199,7 +201,7 @@ class Grapher():
             single_pattern = None
             custom_scatter = []
 
-            if len(y) == 1:  # scatter on the single pattern
+            if len(y) + 1 == 1:  # scatter on the single pattern
                 single_pattern = (1, y[0])
                 custom_scatter.append(single_pattern)
 

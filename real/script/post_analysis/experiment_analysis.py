@@ -55,7 +55,7 @@ class ExperimentAnalysis:
 
         # self.__normalizeQualities(experiment_clusters)
     def __setRssEvolutionForExperiment(self, experiment):
-        rss_evolution: List = RssEvolution.calculate(self.__dataset, experiment.getPatterns())
+        rss_evolution: List = RssEvolution.calculate(self.__dataset, experiment.getPatterns(), empty_model=True)
         rss_evolution = [item[0] for item in rss_evolution]
         experiment.getLog().writeAttribute("RssEvolution", rss_evolution)
 

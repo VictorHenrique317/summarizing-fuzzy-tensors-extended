@@ -36,7 +36,7 @@ class ExperimentAnalysis:
             print(f"\r{100 * counter / len(experiment_clusters): .2f}% done")
 
     def __setRssEvolutionForExperiment(self, experiment):
-        rss_evolution: List = RssEvolution.calculate(experiment.getDataset(), experiment.getPatterns())
+        rss_evolution: List = RssEvolution.calculate(experiment.getDataset(), experiment.getPatterns(), empty_model=True)
         rss_evolution = [item[0] for item in rss_evolution]
         experiment.getLog().writeAttribute("RssEvolution", rss_evolution)
 

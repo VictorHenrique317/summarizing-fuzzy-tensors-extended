@@ -5,6 +5,7 @@ from utils.commands import Commands
 from models.experiment import Experiment
 from base.configs import Configs
 import re
+import subprocess
 
 class NclusterBoxCrisp(Algorithm):
     def __init__(self, controller: Controller) -> None:
@@ -13,7 +14,9 @@ class NclusterBoxCrisp(Algorithm):
         self.__controller = controller
         self.__controller.addAlgorithm(self)
 
-    def __writeLog(self, elapsed_time):
+    def __writeLog(self, elapsed_time, times:str):
+        times = times.split("\n")
+
         nb_patterns = None
         with open(self.experiment_path) as file:
             nb_patterns = sum([1 for line in file])
@@ -22,24 +25,22 @@ class NclusterBoxCrisp(Algorithm):
         with open(self.log_path, "r") as file:
             total_time = file.readlines()[-1]
 
-        # selection_time = None
-        # with open(self.log_path, "r") as file:
-        #     selection_time = file.readlines()[-2]
+        selection_time = times[-2]
 
         try:
             total_time = float(re.findall("(\d*\.\d*)s", total_time)[0])
         except IndexError:
             total_time = float(re.findall("(\d*)s", total_time)[0])
 
-        # match = re.findall("(\d*\.\d*)s", selection_time)
-        # if len(match) > 0:
-        #     selection_time = float(match[0])
-        #     print(f"Selection time: {selection_time}")
-        # else:
-        #     print("Selection time is negligible")
-        #     selection_time = 0
+        match = re.findall("(\d*\.\d*)s", selection_time)
+        if len(match) > 0:
+            selection_time = float(match[0])
+            print(f"Selection time: {selection_time}")
+        else:
+            print("Selection time is negligible")
+            selection_time = 0
 
-        # total_time -= selection_time
+        total_time += selection_time
         total_time = f"Total time: {total_time}s\n"
 
         memory = None
@@ -97,14 +98,16 @@ class NclusterBoxCrisp(Algorithm):
         elapsed_time = end - start
 
         command = f"../algorithms/nclusterbox/nclusterbox --os {temp_experiment_path} {dataset_path} -o {self.experiment_path}"
-        Commands.execute(command)
+        # execute command and save its output to a string
+        times =  subprocess.check_output(f"{command}", shell=True, text=True).strip()
+
         Commands.execute(f"rm {temp_experiment_path}")
 
         if timedout is False:
             experiment = Experiment(self.experiment_path, self.__controller.current_iteration, observations, u,
                                     dimension)
             #self.__deleteEqualPatterns(experiment)
-            self.__writeLog(elapsed_time)
+            self.__writeLog(elapsed_time, times)
             pass
 
         return timedout

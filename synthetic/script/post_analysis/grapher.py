@@ -187,7 +187,8 @@ class Grapher:
                     continue
 
                 y = list(y)[0]
-                x = [index + 1 for index, value in enumerate(y)]
+                # x = [index + 1 for index, value in enumerate(y)]
+                x = [index for index, value in enumerate(y)]
 
                 if self.__isEmpty(x, y):  # algorithm not runned
                     continue
@@ -209,11 +210,11 @@ class Grapher:
                 single_pattern = None
                 elbow_point = Configs.getParameter("n_patterns")
                 custom_scatter = []
-                if len(y) >= elbow_point:  # scatter on the elbow point
+                if len(y) + 1 >= elbow_point:  # scatter on the elbow point
                     elbow_point = (elbow_point, y[elbow_point - 1])
                     custom_scatter.append(elbow_point)
 
-                elif len(y) == 1:  # scatter on the single pattern
+                elif len(y) + 1 == 1:  # scatter on the single pattern
                     single_pattern = (1, y[0])
                     custom_scatter.append(single_pattern)
 

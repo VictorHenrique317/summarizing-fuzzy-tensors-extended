@@ -115,8 +115,11 @@ class RssEvolution:
         return total_rss, counter
 
     @staticmethod
-    def calculate(dataset:RandomDataset, patterns:List[Pattern], max_pattern_nb=20):
+    def calculate(dataset:RandomDataset, patterns:List[Pattern], max_pattern_nb=20, empty_model=False):
         rss_evolution = [] # adicionando padrões da primeira linha a ultima
+        if empty_model:
+            rss_evolution.append((dataset.getEmptyModelRss(), 0))
+
         considerated_patterns = []
         counter = 0
         for pattern in patterns:
