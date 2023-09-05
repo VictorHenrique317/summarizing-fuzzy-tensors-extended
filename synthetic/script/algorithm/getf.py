@@ -103,5 +103,5 @@ class Getf(Algorithm):
             self.__createGetfFile()
         FileSystem.delete(temp_folder)
 
-        return timedout
+        return False
                 
