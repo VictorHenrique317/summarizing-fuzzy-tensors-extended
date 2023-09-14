@@ -290,3 +290,6 @@ class Grapher:
             self.__drawRssEvolutionGraphs(save, figure_width, figure_height, folder)
         else:
             self.__drawUDependentGraphs(save, figure_width, figure_height, folder)
+
+        trash_folder = f"{folder}/rss_evolutions"
+        os.system(f"rm -rf {trash_folder}")

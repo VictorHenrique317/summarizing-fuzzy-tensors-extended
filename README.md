@@ -1,73 +1,78 @@
 # Introduction
-This directory contains everything to rerun all the experiments described in the article "Summarizing Fuzzy Tensors with Sub-Tensors", presented at ACM SAC 2023.
+This directory contains everything to rerun all the experiments described in the article "Summarizing Boolean and fuzzy tensors with
+sub-tensors", published in Data Mining and Knowledge Discovery.
 
 ## Synthetic section
-The synthetic part of this project project (under synthetic/) aims to create a experimental environment to test and analyse different box clustering algorithms. With this code base it is possible to specify:
+The synthetic component of this project (located under synthetic/) is designed to establish an experimental environment for testing and analyzing various box clustering algorithms. 
 
-- Tensor size.
-- Timeout for algorithm execution.
-- Size of randomly planted patterns.
-- Number of randomly planted patterns.
-- Levels of noise that will be applied on the clean tensor.
-- Number of iterations.
+During each iteration, a tensor with randomly planted patterns is generated, and varying levels of noise are applied to this tensor. The specified set of algorithms is run on each noised tensor derived from the original “clean” tensor. This process is repeated in every iteration, with each iteration using a different clean tensor, thereby producing a unique set of noised tensors. All files generated during this phase are stored under `synthetic/iterations`.
 
-And then run the desired algorithms on these noised tensors. On each iteration one tensor with randomly planted patterns is created, and then different levels of noise are applied on the same tensor. The defined set of algorithms is executed on each noised tensor created from this "clean" one, every iteration repeats this process with a different clean tensor. 
-
-When the executions are finished the user can also extract and plot some metrics (RSS evolution, quality, execution time and number of found patterns) from the experiment files. The extracted (and plotted) data is an average across all iterations.
+Upon completion of the executions, various metrics are computed and stored in the `synthetic/post_analysis` directory. These metrics represent an average across all iterations.
 
 ## Real section
-The real part of this project project (under real/) aims to create a experimental environment to test and analyse different box clustering algorithms. With this code base it is possible to specify:
+The real component of this project is designed to establish an experimental environment for testing and analyzing various box clustering algorithms. Unlike the synthetic part, this section does not involve synthetic tensors, noise addition, or multiple iterations.
 
-- Timeout for algorithm execution.
+All files generated during this phase are stored under `real/iterations`, while the metrics are saved under `real/post_analysis`.
 
-Here only the timout time is configurable, as there is no synthetic tensor or noise adding. There is just one iteration and only the RSS evolution graphs are plotted, despite the other metrics also being generated. To take a look at the other metrics (after the algorithm is executed) go to real/iteration/{dataset_name}/output/u0.0/logs/{algorithm}.log, where: 
+## Speedup Section
+This section is dedicated to reproducing the speedup curves, which illustrate the performance enhancements achieved through multithreading. The generated plots are saved in the `speedup/plots` directory.
 
-- {dataset_name} is retweets for the 3D case and retweets-2d for the 2D case.
-- {algorithm} is the desired algorithm name.
+## Usage Instructions
+The two sections outlined in this document function independently. Any configurations or executions performed in one section will not affect the other. Docker is employed to simplify the replication of experiments, considering the extensive dependency list. 
 
-# How to use
-The two sections provided here are independent, configurations or/and executions made on one will not affect the other. To begin the experiments just run synthetic/script/main.py or real/script/main.py. The default configurations are the ones used in the article, the process can be slow so the default number of iterations is set to one on the synthetic section to facilitate reproduction (30 were done in the article).
+To execute the experiments, follow these steps:
 
-The experimental environment can be configured in synthetic/script/configs/configs.json and in real/script/configs/configs.json:
+1. Grant execution permissions to the bash scripts with the following command:
+```bash
+chmod a+x pull_images.sh build.sh synthetic/build.sh synthetic/run.sh real/build.sh real/run.sh
+```
+2. Download the necessary images from Docker Hub by executing:
+```bash
+./pull_images.sh
+```
+3. To reproduce the synthetic experiments run:
+```bash
+cd synthetic; ./run.sh; cd ..
+```
+4. To reproduce the real experiments run:
+```bash
+cd real; ./run.sh; cd ..
+```
+5. To reproduce the speedup curve run:
+```bash
+cd speedup; ./run.sh; cd ..
+```
 
-- configuration_name (synthetic-only): The name of this experimental environment, multiple environments can be defined by creating multiple configuration files. To do so just copy configs.json and paste on the same directory with a different name and configuration_name.
+# Customization
 
-- timeout: Maximum time allowed for EACH algorithm execution (in seconds).
+The default configuration is included in the container available on Docker Hub. However, it's possible to run configurations that differ from the default. The following sections will guide you on how to do this. Please note that after making any changes, you'll need to rebuild the container before executing the customized experiments. Detailed instructions on how to customize and rebuild each section are provided below.
 
-- dataset_size (synthetic-only): Size of the synthetic tensor.
+## Synthetic section customization
 
-- pattern_size (synthetic-only): Size of the synthetic patterns, all dimensions have equal size.
+The synthetic section allows you to specify:
 
-- n_patterns (synthetic-only): Number of randomly planted synthetic patterns.
+- dataset_size: The size of the tensor.
+- pattern_size: The size of randomly planted patterns, all dimensions have equal size.
+- n_patterns: The number of randomly planted patterns.
+- correct_obs: The levels of noise to be applied to the clean tensor. (Inverse cumulative beta distribution), the lower the noisier.
+- nb_iterations: The number of iterations.
 
-- correct_obs (synthetic-only): Levels of applied noise (Inverse cumulative beta distribution), the lower the noisier.
+All of these parameters can be modified in the configuration files located under `synthetic/script/configs/`. The default settings are consistent with those used in the article. Given the time-intensive nature of conducting 30 iterations, it's advisable to reduce the number of iterations if you're aiming for a quick review of the results.
 
-- nb_iterations (synthetic-only): Number of iterations.
+To choose the algorithms to be used, go to `synthetic/script/main.py` and comment or uncomment lines 14 to 19 as required. Experiments can be conducted by uncommenting line 22, while metric calculation and storage can be performed by uncommenting line 23. If you wish to disable either the 3D or 2D experiments, simply add the .off extension to the respective configuration file. For instance, to disable 3D experiments, rename `3d_configs.json` to `3d_configs.json.off`.
 
-To specify which algorithms to use go to synthetic/script/main.py or real/script/main.py and comment/uncomment lines 11 to 15. The experiments can be made by uncommenting line 18, and the data extraction/plotting can be made by uncommenting line 19.
+After customization you have to execute:
+```bash
+cd synthetic; ./build.sh; cd ..
+```
+To re-build de synthetic image.
 
-The graphs are saved under synthetic/post_analysis/{tensor_name}/ and real/post_analysis/{tensor_name}/. It's possible to customize the y axis range for each different metric by changing lines 119, 124, 129 and 135 in synthetic/script/base/controller.py.
+## Real section customization
 
-# Dependencies
+To select the algorithms to use, navigate to `synthetic/script/main.py` and comment or uncomment lines 14 to 19 as needed. Experiments can be conducted by uncommenting line 22, and metric calculation and storage can be performed by uncommenting line 23. If you want to disable all experiments on a specific tensor, you can do so by adding the .off extension to the corresponding configuration file. For example, if you want to disable experiments on the "retweets_2d" tensor, simply rename `retweets2d_configs.json` to `retweets2d_configs.json.off`.
 
-Depedencies for python3 can be installed via pip, these are:
-- numpy.
-- psutil.
-- scipy.
-- matplotlib.
-- sklearn.
-- pandas.
-
-Other:
-- libboost is required to compile NclusterBox and Tri/BiclusterBox.
-- R language and reticulate package is required to run GETF.
-- MATLAB is required to run Cancer.
-
-# Setting up
-The compiled programs are provided for quick reproduction, but it's source code is also available for manual compilation if necessary:
-
-- To compile NclusterBox and Tri/BiclusterBox execute "make" in synthetic/algorithms/nclusterbox, synthetic/algorithms/tribiclusterbox and in real/algorithms/nclusterbox, real/algorithms/tribiclusterbox.
-
-- To compile the programs to generate tensors and to add noise to them execute "make" in synthetic/algorithms/gennsets, synthetic/algorithms/num-noise and in real/algorithms/gennsets, real/algorithms/num-noise.
-
-It is necessary to give execution permission for the input readers (fiber-input and slice-input) in synthetic/algorithms/nclusterbox, synthetic/algorithms/tribiclusterbox and in real/algorithms/nclusterbox, real/algorithms/tribiclusterbox.
+After customization you have to execute:
+```bash
+cd real; ./build.sh; cd ..
+```
+To re-build de real image.
