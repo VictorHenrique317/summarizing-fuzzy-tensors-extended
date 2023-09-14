@@ -40,7 +40,6 @@ class Controller:
         self.current_crisp_dataset_path = None
         self.current_dataset_path = None
         self.initial_patterns_folder = None
-
         self.__skip_gennsets = False
         self.__calculate_rss_evolution = False
         self.__calculate_quality = False
