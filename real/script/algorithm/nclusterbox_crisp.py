@@ -1,3 +1,4 @@
+import subprocess
 from algorithm.algorithm import Algorithm
 from base.controller import Controller
 import time
@@ -13,7 +14,9 @@ class NclusterBoxCrisp(Algorithm):
         self.__controller = controller
         self.__controller.addAlgorithm(self)
 
-    def __writeLog(self, elapsed_time):
+    def __writeLog(self, elapsed_time, times:str):
+        times = times.split("\n")
+
         nb_patterns = None
         with open(self.experiment_path) as file:
             nb_patterns = sum([1 for line in file])
@@ -22,9 +25,7 @@ class NclusterBoxCrisp(Algorithm):
         with open(self.log_path, "r") as file:
             total_time = file.readlines()[-1]
 
-        selection_time = None
-        with open(self.log_path, "r") as file:
-            selection_time = file.readlines()[-2]
+        selection_time = times[-2]
 
         try:
             total_time = float(re.findall("(\d*\.\d*)s", total_time)[0])
@@ -74,6 +75,10 @@ class NclusterBoxCrisp(Algorithm):
     def run(self, u, timeout, boolean_tensor=False, custom_experiment_path=None, custom_log_path=None, 
             initial_patterns_nb=1000):
         
+        if Configs.getParameter("configuration_name") == "school":
+            print("Skipping nclusterboxcrisp school dataset ...")
+            return True
+        
         current_experiment = self.__controller.current_experiment
         current_iteration_folder = self.__controller.current_iteration_folder
         dimension = Configs.getDimensions()
@@ -99,13 +104,15 @@ class NclusterBoxCrisp(Algorithm):
         timedout = False
 
         command = f"../algorithms/nclusterbox/nclusterbox --os {temp_experiment_path} {dataset_path} -o {self.experiment_path}"
-        Commands.execute(command)
+        # execute command and save its output to a string
+        times =  subprocess.check_output(f"{command}", shell=True, text=True).strip()
+
         Commands.execute(f"rm {temp_experiment_path}")
 
         if timedout is False:
             experiment = Experiment(self.experiment_path, u, dimension, custom_log_path=custom_log_path)
             #self.__deleteEqualPatterns(experiment)
-            self.__writeLog(elapsed_time)
+            self.__writeLog(elapsed_time, times)
             pass
 
         return timedout

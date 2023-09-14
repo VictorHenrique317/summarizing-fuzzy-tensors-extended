@@ -87,6 +87,7 @@ class Getf(Algorithm):
 
         translated_tensor_path = f"{current_iteration_folder}/tensors/numpy/dataset-co{observations}.npy"
         self.experiment_path = f"{current_iteration_folder}/output/{current_experiment}/experiments/getf.experiment"
+        
         temp_folder = f"{current_iteration_folder}/output/{current_experiment}/experiments/temp"
         self.log_path = f"{current_iteration_folder}/output/{current_experiment}/logs/getf.log"
         

@@ -7,6 +7,8 @@ from utils.commands import Commands
 import os
 import re
 import numpy as np
+import docker
+
 class Cancer(Algorithm):
     def __init__(self, controller:Controller) -> None:
         super().__init__()
@@ -86,23 +88,39 @@ class Cancer(Algorithm):
         temp_base_folder = f"../iteration/{configuration_name}"
 
         translated_tensor_path = f"{self.__controller.base_dataset_path}.mat"
+        translated_tensor_path = re.sub("\.\./", "/app/", translated_tensor_path)
+
         self.experiment_path = f"../iteration/{configuration_name}/output/{current_experiment}/experiments/cancer.experiment"
         temp_folder = f"../iteration/{configuration_name}/output/{current_experiment}/experiments/temp"
         self.log_path = f"../iteration/{configuration_name}/output/{current_experiment}/logs/cancer.log"
 
-        command = f"/usr/bin/time -o {self.log_path} -f 'Memory (kb): %M' "
-        command += f"{matlab_folder}matlab -nodisplay -r 'cd(\"algorithm\"); "
-        command += f"cancer({rank},\"../{translated_tensor_path}\","
-        command += f"\"../{temp_base_folder}\","
-        command += f"\"{current_experiment}\");exit' | tail -n +11 "
+        current_iteration_folder = f"{self.__controller.current_iteration_folder}"
+        current_iteration_folder = re.sub("\.\./", "/app/", current_iteration_folder)
 
+        dataset_path = self.__controller.current_dataset_path
+
+        cancer_image = "victorhenrique5800/summarizing_fuzzy_tensors_extended_cancer"
+        volume = "summarizing_fuzzy_tensors_extended_real"
+        mount_path = "/app"
+        volumes = {f"{volume}": {'bind': mount_path, 'mode': 'rw'}}
+
+        command = f"docker run -v {volume}:{mount_path} {cancer_image} {rank} {translated_tensor_path} "
+        command += f"{current_iteration_folder} {current_experiment}"
         print(command)
-        timedout = Commands.executeWithTimeout(command, timeout)     
 
-        if timedout is False:
-            self.__createCancerFile()
-            
+        client = docker.from_env()
+        args = [f"{rank}", f"{translated_tensor_path}", f"{current_iteration_folder}", f"{current_experiment}"]
+        args[0] = str(int(args[0]))
+
+        container = client.containers.run(cancer_image, detach=False, volumes=volumes, command=args, user='root')
+        self.__createCancerFile()
+
         FileSystem.delete(temp_folder)
-        return timedout
+
+        # Commands.execute(f"mv {self.experiment_path} {temp_experiment_path}")
+        # Commands.execute(f"../algorithms/nclusterbox/nclusterbox --os {temp_experiment_path} {dataset_path} -o {self.experiment_path}")
+        # Commands.execute(f"rm {temp_experiment_path}")
+
+        return False
 
         

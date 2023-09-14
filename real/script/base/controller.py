@@ -5,6 +5,7 @@ from base.numpy_translator import NumpyTranslator
 from models.attribute import Attribute
 from base.crisp_translator import CrispTranslator
 from base.school_dataset import SchoolDataset
+from base.mat_translator import MatTranslator
 from utils.commands import Commands
 from post_analysis.grapher import Grapher
 from base.file_system import FileSystem
@@ -28,6 +29,7 @@ class Controller():
         self.__sorting_blacklist = ['nclusterbox', 'tribiclusterbox', 'nclusterboxnoperformanceimp', 'nclusterboxcrisp']
         # self.__sorting_blacklist = []
         self.__numpy_translator = NumpyTranslator(self)
+        self.__mat_translator = MatTranslator(self)
         #self.__crisp_translator = CrispTranslator(self)
 
         self.__current_iteration_number = None
@@ -67,6 +69,10 @@ class Controller():
         dimension = len(self.dataset.getDimension())
         if dimension == 3:
             self.__numpy_translator.run(self.dataset)
+        
+        if dimension == 2:
+            self.__mat_translator.run(self.dataset)
+
         self.current_iteration_folder = f"../iteration/{self.current_configuration_name}"
 
         u = 0.0
@@ -167,6 +173,16 @@ class Controller():
         print("Plotting RSS Evolution graph")
         grapher.setAttribute(Attribute.RSS_EVOLUTION)
         grapher.setYLimits(0, 30_000)
+        grapher.drawGraphs(post_analysis_folder, save)
+
+        print("Plotting pattern nb graph")
+        grapher.setAttribute(Attribute.PATTERN_NUMBER)
+        grapher.setYLimits(0.6, 2_000_000)
+        grapher.drawGraphs(post_analysis_folder, save)
+
+        print("Plotting run time graph")
+        grapher.setAttribute(Attribute.RUN_TIME)
+        grapher.setYLimits(1e-3, 3000)
         grapher.drawGraphs(post_analysis_folder, save)
 
     def initiatePostAnalysis(self, save=True):
