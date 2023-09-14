@@ -102,7 +102,6 @@ class TriBiclusterBox(Algorithm):
         end = time.time()
         elapsed_time = end - start
 
-        timedout = False
         elapsed_time = None
 
         if timedout is False:

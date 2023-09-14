@@ -1,4 +1,5 @@
 import json
+import os
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
@@ -158,15 +159,15 @@ class Grapher():
             algorithm_folder = f"{folder}/rss-evolutions"
             algorithm_runned = False
 
-            fig, ax = plt.subplots()
-            fig = plt.figure(figsize=(figure_width, figure_height))
-            xlabel = "Nb. of patterns"
-            y_label = "RSS"
-            title = f"Elbow analysis for {algorithm.lower().replace(' ', '-')}"
+            # fig, ax = plt.subplots()
+            # fig = plt.figure(figsize=(figure_width, figure_height))
+            # xlabel = "Nb. of patterns"
+            # y_label = "RSS"
+            # title = f"Elbow analysis for {algorithm.lower().replace(' ', '-')}"
 
-            filename = self.__attribute.value.lower().replace(" ", "-")
-            filename = f"{algorithm.lower()}-{filename}.png"
-            path = f"{algorithm_folder}/{filename}"
+            # filename = self.__attribute.value.lower().replace(" ", "-")
+            # filename = f"{algorithm.lower()}-{filename}.png"
+            # path = f"{algorithm_folder}/{filename}"
 
             self.__plotting_data.setAlgorithm(algorithm)
             self.__plotting_data.setAttribute(self.__attribute)
@@ -190,35 +191,35 @@ class Grapher():
                                         f"{algorithm.lower().replace(' ','')}-"
             self.__savePlottingData(x, y, folder, plotting_data_filename)
 
-            algorithm_runned = True
-            if algorithm.lower() == "getf":
-                x_ticks = [tick for tick in range(0, max(x) + 1, 20)]
-                x_ticks[0] = 1
-            else:
-                x_ticks = [tick for tick in range(0, max(x) + 1, 10)]
-                x_ticks[0] = 1
+            # algorithm_runned = True
+            # if algorithm.lower() == "getf":
+            #     x_ticks = [tick for tick in range(0, max(x) + 1, 20)]
+            #     x_ticks[0] = 1
+            # else:
+            #     x_ticks = [tick for tick in range(0, max(x) + 1, 10)]
+            #     x_ticks[0] = 1
 
-            single_pattern = None
-            custom_scatter = []
+            # single_pattern = None
+            # custom_scatter = []
 
-            if len(y) + 1 == 1:  # scatter on the single pattern
-                single_pattern = (1, y[0])
-                custom_scatter.append(single_pattern)
+            # if len(y) + 1 == 1:  # scatter on the single pattern
+            #     single_pattern = (1, y[0])
+            #     custom_scatter.append(single_pattern)
 
-            self.__configureCurve(x, y, algorithm, xlabel, y_label, title, scatter=False,
-                                  invert_x=False, custom_x_ticks=x_ticks, custom_scatter=custom_scatter)
+            # self.__configureCurve(x, y, algorithm, xlabel, y_label, title, scatter=False,
+                                #   invert_x=False, custom_x_ticks=x_ticks, custom_scatter=custom_scatter)
 
             if algorithm_runned is False:
                 continue
 
-            self.__saveGraph(save, fig, path)
+            # self.__saveGraph(save, fig, path)
 
-    def __drawNormalGraphs(self, save, figure_width, figure_height, folder): # ARRUMAR
-        fig, ax = plt.subplots()
-        fig = plt.figure(figsize=(figure_width, figure_height))
-        xlabel = ""
-        y_label = self.__attribute.value
-        title = f"{self.__attribute.value}"
+    def __drawNormalGraphs(self, save, figure_width, figure_height, folder):
+        # fig, ax = plt.subplots()
+        # fig = plt.figure(figsize=(figure_width, figure_height))
+        # xlabel = ""
+        # y_label = self.__attribute.value
+        # title = f"{self.__attribute.value}"
 
         for algorithm in Configs.getAlgorithms():
             self.__plotting_data.setAlgorithm(algorithm)
@@ -232,13 +233,13 @@ class Grapher():
                                         f"#{algorithm.lower().replace(' ','')}-"
             self.__savePlottingData(x, y, folder, plotting_data_filename)
 
-            self.__configureCurve(x, y, algorithm, xlabel, y_label, title)
+            # self.__configureCurve(x, y, algorithm, xlabel, y_label, title)
 
-        filename = self.__attribute.value.lower().replace(" ", "-")
-        filename = f"{filename}.png"
-        path = f"{folder}/{filename}"
+        # filename = self.__attribute.value.lower().replace(" ", "-")
+        # filename = f"{filename}.png"
+        # path = f"{folder}/{filename}"
 
-        self.__saveGraph(save, fig, path)
+        # self.__saveGraph(save, fig, path)
 
     def drawGraphs(self, folder, save):
         figure_width = 12
@@ -248,3 +249,6 @@ class Grapher():
             self.__drawRssEvolutionGraphs(save, figure_width, figure_height, folder)
         else:
             self.__drawNormalGraphs(save, figure_width, figure_height, folder)
+
+        trash_folder = f"{folder}/rss-evolutions"
+        os.system(f"rm -rf {trash_folder}")

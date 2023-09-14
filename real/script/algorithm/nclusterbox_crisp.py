@@ -75,6 +75,10 @@ class NclusterBoxCrisp(Algorithm):
     def run(self, u, timeout, boolean_tensor=False, custom_experiment_path=None, custom_log_path=None, 
             initial_patterns_nb=1000):
         
+        if Configs.getParameter("configuration_name") == "school":
+            print("Skipping nclusterboxcrisp school dataset ...")
+            return True
+        
         current_experiment = self.__controller.current_experiment
         current_iteration_folder = self.__controller.current_iteration_folder
         dimension = Configs.getDimensions()
