@@ -1,6 +1,7 @@
 # Introduction
 This directory contains everything to rerun all the experiments described in the article "Summarizing Boolean and fuzzy tensors with
-sub-tensors", published in Data Mining and Knowledge Discovery.
+sub-tensors", published in Data Mining and Knowledge Discovery. The repository containing the code is located at: [(https://github.com/VictorHenrique317/summarizing-fuzzy-tensors-extended)]
+
 
 ## Synthetic section
 The synthetic component of this project (located under synthetic/) is designed to establish an experimental environment for testing and analyzing various box clustering algorithms. 
