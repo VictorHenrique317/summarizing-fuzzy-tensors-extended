@@ -16,6 +16,10 @@ echo "Volume $VOLUME_NAME removed!"
 
 docker volume create $VOLUME_NAME
 echo -e "\n"
+
+# Run the container and enter its shell
+# CONTAINER_ID=$(docker run -it -v $VOLUME_NAME:/app $NAME:latest sh)
+
 docker run -it -v $VOLUME_NAME:/app $NAME:latest ./main.sh --rerun
 
 # Copying volume files to disk
