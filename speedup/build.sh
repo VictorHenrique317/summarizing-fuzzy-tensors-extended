@@ -1,4 +1,4 @@
-NAME="victorhenrique5800/summarizing_fuzzy_tensors_extended_speedup"
+NAME="victorhenrique5800/summarizing_fuzzy_tensors_extended_speedup_additional"
 
 # docker build -t $NAME $1 --no-cache .
 docker build -t $NAME $1 .

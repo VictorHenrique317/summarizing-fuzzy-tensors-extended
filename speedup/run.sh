@@ -1,6 +1,6 @@
 #!/bin/bash
 VOLUME_NAME="summarizing_fuzzy_tensors_extended_speedup"
-NAME="victorhenrique5800/summarizing_fuzzy_tensors_extended_speedup"
+NAME="victorhenrique5800/summarizing_fuzzy_tensors_extended_speedup_additional"
 
 # Unmounting and clearing volumes from the main image
 CONTAINERS=$(docker ps -a --filter volume=$VOLUME_NAME -q)

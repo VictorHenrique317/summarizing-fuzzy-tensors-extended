@@ -5,7 +5,7 @@ if [[ $1 == "--rerun" ]]; then
     rerun=true
 fi
 
-iterations=10
+iterations=1
 raw_perf_results_dir="raw-perf-results"
 formated_perf_results_dir="formated-perf-results"
 datasets="retweets-2d"
