@@ -63,6 +63,10 @@ class Log():
             if self.__algorithm == "nclusterbox":
                 if attribute == variants:
                     return translated_attribute
+                
+            if self.__algorithm == "nclusterboxsac":
+                if attribute == variants:
+                    return translated_attribute
 
             if self.__algorithm == "tribiclusterbox":
                 if attribute == variants:

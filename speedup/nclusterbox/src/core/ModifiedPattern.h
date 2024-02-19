@@ -11,6 +11,10 @@
 #ifndef MODIFIED_PATTERN_H_
 #define MODIFIED_PATTERN_H_
 
+#include <unordered_set>
+#include <mutex>
+#include <boost/container_hash/hash.hpp>
+
 #include "AbstractRoughTensor.h"
 
 enum NextStep { insert, erase, stop };
@@ -18,17 +22,12 @@ enum NextStep { insert, erase, stop };
 class ModifiedPattern
 {
  public:
-  ModifiedPattern();
+  static void modify();
+  static void grow();
 
-  void modify();
-  void grow();
-
-  void insertCandidateVariables();
-  void output() const;
-  unsigned int outputAndGetSizeOfOutput() const;
-
-  static void setContext(const AbstractRoughTensor* roughTensor, const bool isIntermediaryPatternsOutput);
-  static void clearAndFree();
+  static void setContext(const AbstractRoughTensor* roughTensor, const bool isEveryVisitedPatternStored);
+  static unsigned int getNbOfOutputPatterns();
+  static void insertCandidateVariables();
 
  private:
   vector<vector<unsigned int>> nSet;
@@ -41,16 +40,23 @@ class ModifiedPattern
   vector<vector<unsigned int>>::iterator bestDimensionIt;
   vector<int>::const_iterator bestSumIt;
 
-  // patternsToOutput is used if AbstractRoughTensor::isDirectOutput(), candidateVariables otherwise
-  vector<vector<vector<unsigned int>>> candidateVariables;
-  vector<pair<vector<vector<unsigned int>>, float>> patternsToOutput;
+  // if isEveryVisitedPatternStored && AbstractRoughTensor::isDirectOutput(), no container below is used, otherwise one single is used
+  vector<vector<vector<unsigned int>>> candidateVariables; // if isEveryVisitedPatternStored && !AbstractRoughTensor::isDirectOutput()
+  static unordered_set<vector<vector<unsigned int>>, boost::hash<vector<vector<unsigned int>>>> distinctCandidateVariables; // if !isEveryVisitedPatternStored
+
+  static unsigned int nbOfOutputPatterns;
+  static mutex candidateVariablesLock;
 
   static const AbstractRoughTensor* roughTensor;
-  static bool isIntermediaryPatternsOutput;
+  static bool isEveryVisitedPatternStored;
   static Trie tensor;
 
+  ModifiedPattern();
+  ~ModifiedPattern();
+
+  void doModify();
+  void doGrow();
   void init();
-  void initStep();
   void considerDimensionForNextModificationStep(const vector<vector<unsigned int>>::iterator dimensionIt, const vector<int>& sumsInDimension);
   void considerDimensionForNextGrowingStep(const vector<vector<unsigned int>>::iterator dimensionIt, const vector<int>& sumsInDimension, const vector<unsigned int>& firstNonInitialAndSubsequentInitial);
   bool doStep(); // returns whether to go on

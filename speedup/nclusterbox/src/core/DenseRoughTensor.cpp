@@ -19,10 +19,10 @@
 #include "DenseCrispTube.h"
 #include "DenseFuzzyTube.h"
 
-vector<pair<double, unsigned int>> zeroForEveryElementAndPushBackLastElement(const unsigned int nbOfElements, vector<unsigned int>& lastElements)
+template<typename T> vector<pair<T, unsigned int>> zeroForEveryElementAndPushBackLastElement(const unsigned int nbOfElements, vector<unsigned int>& lastElements)
 {
   lastElements.push_back(nbOfElements - 1);
-  vector<pair<double, unsigned int>> elementPositiveMembershipsInDimension;
+  vector<pair<T, unsigned int>> elementPositiveMembershipsInDimension;
   elementPositiveMembershipsInDimension.reserve(nbOfElements);
   unsigned int id = 0;
   do
@@ -33,18 +33,18 @@ vector<pair<double, unsigned int>> zeroForEveryElementAndPushBackLastElement(con
   return elementPositiveMembershipsInDimension;
 }
 
-void updateElementMemberships(const vector<unsigned int>& tuple, const double shiftedMembership, vector<vector<pair<double, unsigned int>>>& elementMemberships)
+vector<pair<double, unsigned int>> presences2Memberships(const vector<vector<pair<unsigned int, unsigned int>>>::const_iterator elementPresencesIt)
 {
-  vector<vector<pair<double, unsigned int>>>::iterator elementMembershipsInDimensionIt = elementMemberships.begin();
-  const vector<unsigned int>::const_iterator idEnd = tuple.end();
-  vector<unsigned int>::const_iterator idIt = tuple.begin();
-  (*elementMembershipsInDimensionIt)[*idIt].first += shiftedMembership;
-  ++idIt;
+  vector<pair<double, unsigned int>> elementMemberships;
+  elementMemberships.reserve(elementPresencesIt->size());
+  const vector<pair<unsigned int, unsigned int>>::const_iterator elementPresenceEnd = elementPresencesIt->end();
+  vector<pair<unsigned int, unsigned int>>::const_iterator elementPresenceIt = elementPresencesIt->begin();
   do
     {
-      (*++elementMembershipsInDimensionIt)[*idIt].first += shiftedMembership;
+      elementMemberships.emplace_back(*elementPresenceIt);
     }
-  while (++idIt != idEnd);
+  while (++elementPresenceIt != elementPresenceEnd);
+  return elementMemberships;
 }
 
 DenseRoughTensor::DenseRoughTensor(const char* tensorFileName, const char* inputDimensionSeparator, const char* inputElementSeparator, const bool isInput01, const bool isVerbose): shift(), memberships()
@@ -72,23 +72,23 @@ DenseRoughTensor::~DenseRoughTensor()
 void DenseRoughTensor::init(vector<FuzzyTuple>& fuzzyTuples)
 {
   nullModelRSS = 0;
-  // Inform ConcurrentPatternPool, responsible of computing the initial patterns, of the number of dimensions
-  ConcurrentPatternPool::setNbOfDimensions(ids2Labels.size());
   // Initialize tuple and positive/negative memberships of the elements
   vector<double> shiftedMemberships;
   unsigned long long nbOfTuples;
   vector<unsigned int> tuple;
   tuple.reserve(ids2Labels.size());
+  double minElementNegativeMembership;
   vector<vector<pair<double, unsigned int>>> elementPositiveMemberships;
   elementPositiveMemberships.reserve(ids2Labels.size());
-  double minElementNegativeMembership;
   if (Trie::is01)
     {
       // Consider a slice with every membership null to define minElementNegativeMembership and, consequently, unit, so that SparseCrispTube::getDefaultMembership() * area (with area the area of a slice) fits in an int (e.g., in Trie::increaseSumsOnHyperplanes)
       vector<vector<string>>::const_iterator labelsInDimensionIt = ids2Labels.begin();
       nbOfTuples = labelsInDimensionIt->size();
       unsigned int minCardinality = nbOfTuples;
-      elementPositiveMemberships.emplace_back(zeroForEveryElementAndPushBackLastElement(minCardinality, tuple));
+      vector<vector<pair<unsigned int, unsigned int>>> elementPresences;
+      elementPresences.reserve(ids2Labels.size());
+      elementPresences.emplace_back(zeroForEveryElementAndPushBackLastElement<unsigned int>(minCardinality, tuple));
       ++labelsInDimensionIt;
       const vector<vector<string>>::const_iterator labelsInDimensionEnd = ids2Labels.end();
       do
@@ -99,7 +99,7 @@ void DenseRoughTensor::init(vector<FuzzyTuple>& fuzzyTuples)
 	      minCardinality = nbOfElements;
 	    }
 	  nbOfTuples *= nbOfElements;
-	  elementPositiveMemberships.emplace_back(zeroForEveryElementAndPushBackLastElement(nbOfElements, tuple));
+	  elementPresences.emplace_back(zeroForEveryElementAndPushBackLastElement<unsigned int>(nbOfElements, tuple));
 	}
       while (++labelsInDimensionIt != labelsInDimensionEnd);
       shiftedMemberships.resize(nbOfTuples);
@@ -113,26 +113,36 @@ void DenseRoughTensor::init(vector<FuzzyTuple>& fuzzyTuples)
 	  // Comparing in the reverse order because the last ids are more likely to be different
 	  while (!equal(tuple.rbegin(), tuple.rend(), fuzzyTupleIt->getTuple().rbegin()))
 	    {
-	      *shiftedMembershipIt++ = updateNullModelRSSAndElementMembershipsAndAdvance(tuple, constantShift, elementPositiveMemberships);
+	      *shiftedMembershipIt++ = updateNullModelRSSAndElementMembershipsAndAdvance(tuple, constantShift, elementPresences);
 	    }
 	  ConcurrentPatternPool::addFuzzyTuple(tuple, fuzzyTupleIt->getMembership() + constantShift);
-	  *shiftedMembershipIt++ = updateNullModelRSSAndElementMembershipsAndAdvance(tuple, fuzzyTupleIt->getMembership() + constantShift, elementPositiveMemberships);
+	  *shiftedMembershipIt++ = updateNullModelRSSAndElementMembershipsAndAdvance(tuple, fuzzyTupleIt->getMembership() + constantShift, elementPresences);
 	}
       while (++fuzzyTupleIt != end);
       // fuzzyTupleIt->getTuple() is necessarily a vector of zero (first fuzzy tuple that was read): no more tuple
       // Comparing in the reverse order because the last ids are more likely to be different
       while (!equal(tuple.rbegin(), tuple.rend(), fuzzyTupleIt->getTuple().rbegin()))
 	{
-	  *shiftedMembershipIt++ = updateNullModelRSSAndElementMembershipsAndAdvance(tuple, constantShift, elementPositiveMemberships);
+	  *shiftedMembershipIt++ = updateNullModelRSSAndElementMembershipsAndAdvance(tuple, constantShift, elementPresences);
 	}
       *shiftedMembershipIt = fuzzyTupleIt->getMembership() + constantShift;
-      updateNullModelRSSAndElementMemberships(tuple, *shiftedMembershipIt, elementPositiveMemberships);
+      updateNullModelRSSAndElementMemberships(tuple, *shiftedMembershipIt, elementPresences);
+      // PERF: instead of coying the integer presences into double memberships, it would be better to use elementPresences all along, turning several functions template
+      const vector<vector<pair<unsigned int, unsigned int>>>::const_iterator elementPresencesEnd = elementPresences.end();
+      vector<vector<pair<unsigned int, unsigned int>>>::const_iterator elementPresencesIt = elementPresences.begin();
+      elementPositiveMemberships.emplace_back(presences2Memberships(elementPresencesIt));
+      ++elementPresencesIt;
+      do
+	{
+	  elementPositiveMemberships.emplace_back(presences2Memberships(elementPresencesIt));
+	}
+      while (++elementPresencesIt != elementPresencesEnd);
     }
   else
     {
       vector<vector<string>>::const_iterator labelsInDimensionIt = ids2Labels.begin();
       nbOfTuples = labelsInDimensionIt->size();
-      elementPositiveMemberships.emplace_back(zeroForEveryElementAndPushBackLastElement(nbOfTuples, tuple));
+      elementPositiveMemberships.emplace_back(zeroForEveryElementAndPushBackLastElement<double>(nbOfTuples, tuple));
       vector<vector<double>> elementNegativeMemberships;
       elementNegativeMemberships.reserve(ids2Labels.size());
       elementNegativeMemberships.emplace_back(nbOfTuples);
@@ -142,7 +152,7 @@ void DenseRoughTensor::init(vector<FuzzyTuple>& fuzzyTuples)
 	{
 	  const unsigned int nbOfElements = labelsInDimensionIt->size();
 	  nbOfTuples *= nbOfElements;
-	  elementPositiveMemberships.emplace_back(zeroForEveryElementAndPushBackLastElement(nbOfElements, tuple));
+	  elementPositiveMemberships.emplace_back(zeroForEveryElementAndPushBackLastElement<double>(nbOfElements, tuple));
 	  elementNegativeMemberships.emplace_back(nbOfElements);
 	}
       while (++labelsInDimensionIt != labelsInDimensionEnd);
@@ -239,9 +249,10 @@ void DenseRoughTensor::init(vector<FuzzyTuple>& fuzzyTuples)
     }
 }
 
-double DenseRoughTensor::updateNullModelRSSAndElementMembershipsAndAdvance(vector<unsigned int>& tuple, const double shiftedMembership, vector<vector<pair<double, unsigned int>>>& elementPositiveMemberships)
+double DenseRoughTensor::updateNullModelRSSAndElementMembershipsAndAdvance(vector<unsigned int>& tuple, const double shiftedMembership, vector<vector<pair<unsigned int, unsigned int>>>& elementPresences)
 {
-  updateNullModelRSSAndElementMemberships(tuple, shiftedMembership, elementPositiveMemberships);
+  // is01
+  updateNullModelRSSAndElementMemberships(tuple, shiftedMembership, elementPresences);
   // Advance tuple, big-endian-like
   vector<unsigned int>::reverse_iterator elementIt = tuple.rbegin();
   for (vector<vector<string>>::const_reverse_iterator labelsInDimensionReverseIt = ids2Labels.rbegin(); !*elementIt; ++labelsInDimensionReverseIt)
@@ -254,6 +265,7 @@ double DenseRoughTensor::updateNullModelRSSAndElementMembershipsAndAdvance(vecto
 
 double DenseRoughTensor::updateNullModelRSSAndElementMembershipsAndAdvance(vector<unsigned int>& tuple, const double shiftedMembership, vector<vector<pair<double, unsigned int>>>& elementPositiveMemberships, vector<vector<double>>& elementNegativeMemberships)
 {
+  // !is01
   updateNullModelRSSAndElementMemberships(tuple, shiftedMembership, elementPositiveMemberships, elementNegativeMemberships);
   // Advance tuple, big-endian-like
   vector<unsigned int>::reverse_iterator elementIt = tuple.rbegin();
@@ -265,21 +277,41 @@ double DenseRoughTensor::updateNullModelRSSAndElementMembershipsAndAdvance(vecto
   return shiftedMembership;
 }
 
-void DenseRoughTensor::updateNullModelRSSAndElementMemberships(const vector<unsigned int>& tuple, const double shiftedMembership, vector<vector<pair<double, unsigned int>>>& elementPositiveMemberships)
+void DenseRoughTensor::updateNullModelRSSAndElementMemberships(const vector<unsigned int>& tuple, const double shiftedMembership, vector<vector<pair<unsigned int, unsigned int>>>& elementPresences)
 {
+  // is01
   nullModelRSS += shiftedMembership * shiftedMembership; // the RSS of the null model on the tuples read so far
   if (shiftedMembership > 0)
     {
-      updateElementMemberships(tuple, shiftedMembership, elementPositiveMemberships);
+      vector<vector<pair<unsigned int, unsigned int>>>::iterator elementMembershipsInDimensionIt = elementPresences.begin();
+      const vector<unsigned int>::const_iterator idEnd = tuple.end();
+      vector<unsigned int>::const_iterator idIt = tuple.begin();
+      ++(*elementMembershipsInDimensionIt)[*idIt].first; // incrementing and not adding shiftedMembership because Trie::sumsOnPatternAndHyperplanes multiplies by unit (the product cannot overflow) before subtracting the shifts
+      ++idIt;
+      do
+	{
+	  ++(*++elementMembershipsInDimensionIt)[*idIt].first; // incrementing and not adding shiftedMembership because Trie::sumsOnPatternAndHyperplanes multiplies by unit (the product cannot overflow) before subtracting the shifts
+	}
+      while (++idIt != idEnd);
     }
 }
 
 void DenseRoughTensor::updateNullModelRSSAndElementMemberships(const vector<unsigned int>& tuple, const double shiftedMembership, vector<vector<pair<double, unsigned int>>>& elementPositiveMemberships, vector<vector<double>>& elementNegativeMemberships)
 {
+  // !is01
   nullModelRSS += shiftedMembership * shiftedMembership; // the RSS of the null model on the tuples read so far
   if (shiftedMembership > 0)
     {
-      updateElementMemberships(tuple, shiftedMembership, elementPositiveMemberships);
+      vector<vector<pair<double, unsigned int>>>::iterator elementMembershipsInDimensionIt = elementPositiveMemberships.begin();
+      const vector<unsigned int>::const_iterator idEnd = tuple.end();
+      vector<unsigned int>::const_iterator idIt = tuple.begin();
+      (*elementMembershipsInDimensionIt)[*idIt].first += shiftedMembership;
+      ++idIt;
+      do
+	{
+	  (*++elementMembershipsInDimensionIt)[*idIt].first += shiftedMembership;
+	}
+      while (++idIt != idEnd);
       return;
     }
   vector<vector<double>>::iterator elementNegativeMembershipsInDimensionIt = elementNegativeMemberships.begin();
@@ -312,7 +344,7 @@ void DenseRoughTensor::setNoSelection()
   memberships.shrink_to_fit();
 }
 
-TrieWithPrediction DenseRoughTensor::projectTensor(const unsigned int nbOfPatternsHavingAllElements)
+TrieWithPrediction DenseRoughTensor::projectTensor()
 {
   // Compute the offsets to access memberships from the non-updated cardinalities
   vector<unsigned int>::const_reverse_iterator cardinalityRIt = cardinalities.rbegin();
@@ -325,7 +357,7 @@ TrieWithPrediction DenseRoughTensor::projectTensor(const unsigned int nbOfPatter
       *offsetRIt = offset;
     }
   // Update cardinalities, ids2Labels and candidateVariables
-  const vector<vector<unsigned int>> newIds2OldIds = projectMetadata(nbOfPatternsHavingAllElements, false);
+  const vector<vector<unsigned int>> newIds2OldIds = projectMetadata(false);
   // Inform the shift of the new ids
   shift->setNewIds(newIds2OldIds);
   // Compute last tuple and nb of tuples, according to new cardinalities
@@ -367,7 +399,7 @@ TrieWithPrediction DenseRoughTensor::projectTensor(const unsigned int nbOfPatter
 	  elementPositiveMemberships[tuple.front()] += membership;
 	}
       rss += membership * membership;
-      if (--nbOfSelectedTuples == 0)
+      if (!--nbOfSelectedTuples)
 	{
 	  break;
 	}

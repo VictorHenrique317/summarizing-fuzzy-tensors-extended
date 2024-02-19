@@ -37,20 +37,21 @@ Parameters.h by uncommenting (respectively commenting) them:
 
 UPDATES_SUM makes nclusterbox update (rather than compute from
 scratch) the sums of the membership degrees on all elements after each
-addition/remotion step.  Use #define UPDATE_SUMS.
+addition/remotion step.  Define it.
 
-REMEMBER makes nclusterbox store or not (#define REMEMBER 0) every
-pattern that it visits, either in a hash set (#define REMEMBER 1) or
-in a homemade trie (#define REMEMBER 2) to avoid redundant computation
-if it is visited again.  Use #define REMEMBER 1.
+REMEMBER makes nclusterbox called without option --forget (or -f)
+store every visited pattern either in a hash set (#define REMEMBER 1)
+or in a trie (#define REMEMBER 2) to avoid redundant computation if it
+is visited again.  Use #define REMEMBER 1.
 
 VERBOSE_PARSER turns on the output (on the standard output) of
 information when the input data are parsed.
 
 DEBUG_MODIFY turns on the output (on the standard output) of
-information during the execution of nclusterbox --jobs 1.  This option
-may be enabled by who wishes to understand how nclusterbox modifies a
-small number of patterns.
+information during the modification of the patterns.  This option may
+be enabled by who wishes to understand how nclusterbox modifies a
+small number of patterns.  1 becomes the default argument of option
+--job.  More jobs scrambles the output.
 
 DEBUG_SELECT turns on the output (on the standard output) of
 information during the selection of the patterns.  This option may be

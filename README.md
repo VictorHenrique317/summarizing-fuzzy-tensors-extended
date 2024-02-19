@@ -60,7 +60,7 @@ The synthetic section allows you to specify:
 
 All of these parameters can be modified in the configuration files located under `synthetic/script/configs/`. The default settings are consistent with those used in the article. Given the time-intensive nature of conducting 30 iterations, it's advisable to reduce the number of iterations if you're aiming for a quick review of the results.
 
-To choose the algorithms to be used, go to `synthetic/script/main.py` and comment or uncomment lines 14 to 19 as required. Experiments can be conducted by uncommenting line 22, while metric calculation and storage can be performed by uncommenting line 23. If you wish to disable either the 3D or 2D experiments, simply add the .off extension to the respective configuration file. For instance, to disable 3D experiments, rename `3d_configs.json` to `3d_configs.json.off`.
+To choose the algorithms to be used, go to `synthetic/script/main.py` and comment or uncomment lines 15 to 21 as needed. Experiments can be conducted by uncommenting line 24, while metric calculation can be performed by uncommenting line 25. If you wish to disable either the 3D or 2D experiments, simply add the .off extension to the respective configuration file. For instance, to disable 3D experiments, rename `3d_configs.json` to `3d_configs.json.off`.
 
 After customization you have to execute:
 ```bash
@@ -70,7 +70,7 @@ To re-build de synthetic image.
 
 ## Real section customization
 
-To select the algorithms to use, navigate to `synthetic/script/main.py` and comment or uncomment lines 14 to 19 as needed. Experiments can be conducted by uncommenting line 22, and metric calculation and storage can be performed by uncommenting line 23. If you want to disable all experiments on a specific tensor, you can do so by adding the .off extension to the corresponding configuration file. For example, if you want to disable experiments on the "retweets_2d" tensor, simply rename `retweets2d_configs.json` to `retweets2d_configs.json.off`.
+To select the algorithms to use, navigate to `synthetic/script/main.py` and comment or uncomment lines 15 to 21 as needed. Experiments can be conducted by uncommenting line 24, and metric calculation and storage can be performed by uncommenting line 25. If you want to disable all experiments on a specific tensor, you can do so by adding the .off extension to the corresponding configuration file. For example, if you want to disable experiments on the "retweets_2d" tensor, simply rename `retweets2d_configs.json` to `retweets2d_configs.json.off`.
 
 After customization you have to execute:
 ```bash

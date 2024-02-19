@@ -160,7 +160,7 @@ void RankPatterns::output(const AbstractRoughTensor* roughTensor, const bool isR
 	{
 	  const unsigned int nbOfDigitsInNbOfCandidates = log10(candidateEnd - candidateBegin);
 	  candidateEnd = candidateBegin; // for printProgressionOnSTDIN to terminate
-	  cout << left << setw(nbOfDigitsInNbOfCandidates + 40) << "\rSelecting patterns: " + boost::lexical_cast<string>(selectionEnd - candidateBegin) + " patterns selected." << '\n';
+	  cout << left << setw(nbOfDigitsInNbOfCandidates + 40) << "\rSelecting patterns: " + boost::lexical_cast<string>(selectionEnd - candidateBegin) + " patterns selected.\n";
 	}
       else
 	{
@@ -198,13 +198,13 @@ void RankPatterns::output(const AbstractRoughTensor* roughTensor, const bool isR
 #endif
 }
 
-void RankPatterns::rank(const unsigned int nbOfCandidateVariablesHavingAllElements, AbstractRoughTensor* roughTensor, const float verboseStep, const int maxSelectionSize, const SelectionCriterion selectionCriterion, const bool isRSSPrinted)
+void RankPatterns::rank(AbstractRoughTensor* roughTensor, const float verboseStep, const unsigned int maxSelectionSize, const SelectionCriterion selectionCriterion, const bool isRSSPrinted)
 {
 #ifdef NB_OF_PATTERNS
 #ifdef GNUPLOT
-  cout << '\t' << AbstractRoughTensor::getCandidateVariables().size();
+  cout << '\t' << AbstractRoughTensor::candidateVariables.size();
 #else
-  cout << "Nb of patterns candidates for selection: " << AbstractRoughTensor::getCandidateVariables().size() << '\n';
+  cout << "Nb of patterns candidates for selection: " << AbstractRoughTensor::candidateVariables.size() << '\n';
 #endif
 #endif
   // Set RSS multiplier depending on the criterion (note that AbstractRoughTensor::getArea must be called before the projection of the tensor)
@@ -234,7 +234,7 @@ void RankPatterns::rank(const unsigned int nbOfCandidateVariablesHavingAllElemen
     {
       cout << "Reducing fuzzy tensor to elements in patterns ... " << flush;
     }
-  tensor = roughTensor->projectTensor(nbOfCandidateVariablesHavingAllElements);
+  tensor = roughTensor->projectTensor();
   if (verboseStep)
     {
       cout << "\rReducing fuzzy tensor to elements in patterns: " << AbstractRoughTensor::getArea() << " tuples.\n";
@@ -255,14 +255,15 @@ void RankPatterns::rank(const unsigned int nbOfCandidateVariablesHavingAllElemen
   maxRSSVariation = rssMultiplier * AbstractRoughTensor::getNullModelRSS();
   rssVariation = maxRSSVariation;
   {
-    vector<vector<vector<unsigned int>>>& raw = AbstractRoughTensor::getCandidateVariables();
-    candidates.reserve(raw.size());
-    for (vector<vector<unsigned int>>& pattern : raw)
+    const vector<vector<vector<unsigned int>>>::iterator patternEnd = AbstractRoughTensor::candidateVariables.end();
+    vector<vector<vector<unsigned int>>>::iterator patternIt = AbstractRoughTensor::candidateVariables.begin();
+    candidates.reserve(patternEnd - patternIt);
+    do
       {
-	const int density = tensor.density(pattern);
+	const int density = tensor.density(*patternIt);
 	if (density > 0)
 	  {
-	    candidates.emplace_back(pattern, density);
+	    candidates.emplace_back(*patternIt, density);
 	    if (candidates.back().getRSSVariation() < rssVariation)
 	      {
 		rssVariation = candidates.back().getRSSVariation();
@@ -270,8 +271,9 @@ void RankPatterns::rank(const unsigned int nbOfCandidateVariablesHavingAllElemen
 	      }
 	  }
       }
-    raw.clear();
-    raw.shrink_to_fit();
+    while (++patternIt != patternEnd);
+    AbstractRoughTensor::candidateVariables.clear();
+    AbstractRoughTensor::candidateVariables.shrink_to_fit();
   }
   candidateBegin = candidates.begin();
   selectionEnd = candidateBegin;
@@ -289,7 +291,7 @@ void RankPatterns::rank(const unsigned int nbOfCandidateVariablesHavingAllElemen
       cout << " to decrease the RSS the most, by " << static_cast<double>(-rssVariation) / AbstractRoughTensor::getUnit() / AbstractRoughTensor::getUnit() << " > " << static_cast<double>(-maxRSSVariation) / AbstractRoughTensor::getUnit() / AbstractRoughTensor::getUnit() << ", the minimum allowed\n";
       roughTensorForDebug = roughTensor;
 #endif
-      rssHistory.reserve(min(static_cast<int>(candidateEnd - selectionEnd), maxSelectionSize));
+      rssHistory.reserve(min(static_cast<unsigned int>(candidateEnd - selectionEnd), maxSelectionSize));
       rssHistory.push_back(AbstractRoughTensor::getNullModelRSS() + rssVariation);
       maxRSSVariation = rssMultiplier * rssHistory.back();
       swap(*selectionEnd, *selectedIt);

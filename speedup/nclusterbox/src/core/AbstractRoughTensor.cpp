@@ -9,6 +9,7 @@
 // You should have received a copy of the GNU General Public License along with nclusterbox.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <cmath>
+#include <iostream>
 
 #include "DenseRoughTensor.h"
 
@@ -29,6 +30,7 @@ vector<unsigned int> AbstractRoughTensor::external2InternalDimensionOrder;
 vector<vector<vector<unsigned int>>> AbstractRoughTensor::candidateVariables;
 bool AbstractRoughTensor::isPrintLambda;
 
+ostream AbstractRoughTensor::outputStream(nullptr);
 ofstream AbstractRoughTensor::outputFile;
 string AbstractRoughTensor::outputDimensionSeparator;
 string AbstractRoughTensor::outputElementSeparator;
@@ -50,7 +52,6 @@ steady_clock::time_point AbstractRoughTensor::shiftingBeginning;
 
 AbstractRoughTensor::~AbstractRoughTensor()
 {
-  outputFile.close();
 }
 
 void AbstractRoughTensor::printDimension(const vector<unsigned int>& dimension, const vector<string>& ids2LabelsInDimension, ostream& out)
@@ -114,14 +115,14 @@ void AbstractRoughTensor::printPattern(const vector<vector<unsigned int>>& nSet,
 
 void AbstractRoughTensor::output(const vector<vector<unsigned int>>& nSet, const float density) const
 {
-  printPattern(nSet, density, outputFile);
-  outputFile << '\n';
+  printPattern(nSet, density, outputStream);
+  outputStream << '\n';
 }
 
 void AbstractRoughTensor::output(const vector<vector<unsigned int>>& nSet, const float density, const double rss) const
 {
-  printPattern(nSet, density, outputFile);
-  outputFile << rssPrefix << rss / unit / unit << '\n';
+  printPattern(nSet, density, outputStream);
+  outputStream << rssPrefix << rss / unit / unit << '\n';
 }
 
 AbstractRoughTensor* AbstractRoughTensor::makeRoughTensor(vector<FuzzyTuple>& fuzzyTuples, const double densityThreshold, const double shift)
@@ -205,11 +206,17 @@ void AbstractRoughTensor::setOutput(const char* outputFileName, const char* outp
   isSizePrinted = isSizePrintedParam;
   isAreaPrinted = isAreaPrintedParam;
   isNoSelection = isNoSelectionParam;
+  if (string(outputFileName) == "-")
+    {
+      outputStream.rdbuf(cout.rdbuf());
+      return;
+    }
   outputFile.open(outputFileName);
   if (!outputFile)
     {
       throw NoOutputException(outputFileName);
     }
+  outputStream.rdbuf(outputFile.rdbuf());
 }
 
 int AbstractRoughTensor::getUnit()
@@ -235,11 +242,6 @@ const vector<vector<string>>& AbstractRoughTensor::getIds2Labels()
 const vector<unsigned int>& AbstractRoughTensor::getExternal2InternalDimensionOrder()
 {
   return external2InternalDimensionOrder;
-}
-
-unsigned int AbstractRoughTensor::getNbOfCandidateVariables()
-{
-  return candidateVariables.size();
 }
 
 unsigned long long AbstractRoughTensor::getArea()
@@ -398,6 +400,59 @@ void AbstractRoughTensor::setMetadataForDimension(const unsigned int dimensionId
   // Sparse tensor
   const unsigned int nbOfElements = ids2LabelsInDimension.size();
   // Computing positive and, for fuzzy tensors, negative memberships of the elements
+  if (Trie::is01)
+    {
+      // shifts not subtracted because Trie::sumsOnPatternAndHyperplanes multiplies by unit (the product cannot overflow) before subtracting the shifts
+      vector<pair<unsigned int, unsigned int>> elementPositiveMemberships;
+      elementPositiveMemberships.reserve(nbOfElements);
+      {
+	unsigned int id = 0;
+	do
+	  {
+	    elementPositiveMemberships.emplace_back(0, id);
+	  }
+	while (++id != nbOfElements);
+      }
+      const vector<FuzzyTuple>::iterator fuzzyTupleEnd = fuzzyTuples.end();
+      vector<FuzzyTuple>::iterator fuzzyTupleIt = fuzzyTuples.begin();
+      do
+	{
+	  ++elementPositiveMemberships[fuzzyTupleIt->getElementId(dimensionId)].first;
+	}
+      while (++fuzzyTupleIt != fuzzyTupleEnd);
+      fuzzyTupleIt = fuzzyTuples.begin();
+      sort(elementPositiveMemberships.begin(), elementPositiveMemberships.end(), [](const pair<double, unsigned int>& elementPositiveMembership1, const pair<unsigned int, unsigned int>& elementPositiveMembership2) {return elementPositiveMembership1.first < elementPositiveMembership2.first;});
+      if (elementPositiveMemberships.back().first > unitDenominator)
+	{
+	  unitDenominator = elementPositiveMemberships.back().first;
+	}
+      vector<unsigned int> mapping(nbOfElements);
+      {
+	vector<string> newIds2LabelsInDimension;
+	newIds2LabelsInDimension.reserve(nbOfElements);
+	{
+	  unsigned int newId = 0;
+	  vector<pair<unsigned int, unsigned int>>::const_iterator elementPositiveMembershipIt = elementPositiveMemberships.begin();
+	  do
+	    {
+	      newIds2LabelsInDimension.emplace_back(std::move(ids2LabelsInDimension[elementPositiveMembershipIt->second]));
+	      mapping[elementPositiveMembershipIt->second] = newId;
+	      ++elementPositiveMembershipIt;
+	    }
+	  while (++newId != nbOfElements);
+	}
+	ids2LabelsInDimension = std::move(newIds2LabelsInDimension);
+      }
+      // Remap the element of the fuzzyTuples accordingly
+      do
+	{
+	  unsigned int& elementId = fuzzyTupleIt->getElementId(dimensionId);
+	  elementId = mapping[elementId];
+	}
+      while (++fuzzyTupleIt != fuzzyTupleEnd);
+      return;
+    }
+  // !is01
   vector<pair<double, unsigned int>> elementPositiveMemberships;
   elementPositiveMemberships.reserve(nbOfElements);
   {
@@ -410,40 +465,28 @@ void AbstractRoughTensor::setMetadataForDimension(const unsigned int dimensionId
   }
   const vector<FuzzyTuple>::iterator fuzzyTupleEnd = fuzzyTuples.end();
   vector<FuzzyTuple>::iterator fuzzyTupleIt = fuzzyTuples.begin();
-  if (Trie::is01)
+  vector<double> elementNegativeMemberships(nbOfElements, shift * (area / nbOfElements)); // assumes every membership null and correct that in the loop below
+  do
     {
-      const double oneMinusShift = 1. - shift;
-      do
+      const unsigned int elementId = fuzzyTupleIt->getElementId(dimensionId);
+      const double membership = fuzzyTupleIt->getMembership();
+      if (membership > 0)
 	{
-	  elementPositiveMemberships[fuzzyTupleIt->getElementId(dimensionId)].first += oneMinusShift;
+	  elementPositiveMemberships[elementId].first += membership;
+	  elementNegativeMemberships[elementId] -= shift;
 	}
-      while (++fuzzyTupleIt != fuzzyTupleEnd);
-    }
-  else
-    {
-      vector<double> elementNegativeMemberships(nbOfElements, shift * (area / nbOfElements)); // assumes every membership null and correct that in the loop below
-      do
+      else
 	{
-	  const unsigned int elementId = fuzzyTupleIt->getElementId(dimensionId);
-	  const double membership = fuzzyTupleIt->getMembership();
-	  if (membership > 0)
-	    {
-	      elementPositiveMemberships[elementId].first += membership;
-	      elementNegativeMemberships[elementId] -= shift;
-	    }
-	  else
-	    {
-	      elementNegativeMemberships[elementId] -= membership + shift;
-	    }
-	}
-      while (++fuzzyTupleIt != fuzzyTupleEnd);
-      const double maxNegativeMembership = *max_element(elementNegativeMemberships.begin(), elementNegativeMemberships.end());
-      if (maxNegativeMembership > unitDenominator)
-	{
-	  unitDenominator = maxNegativeMembership;
+	  elementNegativeMemberships[elementId] -= membership + shift;
 	}
     }
+  while (++fuzzyTupleIt != fuzzyTupleEnd);
   fuzzyTupleIt = fuzzyTuples.begin();
+  const double maxNegativeMembership = *max_element(elementNegativeMemberships.begin(), elementNegativeMemberships.end());
+  if (maxNegativeMembership > unitDenominator)
+    {
+      unitDenominator = maxNegativeMembership;
+    }
   sort(elementPositiveMemberships.begin(), elementPositiveMemberships.end(), [](const pair<double, unsigned int>& elementPositiveMembership1, const pair<double, unsigned int>& elementPositiveMembership2) {return elementPositiveMembership1.first < elementPositiveMembership2.first;});
   if (elementPositiveMemberships.back().first > unitDenominator)
     {
@@ -494,7 +537,7 @@ void AbstractRoughTensor::setMetadata(vector<FuzzyTuple>& fuzzyTuples, const dou
 	}
       while (++fuzzyTupleIt != fuzzyTupleEnd);
       unitDenominator = unitDenominatorGivenNullModelRSS();
-      const double maxElementNegativeMembership = shift * (area / cardinalities.back());
+      const double maxElementNegativeMembership = shift * (area / cardinalities.front());
       if (maxElementNegativeMembership > unitDenominator)
 	{
 	  unitDenominator = maxElementNegativeMembership;
@@ -523,7 +566,6 @@ void AbstractRoughTensor::setMetadata(vector<FuzzyTuple>& fuzzyTuples, const dou
 	setMetadataForDimension(dimensionId, area, shift, unitDenominator, *++ids2LabelsInDimensionIt, fuzzyTuples);
       }
     while (++dimensionId != n);
-    ConcurrentPatternPool::setNbOfDimensions(n);
   }
   // Reorder fuzzy tuples, according to the new dimension order
   do
@@ -543,10 +585,9 @@ void AbstractRoughTensor::setMetadataForDimension(vector<pair<double, unsigned i
 {
   // Dense tensor
   sort(elementPositiveMembershipsInDimension.begin(), elementPositiveMembershipsInDimension.end(), [](const pair<double, unsigned int>& elementPositiveMembership1, const pair<double, unsigned int>& elementPositiveMembership2) {return elementPositiveMembership1.first < elementPositiveMembership2.first;});
-  const unsigned int nbOfElements = ids2LabelsInDimension.size();
   // Computing the new ids, in increasing order of the positive membership (for faster lower_bound in SparseFuzzyTube::sumOnSlice and to choose the element with the greatest membership in case of equality) and reorder ids2LabelsInDimension accordingly
   vector<string> newIds2LabelsInDimension;
-  newIds2LabelsInDimension.reserve(nbOfElements);
+  newIds2LabelsInDimension.reserve(ids2LabelsInDimension.size());
   const vector<pair<double, unsigned int>>::const_iterator elementPositiveMembershipEnd = elementPositiveMembershipsInDimension.end();
   vector<pair<double, unsigned int>>::const_iterator elementPositiveMembershipIt = elementPositiveMembershipsInDimension.begin();
   do
@@ -586,12 +627,12 @@ void AbstractRoughTensor::setMetadata(vector<vector<pair<double, unsigned int>>>
   setUnit(static_cast<double>(numeric_limits<int>::max()) / unitDenominator);
 }
 
-void AbstractRoughTensor::projectMetadataForDimension(const unsigned int internalDimensionId, const unsigned int nbOfPatternsHavingAllElements, const bool isReturningOld2New, vector<string>& ids2LabelsInDimension, vector<unsigned int>& newIds2OldIdsInDimension)
+void AbstractRoughTensor::projectMetadataForDimension(const unsigned int internalDimensionId, const bool isReturningOld2New, vector<string>& ids2LabelsInDimension, vector<unsigned int>& newIds2OldIdsInDimension)
 {
   unsigned int& cardinality = cardinalities[internalDimensionId];
   dynamic_bitset<> elementsInDimension(cardinality);
   const vector<vector<vector<unsigned int>>>::const_iterator end = candidateVariables.end();
-  vector<vector<vector<unsigned int>>>::const_iterator patternIt = end - nbOfPatternsHavingAllElements;
+  vector<vector<vector<unsigned int>>>::const_iterator patternIt = candidateVariables.begin();
   do
     {
       const vector<unsigned int>::const_iterator idEnd = (*patternIt)[internalDimensionId].end();
@@ -648,31 +689,21 @@ void AbstractRoughTensor::projectMetadataForDimension(const unsigned int interna
     }
 }
 
-vector<vector<unsigned int>> AbstractRoughTensor::projectMetadata(const unsigned int nbOfPatternsHavingAllElements, const bool isReturningOld2New)
+vector<vector<unsigned int>> AbstractRoughTensor::projectMetadata(const bool isReturningOld2New)
 {
   // Compute new cardinalities, new ids and rewrite ids2Labels and candidateVariables accordingly
   vector<vector<string>>::iterator ids2LabelsIt = ids2Labels.begin();
   vector<vector<unsigned int>> idMapping(external2InternalDimensionOrder.size());
   const vector<unsigned int>::const_iterator internalDimensionIdEnd = external2InternalDimensionOrder.end();
   vector<unsigned int>::const_iterator internalDimensionIdIt = external2InternalDimensionOrder.begin();
-  projectMetadataForDimension(*internalDimensionIdIt, nbOfPatternsHavingAllElements, isReturningOld2New, *ids2LabelsIt, idMapping[*internalDimensionIdIt]);
+  projectMetadataForDimension(*internalDimensionIdIt, isReturningOld2New, *ids2LabelsIt, idMapping[*internalDimensionIdIt]);
   ++internalDimensionIdIt;
   do
     {
-      projectMetadataForDimension(*internalDimensionIdIt, nbOfPatternsHavingAllElements, isReturningOld2New, *++ids2LabelsIt, idMapping[*internalDimensionIdIt]);
+      projectMetadataForDimension(*internalDimensionIdIt, isReturningOld2New, *++ids2LabelsIt, idMapping[*internalDimensionIdIt]);
     }
   while (++internalDimensionIdIt != internalDimensionIdEnd);
   return idMapping;
-}
-
-void AbstractRoughTensor::insertCandidateVariables(vector<vector<vector<unsigned int>>>& additionalCandidateVariables)
-{
-  std::move(additionalCandidateVariables.begin(), additionalCandidateVariables.end(), back_inserter(candidateVariables));
-}
-
-vector<vector<vector<unsigned int>>>& AbstractRoughTensor::getCandidateVariables()
-{
-  return candidateVariables;
 }
 
 double AbstractRoughTensor::getNullModelRSS()

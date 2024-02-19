@@ -43,11 +43,12 @@ class Grapher:
         tribiclusterbox = algorithms[3]
         nclusterboxminussect51 = algorithms[4]
         nclusterbox_crisp = algorithms[5]
+        nclusterbox_sac = algorithms[6]
         planted_patterns_number = "Number of planted patterns"
 
         self.__curves = {getf: "darkgreen", planted_patterns_number: "orange", nclusterbox: "blue",
                          cancer: "lime", tribiclusterbox: "red", nclusterboxminussect51: "slateblue",
-                         nclusterbox_crisp: "deepskyblue" 
+                         nclusterbox_crisp: "deepskyblue", nclusterbox_sac: "black"
                         }
 
         self.__u_curves = {0.0: "deepskyblue", 0.6: "deepskyblue", 0.7: "blue", 0.8: "black"}
@@ -210,13 +211,13 @@ class Grapher:
                 single_pattern = None
                 elbow_point = Configs.getParameter("n_patterns")
                 custom_scatter = []
-                if len(y) + 1 >= elbow_point:  # scatter on the elbow point
-                    elbow_point = (elbow_point, y[elbow_point - 1])
-                    custom_scatter.append(elbow_point)
+                # if len(y) + 1 >= elbow_point:  # scatter on the elbow point
+                #     elbow_point = (elbow_point, y[elbow_point - 1])
+                #     custom_scatter.append(elbow_point)
 
-                elif len(y) + 1 == 1:  # scatter on the single pattern
-                    single_pattern = (1, y[0])
-                    custom_scatter.append(single_pattern)
+                # elif len(y) + 1 == 1:  # scatter on the single pattern
+                #     single_pattern = (1, y[0])
+                #     custom_scatter.append(single_pattern)
 
                 self.__configureCurve(x, y, algorithm, u, xlabel, y_label, title, "u", scatter=False,
                                         invert_x=False, custom_x_ticks=x_ticks, custom_scatter=custom_scatter)

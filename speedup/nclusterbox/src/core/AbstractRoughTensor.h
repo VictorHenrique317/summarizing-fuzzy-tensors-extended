@@ -12,7 +12,7 @@
 #define ABSTRACT_ROUGH_TENSOR_H_
 
 #include <string>
-#include <iostream>
+#include <fstream>
 
 #include "../../Parameters.h"
 #include "FuzzyTuple.h"
@@ -28,11 +28,13 @@ using namespace std::chrono;
 class AbstractRoughTensor
 {
  public:
+  static vector<vector<vector<unsigned int>>> candidateVariables;
+
   virtual ~AbstractRoughTensor();
 
   virtual void setNoSelection() = 0;
   virtual Trie getTensor() const = 0;
-  virtual TrieWithPrediction projectTensor(const unsigned int nbOfPatternsHavingAllElements) = 0;
+  virtual TrieWithPrediction projectTensor() = 0;
   virtual double getAverageShift(const vector<vector<unsigned int>>& nSet) const = 0;
 
   void printPattern(const vector<vector<unsigned int>>& nSet, const float density, ostream& out) const;
@@ -48,10 +50,7 @@ class AbstractRoughTensor
   static const vector<unsigned int>& getCardinalities();
   static const vector<vector<string>>& getIds2Labels();
   static const vector<unsigned int>& getExternal2InternalDimensionOrder();
-  static unsigned int getNbOfCandidateVariables();
   static unsigned long long getArea();
-  static void insertCandidateVariables(vector<vector<vector<unsigned int>>>& additionalCandidateVariables);
-  static vector<vector<vector<unsigned int>>>& getCandidateVariables();
   static double getNullModelRSS();
 
 #if defined DEBUG_MODIFY || defined ASSERT
@@ -76,9 +75,10 @@ class AbstractRoughTensor
   static void orderDimensionsAndSetExternal2InternalDimensionOrderAndCardinalities();
   static void setMetadata(vector<FuzzyTuple>& fuzzyTuples, const double shift);
   static void setMetadata(vector<vector<pair<double, unsigned int>>>& elementPositiveMemberships, const double maxNegativeMembership); /* the inner vectors of elementPositiveMemberships are reordered by increasing element membership, hence a mapping from new ids (the index) and old ids (the second component of the pairs) */
-  static vector<vector<unsigned int>> projectMetadata(const unsigned int nbOfPatternsHavingAllElements, const bool isReturningOld2New);
+  static vector<vector<unsigned int>> projectMetadata(const bool isReturningOld2New);
 
  private:
+  static ostream outputStream;
   static ofstream outputFile;
   static string outputDimensionSeparator;
   static string outputElementSeparator;
@@ -91,7 +91,6 @@ class AbstractRoughTensor
   static bool isPrintLambda;
   static bool isSizePrinted;
   static bool isAreaPrinted;
-  static vector<vector<vector<unsigned int>>> candidateVariables;
 
 #if defined TIME || defined DETAILED_TIME
   static steady_clock::time_point overallBeginning;
@@ -105,7 +104,7 @@ class AbstractRoughTensor
   static void printDimension(const vector<unsigned int>& dimension, const vector<string>& ids2LabelsInDimension, ostream& out);
   static void setMetadataForDimension(const unsigned int dimensionId, const unsigned long long area, const double shift, double& unitDenominator, vector<string>& ids2LabelsInDimension, vector<FuzzyTuple>& fuzzyTuples);
   static void setMetadataForDimension(vector<pair<double, unsigned int>>& elementPositiveMembershipsInDimension, double& unitDenominator, vector<string>& ids2LabelsInDimension);
-  static void projectMetadataForDimension(const unsigned int internalDimensionId, const unsigned int nbOfPatternsHavingAllElements, const bool isReturningOld2New, vector<string>& ids2LabelsInDimension, vector<unsigned int>& newIds2OldIdsInDimension);
+  static void projectMetadataForDimension(const unsigned int internalDimensionId, const bool isReturningOld2New, vector<string>& ids2LabelsInDimension, vector<unsigned int>& newIds2OldIdsInDimension);
 };
 
 #endif /*ABSTRACT_ROUGH_TENSOR_H_*/

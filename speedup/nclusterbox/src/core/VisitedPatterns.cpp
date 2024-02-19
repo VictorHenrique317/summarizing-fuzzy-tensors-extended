@@ -10,9 +10,8 @@
 
 #include "PresentVisitedPatternLeaf.h"
 
-#if REMEMBER != 0
-vector<unsigned int> VisitedPatterns::tupleOffsets;
 vector<unsigned int> VisitedPatterns::elementOffsets;
+vector<unsigned int> VisitedPatterns::tupleOffsets;
 
 VisitedPatterns::~VisitedPatterns()
 {
@@ -20,7 +19,7 @@ VisitedPatterns::~VisitedPatterns()
 
 #if REMEMBER == 1
 vector<pair<mutex, unordered_set<vector<unsigned int>, boost::hash<vector<unsigned int>>>>> VisitedPatterns::firstTuples;
-#else
+#else  // REMEMBER == 2
 VisitedPatterns VisitedPatterns::presentWithNoExtension;
 
 vector<pair<mutex, VisitedPatterns*>> VisitedPatterns::firstTuples;
@@ -61,7 +60,7 @@ void VisitedPatterns::init(const vector<unsigned int>& cardinalities)
     }
 #if REMEMBER == 1
   firstTuples = vector<pair<mutex, unordered_set<vector<unsigned int>, boost::hash<vector<unsigned int>>>>>(tupleOffsets.back());
-#else
+#else  // REMEMBER == 2
   firstTuples = vector<pair<mutex, VisitedPatterns*>>(tupleOffsets.back());
 #endif
 }
@@ -120,7 +119,7 @@ bool VisitedPatterns::visited(const vector<vector<unsigned int>>& nSet)
     }
   firstTuple.first.unlock();
   return true;
-#else
+#else  // REMEMBER == 2
   pair<mutex, VisitedPatterns*>& firstTuple = firstTuples[mostSurprisingTupleId];
   firstTuple.first.lock();
   if (firstTuple.second)
@@ -157,4 +156,3 @@ void VisitedPatterns::clear()
   firstTuples.clear();
   firstTuples.shrink_to_fit();
 }
-#endif

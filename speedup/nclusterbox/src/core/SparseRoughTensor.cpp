@@ -1,4 +1,4 @@
-// Copyright 2018-2022 Loïc Cerf (lcerf@dcc.ufmg.br)
+// Copyright 2018-2023 Loïc Cerf (lcerf@dcc.ufmg.br)
 
 // This file is part of nclusterbox.
 
@@ -52,10 +52,10 @@ void SparseRoughTensor::setNoSelection()
   fuzzyTuples.shrink_to_fit();
 }
 
-TrieWithPrediction SparseRoughTensor::projectTensor(const unsigned int nbOfPatternsHavingAllElements)
+TrieWithPrediction SparseRoughTensor::projectTensor()
 {
   // Update cardinalities, ids2Labels, candidateVariables, and fuzzyTuples
-  const vector<vector<unsigned int>> oldIds2NewIds = projectMetadata(nbOfPatternsHavingAllElements, true);
+  const vector<vector<unsigned int>> oldIds2NewIds = projectMetadata(true);
   vector<FuzzyTuple>::iterator fuzzyTupleEnd = fuzzyTuples.end();
   vector<FuzzyTuple>::iterator fuzzyTupleIt = fuzzyTuples.begin();
   do

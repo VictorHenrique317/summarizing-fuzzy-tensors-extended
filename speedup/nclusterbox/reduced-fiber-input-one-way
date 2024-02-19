@@ -71,16 +71,16 @@ END {
 	for (t in dim) {
             s = sum[t]
             if (s * s > min_g * area[t])
-	        print substr(dim[t], 2) FS t }
+	        print s * s / area[t] "\t" substr(dim[t], 2), t }
 	exit }
     for (t in dim) {
         s = sum[t]
         if (s * s > min_g * area[t]) {
 	    n = split(t, b)
-	    printf "%s", b[1]
+	    printf "%s", s * s / area[t] "\t" b[1]
 	    for (j = 2; j != i; ++j)
 	        printf "%s", FS b[j]
 	    printf "%s", FS substr(dim[t], 2)
 	    for (; j <= n; ++j)
 	        printf "%s", FS b[j]
-	    print "" } } }' "$1"
+	    print "" } } }' "$1" | sort -k 1,1nr | cut -f 2-

@@ -26,7 +26,7 @@ class Controller():
         self.dataset_folder = "../datasets"
         self.base_dataset_path = None
         self.algorithms = []
-        self.__sorting_blacklist = ['nclusterbox', 'tribiclusterbox', 'nclusterboxnoperformanceimp', 'nclusterboxcrisp']
+        self.__sorting_blacklist = ['nclusterbox', 'tribiclusterbox', 'nclusterboxnoperformanceimp', 'nclusterboxcrisp', 'nclusterboxsac']
         # self.__sorting_blacklist = []
         self.__numpy_translator = NumpyTranslator(self)
         self.__mat_translator = MatTranslator(self)

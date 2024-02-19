@@ -21,7 +21,7 @@ class Controller:
         self.calculate_metrics = calculate_metrics
 
         self.algorithms = []
-        self.__sorting_blacklist = ['nclusterbox', 'tribiclusterbox', 'nclusterboxnoperformanceimp', "nclusterboxcrisp"]
+        self.__sorting_blacklist = ['nclusterbox', 'tribiclusterbox', 'nclusterboxnoperformanceimp', "nclusterboxcrisp", "nclusterboxsac"]
         #self.__sorting_blacklist = []
         self.__configs_folder = "configs"
 
